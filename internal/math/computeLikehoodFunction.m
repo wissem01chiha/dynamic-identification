@@ -1,5 +1,0 @@
-function computeLikehoodFunction(varargin)
-%%
-%
-%
-end

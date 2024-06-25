@@ -1,0 +1,36 @@
+urdfFilePath: C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/gen3.urdf
+robot_params:
+  base_frame: world
+  tool_frame: bracelet_link
+  friction : maxwellSlip
+  has_joint_offset : True
+  stiffness: [0.25, 0.26, 0.369, 0.125, 0.258, 0.123, 0.11]
+  offset   : [3.92e-1, 1.37, 3.26e-1, -1.02e-1, -2.88e-2, 1.27e-1]
+identification:
+  dataFilePath : C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/data/kinova/identification_data/RunTrajectory1.csv
+  problem_params:
+    has_friction  : True
+    has_stiffness : True
+    has_backlash  : False
+    has_actuator_inertia : True
+    external_forces : False
+simulation:
+  time_step : 0.001
+  sampling_frequency : 1000
+  max_samples_num : 1940
+optimisation:
+  pso:
+    W  : 0.5
+    c1 : 0.8
+    c2 : 0.9 
+  cmaes:
+stiffness_params: [0.25, 0.26, 0.369, 0.125, 0.258, 0.123, 0.11] 
+friction_params:
+  maxwellSlip:
+    n: 3
+    k: [0.1, 1.2, 0.5] 
+    c: [1.2, 1.5, 0.3]
+  viscous:
+    Fc : [1.25, 1.25, 2.5, 3.36, 1.58, 2.58, 4.25]
+    Fs : [2.5, 1.26, 2.36, 1.2, 0.25, 1.25, 0.01]
+  lugre:
