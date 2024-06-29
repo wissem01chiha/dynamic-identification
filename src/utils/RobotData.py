@@ -72,7 +72,7 @@ class RobotData:
         self.duration = (len(self.time) - 1) * self.timeStep
         
     def LowPassfilter(self, cutoff_frequency):
-        """ """
+        """Filtring robot data using a butter low pass filter"""
         nyquist_freq = 0.5 * self.samplingRate
         normal_cutoff = cutoff_frequency / nyquist_freq
         b, a = butter(4, normal_cutoff, btype='low', analog=False)
@@ -130,7 +130,7 @@ class RobotData:
         plt.show()
         
     def plotCurrent(self)-> None:   
-        """ """ 
+        """Plot the joints current """ 
         sns.set(style="whitegrid")
         fig, axes = plt.subplots(3, 3, figsize=(10, 6))
         for i in range(7):
@@ -142,14 +142,3 @@ class RobotData:
         fig.suptitle('Joints Recorded Current', fontsize=11)
         fig.tight_layout(rect=[0, 0, 1, 0.95])
         plt.show()    
-        
-        
-   
-        
-        
-        
-        
-        
-#
-#robot_data.plotCurrent()
-#print(robot_data.duration)

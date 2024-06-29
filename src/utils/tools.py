@@ -1,8 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import logging
 import math
 import json
+import yaml
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def wrap2deg(angle):
     """Wrap angle to the interval [-180, 180] degrees."""
@@ -63,13 +68,24 @@ def matrix2Text(matrix, filename):
     except IOError:
         raise IOError(f'Cannot open or write to file: {filename}')
     
-def getYamlParams(robot, calib_data) -> dict:
+def yaml2dict(yamlFilePath) -> dict:
     """
-    Get parameter from the config yaml file and return a simoilar struct dictionary.
+    Get parameters from the config YAML file and return them as a 
+    dictionary.
+    
+    Args:
+        yamlFilePath (str): Path to the YAML file.
     """
-    dic={}
-    return dic
-
+    try:
+        with open(yamlFilePath, 'r') as file:
+            dic = yaml.safe_load(file)
+        return dic
+    except FileNotFoundError:
+        logger.error(f"Error: File '{yamlFilePath}' not found.")
+        return {}
+    except yaml.YAMLError as e:
+        logger.error(f"Error parsing YAML file '{yamlFilePath}': {e}")
+        return {}
 
 def plotArray(array: np.ndarray,title=None) -> None:
     """
@@ -171,11 +187,3 @@ def plot3Arrays(array1: np.ndarray, array2: np.ndarray, array3: np.ndarray,
     if title:
         fig.suptitle(title, fontsize=9)
     plt.tight_layout()
-   
-    
-    
-    
-    
-    
-    
- 

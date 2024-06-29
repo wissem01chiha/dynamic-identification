@@ -18,7 +18,7 @@ class LuGre:
         - z0 (float): Initial value of internal state z.
     """
 
-    def __init__(self, Fc, Fs, v,  sigma0, sigma1, sigma2,tspan,ts=0.001, tinit= 0, z0=0,vs=0.235,):
+    def __init__(self, Fc, Fs, v,  sigma0, sigma1, sigma2,tspan,ts=0.001, tinit= 0, z0=0.0001,vs=0.1235,):
         self.Fc = Fc
         self.Fs = Fs
         self.v = v
@@ -40,7 +40,7 @@ class LuGre:
         """
         t = np.arange(self.tinit, self.tspan + self.ts, self.ts)
         z = self.z0
-        F = np.empty_like(t)
+        F = np.zeros_like(t)
         for j in range(len(t)):
             F[j], z = self._luGre(z, self.v)
         return F

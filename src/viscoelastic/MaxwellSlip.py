@@ -35,7 +35,7 @@ class MaxwellSlip:
       self.sigma0 = sigma0
       self.samplingRate = samplingRate
       
-    def maxwell_equations(self, y, t):
+    def maxwell(self, y, t):
         dydt = np.zeros(2*self.n)   
         F = y[self.n:]
         for i in range(self.n):
@@ -52,6 +52,6 @@ class MaxwellSlip:
         timeSpan = (len(self.velocity) - 1) / self.samplingRate
         t = np.linspace(0, timeSpan, len(self.velocity))
         initial_conditions = np.zeros(2*self.n)
-        y = odeint(self.maxwell_equations, initial_conditions, t)
+        y = odeint(self.maxwell, initial_conditions, t)
         F = np.sum(y[:, self.n:], axis=1)
         return F

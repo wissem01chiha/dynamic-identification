@@ -1,41 +1,44 @@
 import numpy as np
-
+from utils import columnVector
 class Dahl:
     """
     Dahl friction Model class base definition.
+    The friction force is a hysteresis function, without memory of the x
     Args:
-        K: Stiffness coefficient
-        C: Damping coefficient
+        - sigma0: Constant coefficient
+        - Fs    : Stribeck force coefficient
     """
-    def __init__(self, K: float, C: float) -> None:
-        assert K is not None and K != 0, \
-            "Viscoelastic Engine: Stiffness coefficient K must be non-null float."
-        self.K = K   
-        self.C = C   
-        self.x = 0   
-        self.v = 0   
+    def __init__(self, sigma0, Fs, time_step=0.001) -> None:
+        assert sigma0 is not None and sigma0 != 0, \
+            "Viscoelastic Engine: coefficient sigma must be non-null float."
+        assert Fs is not None and Fs != 0, \
+            "Viscoelastic Engine: coefficient Fs must be non-null float."
+        self.sigma0    = sigma0 
+        self.Fs        = Fs     
+        self.time_step = time_step 
 
-    def computeFrictionForce(self, displacement: np.ndarray, velocity: np.ndarray) -> np.ndarray:
+    def computeFrictionForce(self, velocity:np.ndarray) -> np.ndarray:
         """
         Compute the friction force based on the Dahl model.
         
         Args:
-            displacement (np.ndarray): displacement values.
-            velocity (np.ndarray):     velocity values.
+            - velocity (np.ndarray): velocity values.
             
         Returns:
             np.ndarray: computed friction forces.
         """
-        friction_forces = np.zeros_like(displacement)
-        
-        for i in range(1, len(displacement)):
-            dx = displacement[i] - displacement[i-1]
-            dv = velocity[i] - velocity[i-1]
-            self.x += dx
-            self.v += dv
-            dF = self.K * np.sign(self.v) * (1 - np.abs(friction_forces[i-1] / self.K))
-            friction_forces[i] = friction_forces[i-1] + dF
-            
-            friction_forces[i] -= self.C * self.v
-
-        return friction_forces
+        time_span = (velocity.size-1)* self.time_step
+        t = np.linspace(0, time_span, velocity.size)
+        F = np.zeros_like(velocity)
+        dFdt = np.zeros_like(F)
+        for i in range(1,velocity.size):
+            dFdt[i] = self.dahl(F[i-1],velocity[i])
+            F[i] = dFdt[i] *self.time_step + F[i-1]
+        return F
+    
+    def dahl(self,F,v):
+        if v == 0:
+            dFdt = 0
+        else:
+            dFdt = self.sigma0 /v*(1- F/self.Fs*np.sign(v))
+        return dFdt

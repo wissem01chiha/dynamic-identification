@@ -1,2 +1,2 @@
 The /external sub-directory contains libraries, software package, and separte scripts that are housed alongside the 
-identification toolboox, it has different copyright ownership and licensing terms than the rest of the project.
+project, it has different copyright ownership and licensing terms than the rest of the code.

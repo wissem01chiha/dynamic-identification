@@ -1,5 +1,9 @@
-import numpy as np
+"""
+Math Module
+This module provides functions for various mathematical computations.
+"""
 import warnings
+import numpy as np
 
 def discreteTimeIntegral(vector, timeStep):
     """
@@ -18,16 +22,13 @@ def discreteTimeIntegral(vector, timeStep):
         warnings.warn("Warning: time step is too high: results may be inaccurate!", UserWarning)
     if timeStep < 1e-6:
         warnings.warn("Warning: time step is too small: results may be inaccurate!", UserWarning)
-    
     vector = np.asarray(vector)
     int_vector = np.zeros_like(vector)
-    
     for i in range(len(vector)):
         if i == 0:
             int_vector[i] = vector[i]
         else:
             int_vector[i] = int_vector[i - 1] + 2 * vector[i]
-    
     int_vector = (timeStep / 2) * int_vector
     return int_vector
 
@@ -49,9 +50,3 @@ def discreteTimeDerivative(ut, ut_1, dt):
     upt = (ut - ut_1) / dt
     return upt
 
-def disreacteRiccatiAlgebricEquation(A, B, C, D):
-    """
-    Solve the discrete time algebric riccati equation
-    """
-    R=1
-    return R

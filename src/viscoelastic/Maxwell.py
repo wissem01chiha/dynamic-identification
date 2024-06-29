@@ -2,7 +2,7 @@ import numpy as np
 
 class Maxwell:
     """
-    Maxwell Voight constact model calss.
+    Maxwell Voight constact model class.
      
     Args:
         - sigma0 
