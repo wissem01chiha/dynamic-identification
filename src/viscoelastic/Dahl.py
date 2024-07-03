@@ -1,5 +1,6 @@
 import numpy as np
 from utils import columnVector
+
 class Dahl:
     """
     Dahl friction Model class base definition.

@@ -2,7 +2,7 @@ import os
 import numpy as np
 import logging
 import pinocchio as pin
-from utils import discreteTimeIntegral, yaml2dict
+from utils import discreteTimeIntegral, yaml2dict, conditionNumber
 from viscoelastic import LuGre, MaxwellSlip, Dahl, computeViscousFrictionForce
 from models import BLDC
 
@@ -28,7 +28,7 @@ class Robot():
     def __init__(self,q=None,v=None,a=None,configFilePath=None)->None:
         
         if configFilePath ==None:
-            logger.warning("No configuration file provided using default.")
+            logger.warning("No configuration file provided using default file.")
  
         dir = os.path.dirname(os.path.abspath(__file__))
         configFilePath = os.path.join(os.path.dirname(os.path.dirname(dir)), 'exemple\\kinova\\config.yml')
@@ -77,14 +77,19 @@ class Robot():
         else:
             q = np.array(q)
             if q.size < self.model.nq:
-                q = np.pad(q, (0, self.model.nq - q.size), 'constant')
+                logger.error("configuation vector size should be equal to model varibles")
             elif q.size > self.model.nq:
-                raise ValueError("Position input vector maximum size is", self.model.nq)
-    
+                logger.error("Position input vector maximum size is", self.model.nq)
+        if np.isnan(q).any() or np.isinf(q).any():
+            logger.error("configuration array q has NAN or INF values.")
+            q = np.nan_to_num(q, nan=0.0, posinf=0.0, neginf=0.0)
         M = pin.crba(self.model, self.data, q)
-        if np.linalg.cond(M) < 1e-8:
+        if np.isnan(M).any() or np.isinf(M).any():
+            logger.error("mass matrix contain NAN or INF values.")
+            M = np.nan_to_num(M, nan=0.0, posinf=0.0, neginf=0.0)
+        if conditionNumber(M,1e-3):
             M = M + scaling * np.eye(np.shape(M)[0])
-        return M
+        return  M
     
     def computeGeneralizedTorques(self,q=None,qp=None,qpp=None,fext=None):
         """
@@ -125,6 +130,9 @@ class Robot():
             q =self.q
         if qp is  None:
             qp= self.v
+        if np.isnan(qp).any() or np.isinf(qp).any():
+            logger.error("qp array contain NAN or INF values.")
+            qp = np.nan_to_num(qp, nan=0.0, posinf=0.0, neginf=0.0)
         M_t = self.computeMassMatrix(q,scaling)
         C = np.zeros(np.shape(M_t))
         q_t_1 = discreteTimeIntegral(qp,timeStep)
@@ -254,6 +262,17 @@ class Robot():
                 tau_i = pin.rnea(self.model, self.data, q[t,:], qp[t,:], qpp[t,:], pinfext)
                 tau[t,:] = tau_i    
         return tau
+    
+    def computeInverseDynamics(self,x:np.ndarray):
+        """This function require the setup up of the joints tarjectory parmters previlouslly 
+        ie self.q, v and a should be puted in the trajectoy or it will use the default.
+        initlize the robot structure with the trajectory data from begin 
+        """
+        
+        tau = 0
+        return tau
+        
+        
         
     def genralizedInertiasParams(self):
         """
@@ -298,7 +317,7 @@ class Robot():
         """  
         Compute the manipulator Base inertial parameters 
         Returns
-        
+            base_params : numpy-ndarry 
         """
         base_params_vector = 1 
         return base_params_vector
@@ -308,6 +327,7 @@ class Robot():
         Update the robot friction parameters. 
         """   
         friction_type= self.params['robot_params']['friction']
+        
         if friction_type == 'viscous':
             assert new_params.size == 2* self.model.nq # vector of 14
             new_params = np.reshape(new_params,(2,self.model.nq))
@@ -353,12 +373,12 @@ class Robot():
         
     def computeActuatorTorques(self, q, qp, qpp):
         """
-        Estimates the joints motors torque vector.
+        Estimates the joints motors torque from position, velocity and acceleration. 
         Args:
-            - q:
-            - qp: 
+            - q: Joints position (Nsamples * ndof)
+            - qp: Joints velocity (Nsamples * ndof)
         Returns:
-            - tau_m : numpy.ndarry
+            - tau_m : numpy.ndarry (Nsamples *ndof)
         """
         tau_m = np.zeros_like(q)
         I = self.params['actuator_params']['inertia']
@@ -367,18 +387,24 @@ class Robot():
         for i in range(self.model.nq):
             motor_i = BLDC(I[i], kt[i], damping[i])
             tau_m[:,i] = motor_i.computeOutputTorque(q[:,i], qp[:,i], qpp[:,i])
-            
         return tau_m
     
-    def updateActuatorParams(self, new_params)->None:
+    def updateActuatorParams(self, new_params:np.ndarray)->None:
         """
         Updates the joints actuator parameters.
+        Bounds for torque and current (Tmax, Imax) are exclued from update.
         
         Args:
-        
+            new_params [kt, inertia, damping, Ta, Tb, Tck] (numpy-ndarry) 1 * 10.ndof
         """
-            
-    
+        n = self.model.nq 
+        assert new_params.size == 10 * n
+        self.params['actuator_params']['kt'] = new_params[0:n]
+        self.params['actuator_params']['inertia'] = new_params[n:2*n]
+        self.params['actuator_params']['damping'] = new_params[2*n:3*n]
+        self.params['actuator_params']['Ta'] = new_params[3*n:4*n]
+        self.params['actuator_params']['Tb'] = new_params[4*n:5*n]
+        self.params['actuator_params']['Tck'] = new_params[5*n:10*n].reshape((n, 5))
  
 
 

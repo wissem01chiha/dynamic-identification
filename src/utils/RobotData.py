@@ -31,9 +31,9 @@ class RobotData:
         self.time = dataTable.iloc[intIndex:fnlIndex:stepIndex, 0].to_numpy()
 
         self.velocity = dataTable.iloc[intIndex:fnlIndex:stepIndex, 8:15].to_numpy()
-        self.torque = dataTable.iloc[intIndex:fnlIndex:stepIndex, 22:28].to_numpy()      # torque_sm : torque recorded from torque sensor
+        self.torque = dataTable.iloc[intIndex:fnlIndex:stepIndex, 22:29].to_numpy()      # torque_sm : torque recorded from torque sensor
         self.torque_cur = dataTable.iloc[intIndex:fnlIndex:stepIndex, 29:35].to_numpy()  # torque    : recorded using current
-        self.torque_rne =  dataTable.iloc[intIndex:fnlIndex:stepIndex, 15:21].to_numpy() # torque    : from blast
+        self.torque_rne =  dataTable.iloc[intIndex:fnlIndex:stepIndex, 15:22].to_numpy() # torque    : from blast
         self.current = dataTable.iloc[intIndex:fnlIndex:stepIndex, 43:50].to_numpy()
         self.position = dataTable.iloc[intIndex:fnlIndex:stepIndex, 1:8].to_numpy()
         self.temperature = dataTable.iloc[intIndex:fnlIndex:stepIndex, 36:43].to_numpy()

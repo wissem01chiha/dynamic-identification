@@ -15,15 +15,15 @@ class Kalman:
         x0 (np.ndarray): Initial state estimate.
     """
     
-    def __init__(self, F, H, Q, R, P, x0):
+    def __init__(self, F, H, Q, R, P, x0, alpha=0.2, beta=1):
         self.F = F   
         self.H = H   
         self.Q = Q   
         self.R = R   
         self.P = P   
         self.x = x0 
-        self.alpha = 0.2 
-        self.beta = 1
+        self.alpha = alpha
+        self.beta = beta
 
     def predict(self):
         """Predict the state and error covariance for the next time step."""

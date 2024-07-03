@@ -12,16 +12,38 @@ class TestStateSpace(unittest.TestCase):
     
     def test_state_matrices_not_none(self):
         model = StateSpace()
-        A, B, C, D = model.computeStateMatrices(np.random.rand(7),np.random.rand(7))
+        A, B, C, D = model.computeStateMatrices(np.random.rand(14))
         self.assertIsNotNone(A)
         self.assertIsNotNone(B)
         self.assertIsNotNone(C)
         
     def test_state_matrices_shape(self):
         model = StateSpace()
-        A, B, C, D = model.computeStateMatrices(np.random.rand(7),np.random.rand(7))
+        A, B, C, D = model.computeStateMatrices(np.random.rand(14))
         self.assertEqual(A.shape, (14,14))
-
+        self.assertEqual(B.shape, (14,7))
+        self.assertEqual(C.shape, (7,14))
+        self.assertEqual(D.shape, (7,7))
+        
+    def test_update_state_vector(self):
+        model = StateSpace()
+        x_k_1 = model.updateStateVector(np.random.rand(14),np.random.rand(7))
+        self.assertIsNotNone(x_k_1)
+        self.assertEqual(x_k_1.size,14)
+        self.assertEqual(np.all(x_k_1.shape ==(14,)),True)
+        
+    def test_simulate(self):
+        model = StateSpace()
+        input_torques = 0.02*np.ones((20,7))
+        states = model.simulate(0.5*np.ones((14,)),input_torques,'gaussian', True)
+        self.assertIsNotNone(states)
+        self.assertEqual(states.shape,(14,20), True)
+        
+    def test_state_input_vector(self):
+        model = StateSpace()
+        
+        
+        
 
 if __name__ == "__main__":
     unittest.main() 

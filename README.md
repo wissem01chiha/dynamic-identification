@@ -8,8 +8,15 @@ Python code and datasets for the identification of state-dependent dynamic model
 ### Documentation
 see [documentation](docs/README.md) file.
 ### Examples
-Basic examples for [kinova Gen3-R07](https://www.kinovarobotics.com/uploads/User-Guide-Gen3-R07.pdf) robot can be found in the [examples](exemple/kinova/) directory..
+Basic examples for [kinova Gen3-R07](https://www.kinovarobotics.com/uploads/User-Guide-Gen3-R07.pdf) robot can be found in the [examples](exemple/kinova/) directory.
+### Prerequisites
+- CUDA Compilation Toolkit > 11
+- Python interpreter > 3.12
+- Conda > 4.5.0
 ### Installation 
+The computation of basic rigid body algorithms for the manipulator is done with [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/). For more information, refer to [Pinocchio's GitHub page](https://github.com/stack-of-tasks/pinocchio) or [pinocchio cheat sheet](docs/pinocchio_sheet.pdf).
+    
+
 create a new conda environment and install all the dependencies:  
 ```shell
 conda env create -f environment.yml

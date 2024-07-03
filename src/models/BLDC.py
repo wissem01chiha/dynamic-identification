@@ -44,7 +44,7 @@ class BLDC:
     def computeOutputTorque(self, Q_t, dQ_dt, d2Q_d2t):
         Td = self.J * d2Q_d2t + self.Kf * dQ_dt - self.Ta * np.sin(Q_t) - self.Tb * np.cos(Q_t)
         for j in range(1, len(self.Tck) + 1):
-            Td += self.Tck[j - 1] * np.cos(j * self.Q_t)
+            Td += self.Tck[j - 1] * np.cos(j * Q_t)
         return Td
     
     def computeArmatureCurrent(self,Q_t, dQ_dt, d2Q_d2t):

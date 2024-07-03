@@ -40,19 +40,19 @@ def checkSkewSymmetric(matrix):
 def struct2json(structData, filename):
     """Saves a Python dictionary to a JSON file."""
     if not isinstance(structData, dict):
-        raise ValueError('The first input argument must be a Python dictionary')
+        logger.error('The first input argument must be a Python dictionary')
     if not isinstance(filename, str) or filename == '':
-        raise ValueError('The second input argument must ba non-empty string representing the filename')
+        logger.error('The second input argument must ba non-empty string representing the filename')
     try:
         with open(filename, 'w') as file:
             json.dump(structData, file, indent=4)
     except IOError:
-        raise IOError(f'Could not create or open the file "{filename}" for writing')
+        logger.error(f'Could not create or open the file "{filename}" for writing')
 
 def columnVector(vec):
     """Convert a vector to a column vector."""
     if not np.ndim(vec) == 1:
-        raise ValueError("Input must be a vector.")
+        logger.error("Input must be a vector.")
     colVector = vec[:, np.newaxis]
     return colVector
 
@@ -66,7 +66,7 @@ def matrix2Text(matrix, filename):
                     file.write(f'  {matrix[i, j]}  ')
                 file.write('\n')
     except IOError:
-        raise IOError(f'Cannot open or write to file: {filename}')
+        logger.error(f'Cannot open or write to file: {filename}')
     
 def yaml2dict(yamlFilePath) -> dict:
     """
@@ -87,7 +87,7 @@ def yaml2dict(yamlFilePath) -> dict:
         logger.error(f"Error parsing YAML file '{yamlFilePath}': {e}")
         return {}
 
-def plotArray(array: np.ndarray,title=None) -> None:
+def plotArray(array: np.ndarray,title=None,ylabel = None) -> None:
     """
     Given an ( n * m )  data array where n >> m, plot each coloum data 
     in sperate subplots .
@@ -95,19 +95,31 @@ def plotArray(array: np.ndarray,title=None) -> None:
     Args:
         - array: numpy ndarray
     """
-    ndof = array.shape[1]
     N = array.shape[0]
-    fig, axes = plt.subplots(3, 3, figsize=(10, 6), dpi=100)
-    axes = axes.flatten()
-    
-    for i in range(ndof):
-        ax = axes[i]
-        sns.lineplot(ax=ax, x=np.arange(N), y=array[:, i], linewidth=0.5,color='red')
+    if array.ndim ==1 :
+        fig = plt.figure(figsize=(10, 6))
+        ax = fig.add_subplot(111)
+        sns.lineplot(ax=ax, x=np.arange(N), y=array, linewidth=0.5, color='blue')
         ax.set_xlabel("Time (ms)", fontsize=9)
-        ax.set_title(f'Joint {i+1}', fontsize=9)
+        if not(ylabel is None):
+            plt.ylabel(ylabel, fontsize=9)
+    elif array.ndim == 2:
+        ndof = min(array.shape[1],array.shape[0])
+        if not(ndof == array.shape[1]):
+            array = np.transpose(array)
+        fig, axes = plt.subplots(3, 3, figsize=(10, 6), dpi=100)
+        axes = axes.flatten()
+        for i in range(ndof):
+            ax = axes[i]
+            sns.lineplot(ax=ax, x=np.arange(N), y=array[:, i], linewidth=0.5,color='blue')
+            ax.set_xlabel("Time (ms)", fontsize=9)
+            if not(ylabel is None):
+                ax.set_ylabel(ylabel, fontsize=9)
+            ax.set_title(f'Joint {i+1}', fontsize=9)
 
-    for j in range(ndof, len(axes)):
-        fig.delaxes(axes[j])
+        for j in range(ndof, len(axes)):
+            fig.delaxes(axes[j])
+            
     if title != None: 
         fig.suptitle(title, fontsize=9)   
     plt.tight_layout()
@@ -128,7 +140,8 @@ def plot2Arrays(array1: np.ndarray, array2: np.ndarray, legend1=None, legend2=No
         - color2: Line color for the second array  
         - title: Title for the figure  
     """
-    ndof = array1.shape[1]
+    assert array1.shape == array2.shape, "Arrays should have the same size."
+    ndof = min(array1.shape[1],array1.shape[0])
     N = array1.shape[0]
     fig, axes = plt.subplots(3, 3, figsize=(10, 6), dpi=100)
     axes = axes.flatten()
