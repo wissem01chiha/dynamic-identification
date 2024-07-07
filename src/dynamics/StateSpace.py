@@ -1,9 +1,10 @@
 import logging
 import numpy as np 
+import matplotlib.pyplot as plt
+import seaborn as sns
 from scipy.signal import place_poles
 from dynamics import Robot
  
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -81,9 +82,6 @@ class StateSpace:
             A, B, _, _ = self.computeStateMatrices(x)
             A = self.stabilize(A,B)
             x_next = np.dot(A,x) + np.dot(B,tau)
-            xmin = np.min(x_next[0:n])
-            xmax = np.max(x_next[0:n])
-            x_next[0:n] = ((x_next[0:n] - xmin) / (xmax - xmin))
         else:
             q = q_or_x
             qp = qp_or_tau
@@ -92,9 +90,6 @@ class StateSpace:
             x_k = self.getStateVector(qp, q)
             A = self.stabilize(A,B)
             x_next = np.dot(A , x_k) + np.dot(B,tau)
-            xmin = np.min(x_k[0:n])
-            xmax = np.max(x_k[0:n])
-            x_next[0:n] = ((x_k[0:n] - xmin) / (xmax - xmin))
         
         return x_next
     
@@ -137,9 +132,9 @@ class StateSpace:
         z = np.concatenate(x,tau,axis=0)
         return z
     
-    def computeAugemntedStateMatrices(self, q:np.ndarray, qp:np.ndarray):
+    def computeAugemntedStateMatrices(self, q_or_x:np.ndarray, qp:np.ndarray):
         """ Computes and retuns """
-        A, B, C, D = self.computeStateMatrices(qp,q)
+        A, B, C, D = self.computeStateMatrices(q_or_x)
         
     
     def getStateEigvals(self, q_or_x:np.ndarray, qp:np.ndarray=None):
@@ -170,7 +165,7 @@ class StateSpace:
         D_hat =1    
     
     def lsim(self, x0:np.ndarray, input:np.ndarray):
-        """ """
+        """ simualte the ss system by computing the full analytic equation and iteragte it """
         states = 0
         return states
     
@@ -208,14 +203,14 @@ class StateSpace:
     def linearize(self,q:np.ndarray, qp:np.ndarray, noise:bool=False):
         """linearize by finite diffrence method the state-depend dynamics matrices.
         approximate the matrixe A and B variation to fourier or taylor series.
+        to use LPV system utilities
         """
         A,_,_,_ = self.computeStateMatrices(q,qp)
         
         return 
     
     def computeluenbergerObserver(self):
-        """ Computes the luvemberger observer for the default sytem not rduced nor augmented 
-        """
+        """ Computes the luenberger observer for the default sytem"""
         L = 0 
         return L 
     
@@ -246,7 +241,33 @@ class StateSpace:
             A_new = A
         return A_new
     
- 
+    def visualizeRootLocus(self, q_or_x:np.ndarray,qp:np.ndarray=None)->None:
+        """ Plot the system root locus for a given trajectory."""
+        gain = np.linspace(0, 0.45, 35)
+        K = np.ones((7, 14))
+        A, B,_,_ = self.computeStateMatrices(q_or_x,qp)
+        poles = np.array([np.linalg.eigvals(A-np.dot(B,K*k)) for k in gain])
+        for j in range(poles.shape[1]):
+            plt.plot(np.real(poles[:,j]), np.imag(poles[:,j]), '.', markersize=3)
+        plt.title('Root Locus Plot')
+        plt.xlabel('Real')
+        plt.ylabel('Imaginary')
+        plt.axhline(0, color='black', linewidth=0.5)
+        plt.axvline(0, color='black', linewidth=0.5)
+        plt.grid(True)
+         
+    def visualizeStatePoles(self,q,qp):
+        """Plot the system poles for a given trajectory"""
+        eigenvalues = self.getStateEigvals(q,qp)
+        plt.figure(figsize=(6, 4))
+        plt.scatter(np.real(eigenvalues), np.imag(eigenvalues), marker='*', color='blue')
+        plt.axhline(0, color='black', linewidth=0.5)
+        plt.axvline(0, color='black', linewidth=0.5)
+        plt.xlabel('Real')
+        plt.ylabel('Imaginary')
+        plt.title('Pole Plot')
+        plt.grid(True)
+        
     def computeGaussianNoise(self,length):
         mean = self.robot.params['noise_params']['gauss']['mean']
         stdv = self.robot.params['noise_params']['gauss']['stdv']

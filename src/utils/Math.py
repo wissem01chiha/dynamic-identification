@@ -141,7 +141,7 @@ def computeCumulativeCorrelation(array:np.ndarray)->np.ndarray:
         correlation_matrix[i,:,:]= np.corrcoef(array[0:i,:], rowvar=False)
     return correlation_matrix
 
-def computeMovingAverage(array: np.ndarray, window_size: int) -> np.ndarray:
+def MAE(array: np.ndarray, window_size: int) -> np.ndarray:
     """
     Implement a simple moving average estimator.
     

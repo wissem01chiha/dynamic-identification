@@ -52,19 +52,11 @@ class Robot():
         fext = pin.StdVec_Force()
         for i in range(self.model.njoints):
             fext.append(pin.Force.Zero())
-        if q is None:
-            self.q = np.zeros(self.model.nq)
-        else:
-            self.q = q 
-        if v is  None:
-            self.v =np.zeros(self.model.nv)   
-        else:
-            self.v = v
-        if a is None:
-            self.a = np.zeros(self.model.nv)
-        else:
-            self.a = a   
-              
+        self.q = np.zeros(self.model.nq) if q is None else q
+        self.v = np.zeros(self.model.nv) if v is None else v
+        self.a = np.zeros(self.model.nv) if a is None else a
+        self.fext = fext
+  
     def computeMassMatrix(self, q=None, scaling=0.001):
         """
         Compute the mass matrix of the robot.
@@ -83,40 +75,33 @@ class Robot():
         if np.isnan(q).any() or np.isinf(q).any():
             logger.error("configuration array q has NAN or INF values.")
             q = np.nan_to_num(q, nan=0.0, posinf=0.0, neginf=0.0)
-        M = pin.crba(self.model, self.data, q)
+        M = pin.computeMinverse(self.model, self.data, q)
         if np.isnan(M).any() or np.isinf(M).any():
             logger.error("mass matrix contain NAN or INF values.")
             M = np.nan_to_num(M, nan=0.0, posinf=0.0, neginf=0.0)
-        if conditionNumber(M,1e-3):
+        if conditionNumber(M,1e-5):
             M = M + scaling * np.eye(np.shape(M)[0])
-        return  M
+        return  np.linalg.inv(M) 
     
     def computeGeneralizedTorques(self,q=None,qp=None,qpp=None,fext=None):
         """
         Compute the genralized Torques using the recursive netwon euler alogrithm. 
         
         Args:
-            - q    : Joints position vector.
-            - qp   : Joints velocity vector.
-            - qpp  : Joints acceleration vector.
-            - fext : Joints external forces vector.
+            - q    : Joints position vector. ( nq * 1 )
+            - qp   : Joints velocity vector. ( nq * 1 )
+            - qpp  : Joints acceleration vector. ( nq * 1 )
+            - fext : Joints external forces vector. ( nq * 1 )
         """
-        if q is None:
-            q = self.q
-        else:
-            q = q
-        if qp is None:
-            qp = self.v
-        else:
-            qp = qp
-        if qpp is None:
-            qpp = self.v
-        else:
-            qpp = qpp
-        tau = pin.rnea(self.model, self.data, self.q, self.v, self.a, self.fext)
+        q = q if q is not None else self.q
+        qp = qp if qp is not None else self.v
+        qpp = qpp if qpp is not None else self.v
+        try:
+            tau = pin.rnea(self.model, self.data, self.q, self.v, self.a, self.fext)
+        except Exception as e:
+            logger.error('Error Occured when Computing Torques.')
         return tau
-    
-    
+
     def computeCorlolisMatrix(self, qp=None,q=None,timeStep=0.001,scaling=0.01):
         """
         Compute the corlolis matrix using finite difference method.
@@ -138,7 +123,7 @@ class Robot():
         q_t_1 = discreteTimeIntegral(qp,timeStep)
         self.q = q_t_1
         M_t_1= self.computeMassMatrix(self.q,scaling)
-        diff_M   = ( M_t_1 - M_t )/timeStep
+        diff_M   = ( M_t_1 - M_t )
         for i in range(7):
             for j in range(7):
                 for k in range(7):
@@ -158,7 +143,7 @@ class Robot():
         tau_g =  pin.computeGeneralizedGravity(self.model, self.data, q)
         return tau_g
     
-    def computeFrictionTorques(self, qp, q, sampling = 1000):
+    def computeFrictionTorques(self, qp:np.ndarray, q:np.ndarray):
         """
         Estimates the friction torque vector in robot joints given a 
         constant joint velocity vector.
@@ -171,36 +156,49 @@ class Robot():
         Returns:
             tau_f      : Joints friction torques   ( numSamples * ndof )
         """
-        NSamples, ndof = np.shape(qp)
-        tspan = ( NSamples -1 )/sampling
-        tau_f = np.zeros((NSamples, int(self.model.nv)))
+        sampling = self.params['simulation']['sampling_frequency']
         frictionModel = self.params['robot_params']['friction'] 
         
-        assert ndof == self.model.nv,\
-                'joints velocity data input msiamtch with model degree of freedom'
+        NSamples, ndof = np.shape(qp)
+        tspan = ( NSamples -1 )/sampling
+        tau_f = np.zeros_like(qp)
+    
+        assert ndof == self.model.nq,'Joints velocity data input msiamtch with model degree of freedom'
                 
         if frictionModel == 'lugre':
             for k in range(ndof):
                 for t in range(NSamples):
-                    model = LuGre(10,5,qp[t,k],0.1,0.2,0.3,tspan,1/sampling)
+                    Fc = self.params['friction_params']['lugre']['Fc']
+                    Fs = self.params['friction_params']['lugre']['Fs']
+                    sigma0 = self.params['friction_params']['lugre']['sigma0']
+                    sigma1= self.params['friction_params']['lugre']['sigma1']
+                    sigma2= self.params['friction_params']['lugre']['sigma2']
+                    model = LuGre(Fc[k], Fs[k], qp[t,k],  sigma0[k], sigma1[k], sigma2[k],tspan,1/sampling)
                     F = model.computeFrictionForce() 
                     tau_f[t,k] = F[t]
                 
         elif frictionModel == 'maxwellSlip':
-            for k in range(ndof):
-                model = MaxwellSlip(3,qp[:,k],[3,1,1],[3,1,1],0.1)
-                tau_f[:,k]= model.computeFrictionForce()
+  
+            for j in range(int(q.shape[1])): 
+                n = self.params['friction_params']['maxwellSlip']['n']
+                k = self.params['friction_params']['maxwellSlip']['k']
+                c = self.params['friction_params']['maxwellSlip']['c']
+                sigma0 = np.array(self.params['friction_params']['maxwellSlip']['sigma0'])
+                model = MaxwellSlip(n, q[:,j], k, c, sigma0[j],sampling)
+                tau_f[:,j]= model.computeFrictionForce()
                 
         elif frictionModel == 'dahl':
             for k in range(ndof):
-                
-                model = Dahl(20,1)
-                tau_f[:,k]  = model.computeFrictionForce(q[:,k],qp[:,k])
+                sigma0 = self.params['friction_params']['dahl']['sigma0']
+                Fs = self.params['friction_params']['dahl']['Fs']
+                model = Dahl(sigma0[k], Fs[k])
+                tau_f[:,k]  = model.computeFrictionForce(qp[:,k])
                 
         elif frictionModel == 'viscous':
             for k in range(ndof):
-                
-                tau_f[:,k] = computeViscousFrictionForce(qp[:,k],0.1,1)
+                Fc = self.params['friction_params']['viscous']['Fc']
+                Fs = self.params['friction_params']['viscous']['Fs']
+                tau_f[:,k] = computeViscousFrictionForce(qp[:,k],Fc[k],Fs[k])
         else:
             logger.error("Friction Model Not Supported Yet!")
         return tau_f 
@@ -219,12 +217,10 @@ class Robot():
             q = self.q
         stiffCoeffsArray = self.params['stiffness_params']
         if stiffCoeffsArray is None:
-            logger.error(\
-                "Stiffness coefficients are missing in the configuration file")
+            logger.error("Stiffness coefficients are missing in the configuration file")
         nk = len(stiffCoeffsArray)
         if nk != len(q):
-            logger.error(\
-                "Number of stiffness coefficients must be equal to the number of model joints")
+            logger.error("Number of stiffness coefficients must be equal to the number of model joints")
         tau_s = np.zeros_like(q)
         for i in range(nk):
             tau_s[i] = stiffCoeffsArray[i] * q[i]
@@ -263,16 +259,107 @@ class Robot():
                 tau[t,:] = tau_i    
         return tau
     
-    def computeInverseDynamics(self,x:np.ndarray):
-        """This function require the setup up of the joints tarjectory parmters previlouslly 
-        ie self.q, v and a should be puted in the trajectoy or it will use the default.
-        initlize the robot structure with the trajectory data from begin 
+    def updateExternalForces(self, F:np.ndarray)->None:
+        """update the Pinnchoi external Forces vector."""
+        assert F.size == 6,'Force vector size should be 6'
+        pinfext = pin.StdVec_Force()
+        for i in range(self.model.njoints):
+            linearFext = F[:3]
+            angularFext = F[3:]
+            pinfext.append(pin.Force(linearFext, angularFext))
+        self.fext = pinfext
+        
+    def computeDifferentialModel(self,q=None,qp=None,qpp=None, inertia_params=None):
+        if not(inertia_params is None):
+            self.updateInertiaParams(inertia_params)
+        M = self.computeMassMatrix(q)
+        C = self.computeCorlolisMatrix(qp,q)
+        G = self.computeGravityTorques(q)
+        tau_sim = np.dot(M,qpp)+ np.dot(C, qp) + G
+        
+        return tau_sim
+    
+    
+    def computeIdentificationModel(self,x:np.ndarray):
         """
+        This function require the setup up of the joints tarjectory parmters previlouslly 
+        ie self.q, v and a should be puted in the trajectoy or it will use the default.
+        initlize the robot structure with the trajectory data from begin.
+        x : paramters: - 
+        this fuunction woroks for 1 step time  
+        """
+        if np.ndim(x) != 1:
+            logger.error("X should be 1-dimensional array.")
+            
+        fext = self.params['identification']['problem_params']['has_ external_forces']    
+        friction = self.params['identification']['problem_params']['has_friction']
+        motor = self.params['identification']['problem_params']['has_actuator']
+        stiffness = self.params['identification']['problem_params']['has_stiffness']
         
-        tau = 0
+        if not(fext) :
+            self.updateInertiaParams(x)
+            tau = self.computeTrajectoryTorques(self.q,self.v,self.a)
+            if friction:
+                self.updateFrictionParams(x)
+                tau_f = self.computeFrictionTorques(self.v,self.q)
+                tau = tau + tau_f
+                if stiffness:
+                    tau_s = self.computeStiffnessTorques(self.q)
+                    tau = tau+tau_f-tau_s
+                    if motor:
+                        tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
+                        tau = tau_m + tau_f-tau_s
+                elif motor:
+                    self.updateActuatorParams(x)
+                    tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
+                    tau = tau_m + tau_f
+            else:
+                if stiffness:
+                    self.updateStiffnessParams(x)
+                    tau_s = self.computeStiffnessTorques(self.q)
+                    tau = tau -tau_s
+                    if motor:
+                        self.updateActuatorParams(x)
+                        tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
+                        tau = tau_m -tau_s
+                elif motor:
+                    self.updateActuatorParams(x)
+                    tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
+                    tau = tau_m 
+        else:
+            self.updateInertiaParams(x)
+            self.updateExternalForces(x) 
+            tau = self.computeTrajectoryTorques(self.q,self.v,self.a,self.fext)    
+            if friction:
+                self.updateFrictionParams(x)
+                tau_f = self.computeFrictionTorques(self.v,self.q)
+                tau = tau + tau_f
+                if stiffness:
+                    self.updateStiffnessParams(x)
+                    tau_s = self.computeStiffnessTorques(self.q)
+                    tau = tau+tau_f-tau_s
+                    if motor:
+                        self.updateActuatorParams(x)
+                        tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
+                        tau = tau_m + tau_f-tau_s
+                elif motor:
+                    self.updateActuatorParams(x)
+                    tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
+                    tau = tau_m + tau_f
+            else:
+                if stiffness:
+                    self.updateStiffnessParams(x)
+                    tau_s = self.computeStiffnessTorques(self.q)
+                    tau = tau -tau_s
+                    if motor:
+                        self.updateActuatorParams(x)
+                        tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
+                        tau = tau_m -tau_s
+                elif motor:
+                    self.updateActuatorParams(x)
+                    tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
+                    tau = tau_m    
         return tau
-        
-        
         
     def genralizedInertiasParams(self):
         """

@@ -2,6 +2,7 @@ import os
 import sys
 import unittest
 import numpy as np
+import matplotlib.pyplot as plt
 
 src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 sys.path.append(src_folder)
@@ -42,9 +43,16 @@ class TestStateSpace(unittest.TestCase):
     def test_state_input_vector(self):
         model = StateSpace()
         
+    def test_visualize_pols_plot(self):
+        model = StateSpace()
+        #model.visualizeStatePoles(np.random.rand(7),np.random.rand(7))
+        #plt.show()
         
-        
-
+    def test_visulize_root_locus(self):
+        model = StateSpace()
+        model.visualizeRootLocus(np.ones(7),np.ones(7))
+        plt.show()
+    
 if __name__ == "__main__":
     unittest.main() 
         

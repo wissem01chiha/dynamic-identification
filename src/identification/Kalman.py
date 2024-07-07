@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns 
 
 class Kalman:
     """
@@ -62,7 +64,6 @@ class Kalman:
             states.append(self.x.copy())
         return np.array(states)
 
-
     def evaluate(self, true_states, estimated_states):
         """
         Evaluate the performance of the Kalman filter.
@@ -87,3 +88,7 @@ class Kalman:
         """
         self.Q = self.Q + self.alpha * (np.outer(y, y) - self.Q)
         self.R = self.R + self.beta * (np.outer(y, y) - self.R)
+        
+    def visualizeSatets(self):
+        """ """
+        plt.figure(figsize=(12, 6))

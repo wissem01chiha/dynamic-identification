@@ -29,7 +29,7 @@
   <link name="base_link">
     <inertial>
       <origin rpy="0 0 0" xyz="-0.000648 -0.000166 0.084487"/>
-      <mass value=" 1.377"/>
+      <mass value=" 1.477"/>
       <inertia ixx="0.004570" ixy="0.000001" ixz="0.000002" iyy="0.004831" iyz="0.001409" izz="0.072179"/>
     </inertial>
   </link>
@@ -102,7 +102,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="1E-06 -0.009432 -0.063883"/>
       <mass value=" 0.678"/>
-      <inertia ixx="0.001596" ixy="0" ixz="0" iyy="0.001607" iyz="0.000256" izz="0.000399"/>
+      <inertia ixx="0.01596" ixy="0" ixz="0" iyy="0.001607" iyz="0.000256" izz="0.000399"/>
     </inertial>
   </link>
 

@@ -1,5 +1,70 @@
 import pinocchio as pin
 import numpy as np
+ 
+from dynamics import Robot
+
+
+class Regressor:
+    
+    def __init__(self, robot:Robot=None) -> None:
+        
+        if robot is None:
+            self.robot = Robot()
+        else:
+            self.robot= robot   
+        
+    def computeBasicRegressor(self):
+        regx = 0
+        return regx
+
+    def addActuatorInertia(self,W, robot, q, v, a, param):
+        N = len(q) # nb of samples 
+        nv = robot.model.nv
+        add_col = 4
+        for k in range(nv):
+            W[:, (10 + add_col) * k + 10] = a[i, j]
+        return W
+    
+    def addFriction(self,W, param):
+        N = len(self.robot.model.q) # nb of samples 
+        nv = self.robot.model.nv
+        add_col = 4
+        for k in range(nv):
+            W[:, (10 + add_col) * k + 11] = self.robot.model.v[i, j]
+            W[:, (10 + add_col) * k + 12] = np.sign(self.robot.model.v[i, j])
+        return W
+    
+    def eliminateNonDynaffect(self,W, params_std, tol_e=1e-6):
+        """
+        This function eliminates columns which has L2 norm smaller than tolerance.
+        Input:  W: (ndarray) joint torque regressor
+            params_std: (dict) standard parameters
+            tol_e: (float) tolerance
+        Output: W_e: (ndarray) reduced regressor
+            params_r: [list] corresponding parameters to columns of reduced regressor"""
+        col_norm = np.diag(np.dot(W.T, W))
+        idx_e = []
+        params_e = []
+        params_r = []
+        for i in range(col_norm.shape[0]):
+            if col_norm[i] < tol_e:
+                idx_e.append(i)
+                params_e.append(list(params_std.keys())[i])
+            else:
+                params_r.append(list(params_std.keys())[i])
+        idx_e = tuple(idx_e)
+        W_e = np.delete(W, idx_e, 1)
+        return W_e, params_r
+    
+    def build_regressor_reduced(self,W, idx_e):
+        W_e = np.delete(W, idx_e, 1)
+        return W_e
+
+
+
+
+
+
 
 
 
@@ -179,22 +244,9 @@ def build_regressor_basic(robot, q, v, a, param, tau=None):
 
     return W_mod
 
-def add_actuator_inertia(W, robot, q, v, a, param):
-    N = len(q) # nb of samples 
-    nv = robot.model.nv
-    add_col = 4
-    for k in range(nv):
-        W[:, (10 + add_col) * k + 10] = a[i, j]
-    return W
 
-def add_friction(W,robot, q, v, a, param):
-    N = len(q) # nb of samples 
-    nv = robot.model.nv
-    add_col = 4
-    for k in range(nv):
-        W[:, (10 + add_col) * k + 11] = v[i, j]
-        W[:, (10 + add_col) * k + 12] = np.sign(v[i, j])
-    return W
+
+
 
 def add_joint_offset(W, robot, q, v, a, param):
     N = len(q) # nb of samples 
@@ -204,43 +256,8 @@ def add_joint_offset(W, robot, q, v, a, param):
         W[:, (10 + add_col) * k + 13] = 1
     return W
 
-def add_coupling_TX40(W, model, data, N, nq, nv, njoints, q, v, a):
-    """ Dedicated function for Staubli TX40
-    """
-    W = np.c_[W, np.zeros([W.shape[0], 3])]
-    for i in range(N):
-        # joint 5
-        W[4 * N + i, W.shape[1] - 3] = a[i, 5]
-        W[4 * N + i, W.shape[1] - 2] = v[i, 5]
-        W[4 * N + i, W.shape[1] - 1] = np.sign(v[i, 4] + v[i, 5])
-        # joint 6
-        W[5 * N + i, W.shape[1] - 3] = a[i, 4]
-        W[5 * N + i, W.shape[1] - 2] = v[i, 4]
-        W[5 * N + i, W.shape[1] - 1] = np.sign(v[i, 4] + v[i, 5])
-
-    return W
 
 
-def eliminate_non_dynaffect(W, params_std, tol_e=1e-6):
-    """This function eliminates columns which has L2 norm smaller than tolerance.
-    Input:  W: (ndarray) joint torque regressor
-            params_std: (dict) standard parameters
-            tol_e: (float) tolerance
-    Output: W_e: (ndarray) reduced regressor
-            params_r: [list] corresponding parameters to columns of reduced regressor"""
-    col_norm = np.diag(np.dot(W.T, W))
-    idx_e = []
-    params_e = []
-    params_r = []
-    for i in range(col_norm.shape[0]):
-        if col_norm[i] < tol_e:
-            idx_e.append(i)
-            params_e.append(list(params_std.keys())[i])
-        else:
-            params_r.append(list(params_std.keys())[i])
-    idx_e = tuple(idx_e)
-    W_e = np.delete(W, idx_e, 1)
-    return W_e, params_r
 
 
 def get_index_eliminate(W, params_std, tol_e=1e-6):
@@ -255,9 +272,7 @@ def get_index_eliminate(W, params_std, tol_e=1e-6):
     return idx_e, params_r
 
 
-def build_regressor_reduced(W, idx_e):
-    W_e = np.delete(W, idx_e, 1)
-    return W_e
+
 
 # Function for the total least square
 

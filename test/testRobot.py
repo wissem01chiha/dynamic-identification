@@ -18,18 +18,17 @@ class TestRobot(unittest.TestCase):
         robot = Robot()
         tau_s = robot.computeStiffnessTorques([1.25, 1, 125,1,1,1,1])
         self.assertIsNotNone(tau_s, "The computed matrix is None")
-    """   
+       
     def test_friction_torque_not_none(self):
         robot = Robot()
-        tau_f= robot.computeFrictionTorques(np.random.rand(1001))
+        tau_f= robot.computeFrictionTorques(np.random.rand(100,7),np.random.rand(100,7))
         self.assertIsNotNone(tau_f, "The computed matrix is None")
-        
+
     def test_friction_torque_size(self):
         robot = Robot()
-        input_velocity = np.random.rand(1001, 7) 
-        tau_f= robot.computeFrictionTorques(input_velocity,1)
-        self.assertEqual(np.size(tau_f),np.size(input_velocity))
-    """  
+        tau_f= robot.computeFrictionTorques(np.random.rand(1001, 7) ,np.random.rand(1001,7))
+        self.assertEqual(np.size(tau_f),np.size(np.random.rand(1001, 7) ))
+    
     def test_corlois_matrix_not_none(self):
         robot = Robot()
         C = robot.computeCorlolisMatrix()
@@ -62,8 +61,11 @@ class TestRobot(unittest.TestCase):
     
     def test_update_stiffness_params(self):
         robot = Robot()
-        s1 = robot.updateStiffnessParams(np.random.rand(7))
-        #self.assertEqual(np.any(s1),True)
+        q = np.ones(7)
+        tau_s1 = robot.computeStiffnessTorques(q)
+        robot.updateStiffnessParams(np.random.rand(7))
+        tau_s2 = robot.computeStiffnessTorques(q)
+        self.assertEqual(np.any(tau_s1!=tau_s2),True)
     
     def test_actuator_torques_not_none(self):
         robot = Robot()
@@ -80,13 +82,21 @@ class TestRobot(unittest.TestCase):
     def test_actuator_torques_params(self):
         robot = Robot()
         q = np.random.rand(100,7)
-        qp =np.random.rand(100,7)
+        qp = np.random.rand(100,7)
         qpp = np.random.rand(100,7)
         tau_m_1 = robot.computeActuatorTorques(q, qp, qpp)
         robot.updateActuatorParams(np.random.rand(70,1))
         tau_m_2 = robot.computeActuatorTorques(q, qp, qpp)
         self.assertEqual(np.any(tau_m_1!=tau_m_2), True)
-
+        
+    def test_update_friction_params(self):
+        robot = Robot()
+        q = np.random.rand(100,7)
+        qp = np.random.rand(100,7)
+        tau_f1 = robot.computeFrictionTorques(qp,q)
+        robot.updateFrictionParams(np.random.rand(10))
+        tau_f2 = robot.computeFrictionTorques(qp,q)
+        self.assertEqual(np.any(tau_f1!=tau_f2), True)
         
 if __name__ == "__main__":
     unittest.main() 

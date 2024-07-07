@@ -22,7 +22,7 @@ class MaxwellSlip:
       Fundamentals Of Friction Modeling - Farid Al-Bender - 2010.
     """
 
-    def __init__(self, n, velocity, k, c, sigma0, samplingRate=1000):
+    def __init__(self, n, velocity:np.ndarray, k, c, sigma0, samplingRate=1000):
       assert samplingRate != 0,"Sampling frequency should not be null."
       self.n = n
       self.velocity = velocity
