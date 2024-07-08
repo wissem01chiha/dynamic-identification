@@ -3,11 +3,12 @@ import numpy as np
  
 from dynamics import Robot
 
-
 class Regressor:
+    """ 
+    Ref:
     
+    """
     def __init__(self, robot:Robot=None) -> None:
-        
         if robot is None:
             self.robot = Robot()
         else:
@@ -26,6 +27,7 @@ class Regressor:
         return W
     
     def addFriction(self,W, param):
+        """ only works with viscous friction else give error"""
         N = len(self.robot.model.q) # nb of samples 
         nv = self.robot.model.nv
         add_col = 4
@@ -56,7 +58,7 @@ class Regressor:
         W_e = np.delete(W, idx_e, 1)
         return W_e, params_r
     
-    def build_regressor_reduced(self,W, idx_e):
+    def computeReducedRegressor(self,W, idx_e):
         W_e = np.delete(W, idx_e, 1)
         return W_e
 

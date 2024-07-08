@@ -1,34 +1,41 @@
 import random
 import numpy as np
-import warnings
 import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 from numba import cuda
 if (cuda.is_available()):
+    import warnings
     from numba.cuda.dispatcher import NumbaPerformanceWarning
     warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
-W = 0.85
-c1 = 0.72
-c2 = 0.91
-
- 
-n_iterations = int(input("Inform the number of iterations: "))
-target_error = float(input("Inform the target error: "))
-n_particles = int(input("Inform the number of particles: "))
-
-@cuda.jit
-def move_particles_kernel(positions, velocities, pbest_positions, gbest_position, W, c1, c2):
-    idx = cuda.grid(1)
-    if idx < positions.shape[0]:
-        r1 = -0.2
-        r2 = 1.1
-        for d in range(positions.shape[1]):
-            velocities[idx, d] = W * velocities[idx, d] + \
+if (cuda.is_available()):
+    @cuda.jit
+    def move_particles_kernel(positions, velocities, pbest_positions, gbest_position, W, c1, c2):
+        idx = cuda.grid(1)
+        if idx < positions.shape[0]:
+            r1 = -0.2
+            r2 = 1.1
+            for d in range(positions.shape[1]):
+                velocities[idx, d] = W * velocities[idx, d] + \
                                  c1 * r1 * (pbest_positions[idx, d] - positions[idx, d]) + \
                                  c2 * r2 * (gbest_position[d] - positions[idx, d])
-            positions[idx, d] += velocities[idx, d]
-
+                positions[idx, d] += velocities[idx, d]
+else:
+    def move_particles(positions, velocities, pbest_positions, gbest_position, W, c1, c2):
+        num_particles = positions.shape[0]
+        num_dimensions = positions.shape[1]
+        r1 = -0.2
+        r2 = 1.1
+        for idx in range(num_particles):
+            for d in range(num_dimensions):
+                velocities[idx, d] = W * velocities[idx, d] + \
+                                 c1 * r1 * (pbest_positions[idx, d] - positions[idx, d]) + \
+                                 c2 * r2 * (gbest_position[d] - positions[idx, d])
+                positions[idx, d] += velocities[idx, d]
+                   
 class Particle():
     def __init__(self,dim=2):
         self.position = cuda.to_device(np.array([
@@ -68,8 +75,7 @@ class Space():
             print(particle)
 
     def fitness(self, particle):
-        return particle.position[0] ** 2 + particle.position[1] ** 3 \
-            + np.cos(particle.position[1]) - np.sin(particle.position[0])**4 + 1
+        return particle.position[0] ** 2 + particle.position[1] ** 2
 
     def set_pbest(self):
         for particle in self.particles:
@@ -102,8 +108,13 @@ class Space():
             particle.velocity = d_velocities[i]
             
 class PSO:
-    def __init__(self, iter,particles,w,c1,c2) -> None:
-        pass
+    def __init__(self, iter:int,particles:int,target_error:float,w:float,c1:float,c2:float) -> None:
+        self.w = w
+        self.c1 = c1
+        self.c2 = c2
+        self.iter =iter
+        self.particles = particles
+        
 
 
 

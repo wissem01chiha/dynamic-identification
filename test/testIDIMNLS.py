@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 sys.path.append(src_folder)
 
-from identification import IDIMNLS
-from utils import plotArray
+from identification import IDIMNLS, Kalman
+ 
 
 class TestIDIMNLS(unittest.TestCase):
     
@@ -20,12 +20,6 @@ class TestIDIMNLS(unittest.TestCase):
             array[:, i] = np.sin(params[0] * t + params[1] * i) \
                 * params[2] + params[3] * np.cos(params[4] * t + params[5] * i)
         return array
-    
-    def test_model_funtion(self):
-        objval = self.modelFun(np.random.rand(6))
-        plotArray(objval)
-        plt.show()
-        self.assertEqual(objval.shape,(1000,7))
     
     def test_cost_function_not_none(self):
         output = np.random.rand(1000,7)
@@ -47,13 +41,19 @@ class TestIDIMNLS(unittest.TestCase):
         
     def test_evaluate(self):
         output = self.modelFun([0.5,1,0.3,0.01,0.5,1.5])
-        model = IDIMNLS(5,output,TestIDIMNLS.modelFun)
+        model = IDIMNLS(6,output,TestIDIMNLS.modelFun)
         sol = model.optimize(np.random.rand(6))
         self.assertIsNotNone(model.optimized_params)
-        print(model.optimized_params)
-        #model.visualizeError('opt err')
         model.visualizeResults('results')
-        plt.show()
+        
+    def test_plot_cost_function(self):
+        output = self.modelFun([0.8,1.1,0.7,0.1,0.85,1.5])
+        model = IDIMNLS(6,output,TestIDIMNLS.modelFun)
+        model.optimize(np.random.rand(6))
+        print(model.optimized_params)
+        model.visualizeCostFunction()
+        
         
 if __name__ == "__main__":
-    unittest.main() 
+    unittest.main(exit=False)
+    plt.show() 

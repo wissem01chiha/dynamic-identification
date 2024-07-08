@@ -1,12 +1,16 @@
-import unittest 
-import numpy as np 
 import sys 
 import os 
+import unittest 
+import numpy as np 
+
 src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 sys.path.append(src_folder)
 
 from optimisation import PSO
 
+class TestPSO(unittest.TestCase):
+    def test_particles(self):
+        """"""
 
 # --------------------------------------------------------------
 search_space = Space(0, target_error, n_particles)

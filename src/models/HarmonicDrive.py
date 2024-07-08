@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.integrate import odeint
 
 class HarmonicDrive():
     """
@@ -6,10 +7,10 @@ class HarmonicDrive():
     Ref:
 
     """
-    def __init__(self,Tin,Vin,N = 100) -> None:
+    def __init__(self,Tinput,Vinput,N = 100) -> None:
         self.reductionRatio = N
-        self.inputTorque    = Tin
-        self.inputVelocity   = Vin
+        self.inputTorque    = Tinput
+        self.inputVelocity  = Vinput
         
     
     def getOutputVelocity(self):
@@ -22,9 +23,17 @@ class HarmonicDrive():
         T=1
         return T
     
+    def computeCompliance(self):
+        """ """
+        return 
+    
+    
+    
+    
+    
 """
-import numpy as np
-from scipy.integrate import odeint
+ 
+
 
 def HarmonicDrive(reductionRatio, inputTorque, inputVelocity, samplingRate, **kwargs):
     # Default parameters

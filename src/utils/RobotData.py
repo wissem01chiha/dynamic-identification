@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import logging
 from scipy.signal import butter, filtfilt
-from identification import Kalman
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -96,28 +95,6 @@ class RobotData:
         
         return smoothed_data
     
-    def kalmanFilter(self,variable='torque'):
-        """Filtering Robot Data torques uisng an adaptive kalman filter"""
-        if variable =='torque_cur':
-            observations = np.transpose(self.torque_cur)
-            x0 = self.torque_cur[0,:]
-        elif variable == 'torque_rne':
-            observations = np.transpose(self.torque_rne)
-            x0 = self.torque_rne[0,:]
-        elif variable =='torque':
-            observations = np.transpose(self.torque)
-            x0 = self.torque[0,:]
-        else:
-            logger.error('variable type not supported yet')
-        F = np.eye(self.ndof)
-        H = np.random.randn(self.ndof, self.ndof)
-        Q = np.eye(self.ndof) * 0.01   
-        R = np.eye(self.ndof) * 0.1   
-        P = np.eye(self.ndof)   
-        kf = Kalman(F, H, Q, R, P, x0)
-        estimated_states, innovations = kf.filter(observations)
-        
-        return estimated_states, innovations
     
     def plotCorrelationGraph(self,variable='torque'):
         """
@@ -135,7 +112,6 @@ class RobotData:
             x0 = self.torque[0,:]
         else:
             logger.error('variable type not supported yet')
-            
         sns.set(style="whitegrid")
     
     

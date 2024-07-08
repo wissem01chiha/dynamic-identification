@@ -24,8 +24,7 @@ optimisation:
     c2 : 0.9 
     r1: -0.2
     r2: 1.1
-    iter: 100
-    
+    iter: 100  
   cmaes:
 stiffness_params: [0.25, 0.26, 0.369, 0.125, 0.258, 0.123, 0.11] 
 actuator_params:

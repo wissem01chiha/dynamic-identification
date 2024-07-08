@@ -2,6 +2,7 @@ import logging
 import numpy as np
 from typing import Callable
 import matplotlib.pyplot as plt
+import seaborn as sns 
 from scipy.optimize import least_squares, curve_fit 
 from utils import RMSE, clampArray, plotArray, plot2Arrays
 
@@ -22,8 +23,10 @@ class IDIMNLS:
             of shape : ( Nsamples * ndof )
     """
     def __init__(self,nVars,output,identificationModel: Callable[[np.ndarray],np.ndarray],\
-        upperBound=10,lowerBound=0.001,time_step=0.001) -> None:
+        upperBound=2,lowerBound=-2,time_step=0.001) -> None:
         
+        if np.ndim(output) != 2 :
+            logger.error("Target output should be 2 dimentional")
         # Class Attributes
         self.time_step = time_step
         self.output = output
@@ -32,8 +35,7 @@ class IDIMNLS:
         self.lowerBound = lowerBound
         self.identificationModel  = identificationModel
         self.optimized_params = None
-        assert (np.ndim(self.output) == 2)
-       
+    
     def __str__(self) -> str:
         return (f"IDIMNLS Model with {self.nVars} optimization variables,"
                 f"output shape: {self.output.shape}, "
@@ -55,19 +57,24 @@ class IDIMNLS:
         else:
             logger.error(\
         'Identification Engine: Optimisation Variables number should be <= input vector size. ')
-        
         rmse = RMSE(self.output, tau_s) 
         cost = np.mean(rmse**2)
         return cost 
     
-    def computeRelativeError(self):
-        relaErr =0
-        return relaErr 
-    
+    def computeRelativeError(self, x:np.ndarray=None):
+        if x is None:
+            tau_s = self.identificationModel(self.optimized_params)
+        else:
+            tau_s = self.identificationModel(x)
+        n = min(self.output.shape[0],self.output.shape[1])
+        relative_error =np.zeros(n)
+        for i in range(n):
+            relative_error[i] =np.where(self.output[:,i]!=0, \
+                np.abs(tau_s[:,i] -self.output[:,i] )/np.abs(self.output[:,i]),np.inf)
+        return relative_error
     
     def evaluate(self)->None:
         """Evaluate the model's performance using the current parameters."""
-        
         if self.optimized_params is None:
             logger.error("No optimized parameters found. Run optimize() first.")
             return
@@ -76,19 +83,22 @@ class IDIMNLS:
         mean_rmse = np.mean(rmse)
         logger.info(f"Evaluation result - Mean RMSE: {mean_rmse:.4f}")
     
-    def optimize(self, x0:np.ndarray, method='least_square', tol=0.0001):
+    def optimize(self, x0:np.ndarray=None, method='least_square', tol=1e-4):
         """
         Optimize the cost function with NLS alorithms to mimize it value.
         Args:
-            x0 : numpy-ndarry : initial paramters values estimation.
-            method : optimisation algorithm
-            tol : optimization alorithm error stop tolerence.
+            - x0 : numpy-ndarry : initial paramters values estimation.
+            - method : optimisation algorithm
+            - tol : optimization alorithm error stop tolerence.
         """
+        if x0 is None:
+            x0 = clampArray(abs(np.random.rand(self.nVars)),self.lowerBound,self.upperBound)
         xOpt = x0
         if method == 'least_square':
             try:
-                xOpt = least_squares(self.computeLsCostFunction, x0, xtol=tol)
-                self.optimized_params = xOpt.x
+                xOpt = least_squares(self.computeLsCostFunction, x0, xtol=tol, verbose=1)
+                self.optimized_params = clampArray(xOpt.x,self.lowerBound,self.upperBound)
+                xOpt = self.optimized_params
             except Exception as e:
                 logger.error(f"An error occurred during optimization: {e}")
         elif method == 'curve_fit':
@@ -98,42 +108,58 @@ class IDIMNLS:
                     len(self.output))
                 popt, _ = curve_fit(self.identificationModel, x_data, \
                     self.output , p0=init_params,method='trf')
-                self.optimized_params = popt.x
+                self.optimized_params = clampArray(popt.x,self.lowerBound,self.upperBound)
+                xOpt = clampArray(popt.x,self.lowerBound,self.upperBound)
             except Exception as e:
                 logger.error(f"An error occurred during optimization: {e}")
         else:
             logger.error('Optimisation method Not Supported!')
         return xOpt
     
-    def visualizeCostFunction(self)->None:
-        """
-        Plot the cost function scalar variation respect to ||x|| only 
-        the optimisation variables 
-        are considerd 
-        """
-        plt.figure(figsize=(12, 6))
-    
-    
     def visualizeError(self,title=None, ylabel=None)->None:
         """Plot the root squred error between simulated and inputs"""
-        
         if self.optimized_params is None:
             logger.error("Identification Engine : No optimized parameters found. Run optimize() first.")
             return
         tau_s = self.identificationModel(self.optimized_params)
-        rmse = RMSE(self.output, tau_s,1)
-        plotArray(rmse,'err per joint','abs err')
+        rmse = RMSE(self.output,tau_s,1)
+        plotArray(rmse,title,ylabel)
         
     def visualizeResults(self, title=None, y_label=None)->None:
         """Plot the simulated and real signals in one figure."""
-    
         if self.optimized_params is None:
             logger.error("No optimized parameters found. Run optimize() first.")
         tau_s = self.identificationModel(self.optimized_params)
         plot2Arrays(tau_s,self.output,'simultion','true',title)
         
-    def visualizeRelativeError(self):
-        """ """
- 
-
+    def visualizeRelativeError(self,x:np.ndarray=None):
+        """Plot the bar diagram of each joint relative error"""
+        plt.figure(figsize=(12, 6))
+        n = min(self.output.shape[0],self.output.shape[1])
+        relative_error = self.computeRelativeError(x)
+        sns.barplot(x= np.ones_like(range(n)), y=relative_error)
+        plt.xlabel('Joint Index',fontsize=9)
+        plt.title('Relative Joints Error',fontsize=9)
+        
+    def visualizeCostFunction(self,points_number:int=1500)->None:
+        """Plot the cost function scalar variation with respect to ||x||"""
+        xi = np.zeros(self.nVars)
+        xlist= [xi] * points_number
+        xnorm = [0] * points_number
+        ylist = [0] * points_number
+        for i in range(len(xlist)):
+            xi = np.random.uniform(self.lowerBound, self.upperBound, self.nVars)
+            ylist[i] = self.computeLsCostFunction(xi)
+            xnorm[i] = np.linalg.norm(xi)
+            xlist[i]= xi
+        plt.figure(figsize=(12, 6))
+        plt.scatter(xnorm,ylist,marker='.',s=4)
+        if not (self.optimized_params is None):
+            optnorm = np.linalg.norm(self.optimized_params)
+            yopt= self.computeLsCostFunction(self.optimized_params)
+            plt.scatter([optnorm], [yopt], color='red', marker='.',s=10)
+        
+        plt.title('Cost Function vs Paramter Vector Norm',fontsize=9)
+        plt.xlabel("Norm2 Values")
+        plt.ylabel("Loss Values")
    

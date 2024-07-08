@@ -100,6 +100,9 @@ class TestRobot(unittest.TestCase):
         
     def test_identification_model_not_none(self):
         robot = Robot()
+        q = np.random.rand(100,7)
+        qp = np.random.rand(100,7)
+        qpp = np.random.rand(100,7)
         
 if __name__ == "__main__":
     unittest.main() 
