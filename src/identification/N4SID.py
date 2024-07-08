@@ -1,9 +1,9 @@
 import numpy as np 
-from dynamics import StateSpace as ss
+from dynamics import StateSpace 
 
 class N4SID:
     """
-     Numerical Subspace State Space System IDentification
+     Numerical Subspace State Space System Identification
      This method uses input-output data to construct a state-space model by minimizing 
      a prediction error criterion.
      

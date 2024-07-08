@@ -1,16 +1,18 @@
 import random
 import numpy as np
-from numba import cuda
 import warnings
-from numba.cuda.dispatcher import NumbaPerformanceWarning
+import logging
 
-warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
+from numba import cuda
+if (cuda.is_available()):
+    from numba.cuda.dispatcher import NumbaPerformanceWarning
+    warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 W = 0.85
 c1 = 0.72
 c2 = 0.91
 
-print(cuda.is_available())
+ 
 n_iterations = int(input("Inform the number of iterations: "))
 target_error = float(input("Inform the target error: "))
 n_particles = int(input("Inform the number of particles: "))
@@ -98,6 +100,10 @@ class Space():
         for i, particle in enumerate(self.particles):
             particle.position = d_positions[i]
             particle.velocity = d_velocities[i]
+            
+class PSO:
+    def __init__(self, iter,particles,w,c1,c2) -> None:
+        pass
 
 
 

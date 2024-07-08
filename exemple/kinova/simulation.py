@@ -1,6 +1,9 @@
-""" 
-
-"""
+###########################################################################################
+# tghis script for robot data visulization adn the static simulation of the robt models 
+# with pataerts stored in config.yml file
+# all figures are saved in figure/pyDynamapp 
+#
+###########################################################################################
 import sys
 import os
 import pandas as pd
@@ -15,20 +18,22 @@ logging.basicConfig(level='INFO')
 mlogger = logging.getLogger('matplotlib')
 mlogger.setLevel(logging.WARNING)
 
-src_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'src'))
+src_folder = os.path.abspath(os.path.join(os.path.dirname(\
+    os.path.dirname(__file__)), '..', 'src'))
 sys.path.append(src_folder)
 
 from dynamics import Robot, StateSpace
 from utils import RobotData, plotArray, plot2Arrays, yaml2dict, RMSE, MAE
 
 cutoff_frequency = 3
-config_params    = yaml2dict("C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml")
-data             = RobotData(config_params['identification']['dataFilePath'])
+config_params    = yaml2dict(\
+"C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml")
+data = RobotData(config_params['identification']['dataFilePath'])
 
-fildata = data.LowPassfilter(cutoff_frequency)
+fildata = data.lowPassfilter(cutoff_frequency)
 kinova = Robot()
  
-q_f       = fildata['position']
+q_f       = fildata ['position']
 qp_f      = fildata['velocity']
 qpp_f     = fildata['desiredAcceleration']
 current_f = fildata['current']
@@ -44,6 +49,8 @@ rmse_joint = RMSE(torque, data.torque_rne).flatten()
 rmse_time  = RMSE(torque, data.torque_rne,axis=1) 
 # compute the model with computed matrices tau =M(q)qddot+C(q,qp)qp+G(q) 
 tau_sim = np.zeros_like(torque)
+
+
 x = 0.0001*np.abs(np.random.rand(13*7))
 tau_f =kinova.computeFrictionTorques(qp,q)
 for i  in range(data.numRows):

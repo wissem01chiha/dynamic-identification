@@ -2,39 +2,58 @@ import sys
 import os
 import unittest 
 import numpy as np
+import matplotlib.pyplot as plt
 
 src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 sys.path.append(src_folder)
 
 from identification import IDIMNLS
+from utils import plotArray
 
 class TestIDIMNLS(unittest.TestCase):
     
     @staticmethod
     def modelFun(params):
-        array = np.random.normal(0, 0.5, size=(1000,10))
-        for i, param in enumerate(params):
-            array += param * np.sin((i+1) * array)
+        t = np.linspace(0, 2*np.pi, 1000)
+        array = np.zeros((1000,7))
+        for i in range(7):
+            array[:, i] = np.sin(params[0] * t + params[1] * i) \
+                * params[2] + params[3] * np.cos(params[4] * t + params[5] * i)
         return array
     
+    def test_model_funtion(self):
+        objval = self.modelFun(np.random.rand(6))
+        plotArray(objval)
+        plt.show()
+        self.assertEqual(objval.shape,(1000,7))
+    
     def test_cost_function_not_none(self):
-        output = 1.2*np.random.normal(0,0.5,size=(1000,10))
-        model = IDIMNLS(5,output,TestIDIMNLS.modelFun)
-        obj = model.computeLsCostFunction(np.random.rand(7))
+        output = np.random.rand(1000,7)
+        model = IDIMNLS(6,output,TestIDIMNLS.modelFun)
+        obj = model.computeLsCostFunction(np.random.rand(6))
         self.assertIsNotNone(obj)
         
     def test_cost_function_shape(self):
-        output = 1.2*np.random.normal(0,0.5,size=(1000,10))
-        model = IDIMNLS(5,output,TestIDIMNLS.modelFun)
-        obj = model.computeLsCostFunction(np.random.rand(7))
+        output = np.random.rand(1000,7)
+        model = IDIMNLS(6,output,TestIDIMNLS.modelFun)
+        obj = model.computeLsCostFunction(np.random.rand(6))
         self.assertEqual(obj.ndim==0,True)
         
     def test_optimize_not_none(self):
-        output = 1.2*np.random.normal(0,0.5,size=(1000,10))
-        model = IDIMNLS(5,output,TestIDIMNLS.modelFun)
-        sol = model.optimize(np.zeros(5))
-        print(sol)
+        output = 1.2*np.random.normal(0,0.5,size=(1000,7))
+        model = IDIMNLS(6,output,TestIDIMNLS.modelFun)
+        sol = model.optimize(np.zeros(6))
         self.assertIsNotNone(sol)
+        
+    def test_evaluate(self):
+        output = self.modelFun([0.5,1,0.3,0.01,0.5,1.5])
+        model = IDIMNLS(5,output,TestIDIMNLS.modelFun)
+        sol = model.optimize(np.random.rand(6))
+        self.assertIsNotNone(model.optimized_params)
+        print(model.optimized_params)
+        #model.visualizeError('opt err')
+        model.visualizeResults('results')
+        plt.show()
         
 if __name__ == "__main__":
     unittest.main() 

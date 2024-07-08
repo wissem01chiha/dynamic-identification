@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns 
-
+ 
 class Kalman:
     """
     KALMAN
@@ -15,6 +14,8 @@ class Kalman:
         R (np.ndarray): Covariance of the observation noise.
         P (np.ndarray): Initial error covariance.
         x0 (np.ndarray): Initial state estimate.
+    Ref:
+        An Introduction to the Kalman Filter - Greg Welch and Gary Bishop.
     """
     
     def __init__(self, F, H, Q, R, P, x0, alpha=0.2, beta=1):
@@ -58,11 +59,14 @@ class Kalman:
             states (np.ndarray): Sequence of state estimates.
         """
         states = []
+        innovations = []
         for z in observations:
             self.predict()
             self.update(z)
+            y = self.update(z)
             states.append(self.x.copy())
-        return np.array(states)
+            innovations.append(y.copy())
+        return np.array(states), np.array(innovations)
 
     def evaluate(self, true_states, estimated_states):
         """
@@ -89,6 +93,12 @@ class Kalman:
         self.Q = self.Q + self.alpha * (np.outer(y, y) - self.Q)
         self.R = self.R + self.beta * (np.outer(y, y) - self.R)
         
-    def visualizeSatets(self):
-        """ """
+    def visualizeEstimates(self):
+        """Visualize the estimated states over time."""
         plt.figure(figsize=(12, 6))
+        for i in range(self.x.shape[1]):
+            plt.plot(self.x[:, i], label=f'Estimated state {i+1}')
+        plt.xlabel('Time (ms)')
+        plt.ylabel('state values')
+        plt.title('Estimated states over time')
+        plt.legend()

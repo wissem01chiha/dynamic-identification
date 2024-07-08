@@ -2,10 +2,8 @@ import logging
 import numpy as np
 from typing import Callable
 import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd 
 from scipy.optimize import least_squares, curve_fit 
-from utils import RMSE
+from utils import RMSE, clampArray, plotArray, plot2Arrays
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,18 +21,22 @@ class IDIMNLS:
         - identificationModel : function that return the model computed torques.
             of shape : ( Nsamples * ndof )
     """
-    def __init__(self,nVars,output,identificationModel: Callable[[np.ndarray],np.ndarray],time_step=0.001) -> None:
-        self.time_step        = time_step
-        self.output           = output
-        self.nVars            = nVars
-         
+    def __init__(self,nVars,output,identificationModel: Callable[[np.ndarray],np.ndarray],\
+        upperBound=10,lowerBound=0.001,time_step=0.001) -> None:
+        
+        # Class Attributes
+        self.time_step = time_step
+        self.output = output
+        self.nVars = nVars
+        self.upperBound = upperBound
+        self.lowerBound = lowerBound
         self.identificationModel  = identificationModel
         self.optimized_params = None
         assert (np.ndim(self.output) == 2)
        
     def __str__(self) -> str:
         return (f"IDIMNLS Model with {self.nVars} optimization variables,"
-                f"output shape: {self.torque.shape}, "
+                f"output shape: {self.output.shape}, "
                 f"time step: {self.time_step}")
         
     def computeLsCostFunction(self, x:np.ndarray):
@@ -45,17 +47,24 @@ class IDIMNLS:
         """
         if self.nVars < x.size :
             xnew = np.concatenate([x[0:self.nVars], np.zeros(x.size-self.nVars)])
+            xnew = clampArray(xnew,self.lowerBound,self.upperBound)
             tau_s = self.identificationModel(xnew)
         elif self.nVars == x.size:
+            x = clampArray(x,self.lowerBound,self.upperBound)
             tau_s = self.identificationModel(x)
         else:
             logger.error(\
-        'Identification Engine: Optimisation Variables number should be <= optimisation vector. ')
+        'Identification Engine: Optimisation Variables number should be <= input vector size. ')
         
         rmse = RMSE(self.output, tau_s) 
         cost = np.mean(rmse**2)
         return cost 
-
+    
+    def computeRelativeError(self):
+        relaErr =0
+        return relaErr 
+    
+    
     def evaluate(self)->None:
         """Evaluate the model's performance using the current parameters."""
         
@@ -67,7 +76,7 @@ class IDIMNLS:
         mean_rmse = np.mean(rmse)
         logger.info(f"Evaluation result - Mean RMSE: {mean_rmse:.4f}")
     
-    def optimize(self, x0:np.ndarray, method='least_square', tol=0.5):
+    def optimize(self, x0:np.ndarray, method='least_square', tol=0.0001):
         """
         Optimize the cost function with NLS alorithms to mimize it value.
         Args:
@@ -75,7 +84,7 @@ class IDIMNLS:
             method : optimisation algorithm
             tol : optimization alorithm error stop tolerence.
         """
-        assert x0.size == self.nVars
+        xOpt = x0
         if method == 'least_square':
             try:
                 xOpt = least_squares(self.computeLsCostFunction, x0, xtol=tol)
@@ -89,7 +98,7 @@ class IDIMNLS:
                     len(self.output))
                 popt, _ = curve_fit(self.identificationModel, x_data, \
                     self.output , p0=init_params,method='trf')
-                self.optimized_params = popt
+                self.optimized_params = popt.x
             except Exception as e:
                 logger.error(f"An error occurred during optimization: {e}")
         else:
@@ -97,68 +106,34 @@ class IDIMNLS:
         return xOpt
     
     def visualizeCostFunction(self)->None:
-        """ """
-    
-    
-    
+        """
+        Plot the cost function scalar variation respect to ||x|| only 
+        the optimisation variables 
+        are considerd 
+        """
+        plt.figure(figsize=(12, 6))
     
     
     def visualizeError(self,title=None, ylabel=None)->None:
-        """Plot the error between simulated and real torque using Seaborn."""
+        """Plot the root squred error between simulated and inputs"""
         
         if self.optimized_params is None:
-            logger.error("No optimized parameters found. Run optimize() first.")
+            logger.error("Identification Engine : No optimized parameters found. Run optimize() first.")
             return
         tau_s = self.identificationModel(self.optimized_params)
-        error = self.torque - tau_s
-        time_steps = np.arange(error.shape[0])
-        error_df = pd.DataFrame(error, columns=[f'Joint {i+1}' for i in \
-            range(error.shape[1])])
-        error_df['Time Step'] = time_steps
-        error_df_melted = error_df.melt(id_vars='Time Step', \
-            var_name='Joint', value_name='Error')
-
-        plt.figure(figsize=(12, 6))
-        sns.lineplot(data=error_df_melted, x='Time Step', y='Error', hue='Joint')
-        if not(title is None):
-            plt.title(title,fontsize=9)
-        plt.xlabel('Time (ms)',fontsize=9)
-        if not(ylabel is None):
-            plt.ylabel(ylabel,fontsize=9)
-        plt.legend(title='Joint',fontsize=9)
+        rmse = RMSE(self.output, tau_s,1)
+        plotArray(rmse,'err per joint','abs err')
         
-def visualizeResults(self, title=None, y_label=None)->None:
-    """Plot the simulated and real torque in one figure."""
+    def visualizeResults(self, title=None, y_label=None)->None:
+        """Plot the simulated and real signals in one figure."""
     
-    if self.optimized_params is None:
-        logger.error("No optimized parameters found. Run optimize() first.")
+        if self.optimized_params is None:
+            logger.error("No optimized parameters found. Run optimize() first.")
+        tau_s = self.identificationModel(self.optimized_params)
+        plot2Arrays(tau_s,self.output,'simultion','true',title)
+        
+    def visualizeRelativeError(self):
+        """ """
+ 
 
-    tau_s = self.identificationModel(self.optimized_params)
-    time_steps = np.arange(self.torque.shape[0])
-
-    real_df = pd.DataFrame(self.torque, columns=[f'Joint {i+1}' for i in \
-        range(self.torque.shape[1])])
-    simulated_df = pd.DataFrame(tau_s, columns=[f'Joint {i+1}' for i in \
-        range(tau_s.shape[1])])
-
-    real_df['Time'] = time_steps
-    simulated_df['Time'] = time_steps
-
-    combined_df = pd.merge(real_df.melt(id_vars='Time', var_name='Joint', \
-        value_name='Real Torque'),
-                           simulated_df.melt(id_vars='Time', var_name='Joint',\
-                               value_name='Simulated Torque'),
-                           on=['Time', 'Joint'])
-
-    plt.figure(figsize=(12, 6))
-    sns.lineplot(data=combined_df, x='Time', y='Real Torque', hue='Joint',\
-        style='Joint', dashes=False, markers=True, alpha=0.6)
-    sns.lineplot(data=combined_df, x='Time', y='Simulated Torque', hue='Joint',\
-        style='Joint', dashes=True)
-
-    if title is not None:
-        plt.title(title)
-    plt.xlabel('Time (ms)', fontsize=9)
-    if y_label is not None:
-        plt.ylabel(y_label, fontsize=9)
-    plt.legend(title='Joint', fontsize=9)
+   

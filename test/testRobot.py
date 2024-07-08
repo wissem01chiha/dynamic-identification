@@ -98,6 +98,9 @@ class TestRobot(unittest.TestCase):
         tau_f2 = robot.computeFrictionTorques(qp,q)
         self.assertEqual(np.any(tau_f1!=tau_f2), True)
         
+    def test_identification_model_not_none(self):
+        robot = Robot()
+        
 if __name__ == "__main__":
     unittest.main() 
         

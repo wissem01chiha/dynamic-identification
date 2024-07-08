@@ -86,6 +86,24 @@ def yaml2dict(yamlFilePath) -> dict:
     except yaml.YAMLError as e:
         logger.error(f"Error parsing YAML file '{yamlFilePath}': {e}")
         return {}
+    
+def wrapArray(array:np.ndarray, lower_bound, upper_bound):
+    range_width = upper_bound - lower_bound
+    wrapped_array = lower_bound + (array - lower_bound)
+    
+    return wrapped_array
+    
+def scaleArray(array:np.ndarray, lower_bound,upper_bound):
+    min_val = np.min(array)
+    max_val = np.max(array)
+    scaled_array = (upper_bound - lower_bound) * (array - min_val) / (max_val - min_val) + lower_bound
+    
+    return scaled_array
+
+def clampArray(array:np.ndarray, lower_bound, upper_bound):
+    clamped_array = np.clip(array, lower_bound, upper_bound)
+    
+    return clamped_array
 
 def plotArray(array: np.ndarray,title=None,ylabel = None) -> None:
     """
@@ -97,7 +115,7 @@ def plotArray(array: np.ndarray,title=None,ylabel = None) -> None:
     """
     N = array.shape[0]
     if array.ndim ==1 :
-        fig = plt.figure(figsize=(10, 6))
+        fig = plt.figure(figsize=(12, 6))
         ax = fig.add_subplot(111)
         sns.lineplot(ax=ax, x=np.arange(N), y=array, linewidth=0.5, color='blue')
         ax.set_xlabel("Time (ms)", fontsize=9)
@@ -107,7 +125,7 @@ def plotArray(array: np.ndarray,title=None,ylabel = None) -> None:
         ndof = min(array.shape[1],array.shape[0])
         if not(ndof == array.shape[1]):
             array = np.transpose(array)
-        fig, axes = plt.subplots(3, 3, figsize=(10, 6), dpi=100)
+        fig, axes = plt.subplots(3, 3, figsize=(12, 6), dpi=100)
         axes = axes.flatten()
         for i in range(ndof):
             ax = axes[i]
@@ -129,21 +147,15 @@ def plot2Arrays(array1: np.ndarray, array2: np.ndarray, legend1=None, legend2=No
                color1='red', color2='blue') -> None:
     """
     Given two (n * m) data arrays where n >> m, plot each column data
-    from both arrays in separate subplots.
-
-    Args:
-        - array1: First numpy ndarray
-        - array2: Second numpy ndarray
-        - legend1: Legend for the first array  
-        - legend2: Legend for the second array  
-        - color1: Line color for the first array  
-        - color2: Line color for the second array  
-        - title: Title for the figure  
+    from both arrays in separate subplots. 
     """
-    assert array1.shape == array2.shape, "Arrays should have the same size."
+    assert array1.shape == array2.shape, "Arrays should have the same shapes."
     ndof = min(array1.shape[1],array1.shape[0])
-    N = array1.shape[0]
-    fig, axes = plt.subplots(3, 3, figsize=(10, 6), dpi=100)
+    if ndof == array1.shape[1]:
+        N = array1.shape[0]
+    else:
+        N = array1.shape[1]
+    fig, axes = plt.subplots(3, 3, figsize=(12, 6), dpi=100)
     axes = axes.flatten()
     
     for i in range(ndof):
@@ -166,19 +178,7 @@ def plot3Arrays(array1: np.ndarray, array2: np.ndarray, array3: np.ndarray,
                     title=None, color1='red', color2='blue', color3='green') -> None:
     """
     Given three (n * m) data arrays where n >> m, plot each column data
-    from all arrays in separate subplots.
-
-    Args:
-        - array1: First numpy ndarray
-        - array2: Second numpy ndarray
-        - array3: Third numpy ndarray
-        - legend1: Legend for the first array  
-        - legend2: Legend for the second array  
-        - legend3: Legend for the third array  
-        - color1: Line color for the first array  
-        - color2: Line color for the second array  
-        - color3: Line color for the third array  
-        - title: Title for the figure  
+    from all arrays in separate subplots. 
     """
     ndof = array1.shape[1]
     N = array1.shape[0]

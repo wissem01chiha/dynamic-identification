@@ -2,7 +2,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from   scipy.signal import butter, filtfilt
+import logging
+from scipy.signal import butter, filtfilt
+from identification import Kalman
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class RobotData:
     """
@@ -10,16 +15,19 @@ class RobotData:
     
     Args:
         - dataFilePath (str): Path to the CSV data file.
+        - ndof (int) : number of freedom degree of the manipulator.
+        - time_step (float) : step time beteewn tow conscutive sample of data
         - intIndex (int): Initial index for data slicing.
         - stepIndex (int): Step index for periodic data selection.
         - fnlIndex (int): Final index for data slicing.
     """
-    def __init__(self, dataFilePath, intIndex=None, stepIndex=1, fnlIndex=None):
+    def __init__(self, dataFilePath,ndof=7,time_step=1e-3, intIndex=None, stepIndex=1, fnlIndex=None):
         try:
             dataTable = pd.read_csv(dataFilePath)
         except Exception as e:
-            raise ValueError(f"Error loading data: {e}")
-
+            logger.error(f"Error loading data: {e}")
+            
+        self.ndof = ndof
         if intIndex is None:
             intIndex = 0
         if fnlIndex is None:
@@ -42,8 +50,8 @@ class RobotData:
         self.desiredAcceleration = dataTable.iloc[intIndex:fnlIndex:stepIndex, 64:71].to_numpy()
 
         self.timeUnit = 'milliseconds'
-        self.timeStep = 1e-3 
-        self.samplingRate = 1000  
+        self.timeStep = time_step
+        self.samplingRate = 1/self.timeStep 
         self.duration = (len(self.time) - 1) * self.timeStep  
 
         self.maxJointVelocity = np.max(self.velocity, axis=0)
@@ -71,7 +79,7 @@ class RobotData:
         self.timeStep = 1 / self.samplingRate
         self.duration = (len(self.time) - 1) * self.timeStep
         
-    def LowPassfilter(self, cutoff_frequency):
+    def lowPassfilter(self, cutoff_frequency):
         """Filtring robot data using a butter low pass filter"""
         nyquist_freq = 0.5 * self.samplingRate
         normal_cutoff = cutoff_frequency / nyquist_freq
@@ -87,58 +95,111 @@ class RobotData:
         smoothed_data['desiredAcceleration'] = filtfilt(b, a, self.desiredAcceleration, axis=0)
         
         return smoothed_data
+    
+    def kalmanFilter(self,variable='torque'):
+        """Filtering Robot Data torques uisng an adaptive kalman filter"""
+        if variable =='torque_cur':
+            observations = np.transpose(self.torque_cur)
+            x0 = self.torque_cur[0,:]
+        elif variable == 'torque_rne':
+            observations = np.transpose(self.torque_rne)
+            x0 = self.torque_rne[0,:]
+        elif variable =='torque':
+            observations = np.transpose(self.torque)
+            x0 = self.torque[0,:]
+        else:
+            logger.error('variable type not supported yet')
+        F = np.eye(self.ndof)
+        H = np.random.randn(self.ndof, self.ndof)
+        Q = np.eye(self.ndof) * 0.01   
+        R = np.eye(self.ndof) * 0.1   
+        P = np.eye(self.ndof)   
+        kf = Kalman(F, H, Q, R, P, x0)
+        estimated_states, innovations = kf.filter(observations)
         
+        return estimated_states, innovations
+    
+    def plotCorrelationGraph(self,variable='torque'):
+        """
+        Plot the correlation graph between joints variable data given by 
+        varaible params 
+        """
+        if variable =='torque_cur':
+            observations = np.transpose(self.torque_cur)
+          
+        elif variable == 'torque_rne':
+            observations = np.transpose(self.torque_rne)
+            x0 = self.torque_rne[0,:]
+        elif variable =='torque':
+            observations = np.transpose(self.torque)
+            x0 = self.torque[0,:]
+        else:
+            logger.error('variable type not supported yet')
+            
+        sns.set(style="whitegrid")
+    
+    
     def plotVelocity(self)->None:
         """Plot the joints velocity recorded by the sensors."""
         sns.set(style="whitegrid")
-        fig, axes = plt.subplots(3, 3, figsize=(10, 6))
-        for i in range(7):
+        fig, axes = plt.subplots(3, 3, figsize=(12, 6))
+        for i in range(self.ndof):
             ax = axes[i // 3, i % 3]
             sns.lineplot(ax=ax, x=np.arange(len(self.velocity[:, i])), y= self.velocity[:, i],linewidth=0.5)
-            ax.set_xlabel("Time (seconds)")
+            ax.set_xlabel("Time (ms)")
             ax.set_ylabel("Velocity")
             ax.set_title(f'Joint {i+1}')
         fig.suptitle('Joints Recorded Velocity', fontsize=11)
-        plt.show()
         
     def plotPosition(self)->None:
         """Plot the joints position recorded by the sensors."""
         sns.set(style="whitegrid")
-        fig, axes = plt.subplots(3, 3, figsize=(10, 6))
-        for i in range(7):
+        fig, axes = plt.subplots(3, 3, figsize=(12, 6))
+        for i in range(self.ndof):
             ax = axes[i // 3, i % 3]
             sns.lineplot(ax = ax, x = np.arange(len(self.position[:, i])), y=self.position[:, i],linewidth=0.5)
-            ax.set_xlabel("Time (seconds)")
+            ax.set_xlabel("Time (ms)")
             ax.set_ylabel("Position")
             ax.set_title(f'Joint {i+1}')
         fig.suptitle('Joints Recorded Position', fontsize=10)
         fig.tight_layout(rect = [0, 0, 1, 0.95])
-        plt.show()
         
     def plotTorque(self)->None:  
         """Plot the joints torque"""
         sns.set(style="whitegrid") 
-        fig, axes = plt.subplots(3, 3, figsize=(10, 6))
-        for i in range(7):
+        fig, axes = plt.subplots(3, 3, figsize=(12, 6))
+        for i in range(self.ndof):
             ax = axes[i // 3, i % 3]
             sns.lineplot(ax=ax, x=np.arange(len(self.torque[:, i])), y=self.torque[:, i],linewidth=0.5)
-            ax.set_xlabel("Time (seconds)")
+            ax.set_xlabel("Time (ms)")
             ax.set_ylabel("Torque (N.m)")
             ax.set_title(f'Joint {i+1}')
         fig.suptitle('Joints Recorded Torque', fontsize=11)
         fig.tight_layout(rect=[0, 0, 1, 0.95])
-        plt.show()
-        
+          
     def plotCurrent(self)-> None:   
         """Plot the joints current """ 
         sns.set(style="whitegrid")
-        fig, axes = plt.subplots(3, 3, figsize=(10, 6))
-        for i in range(7):
+        fig, axes = plt.subplots(3, 3, figsize=(12, 6))
+        for i in range(self.ndof):
             ax = axes[i // 3, i % 3]
             sns.lineplot(ax=ax, x=np.arange(len(self.current[:, i])), y=self.current[:, i],linewidth=0.5)
-            ax.set_xlabel("Time (seconds)")
+            ax.set_xlabel("Time (ms)")
             ax.set_ylabel("Current (mA)")
             ax.set_title(f'Joint {i+1}')
         fig.suptitle('Joints Recorded Current', fontsize=11)
         fig.tight_layout(rect=[0, 0, 1, 0.95])
-        plt.show()    
+    
+    def plotAcceleration(self)->None: 
+        """Plot the joints desired accleration"""
+        sns.set(style="whitegrid")
+        fig, axes = plt.subplots(3, 3, figsize=(12, 6))   
+        for i in range(self.ndof):
+            ax = axes[i // 3, i % 3]
+            sns.lineplot(ax=ax, x=np.arange(len(self.desiredAcceleration[:, i])),\
+                y=self.desiredAcceleration[:, i],linewidth=0.5)
+            ax.set_xlabel("Time (ms)")
+            ax.set_ylabel("Acceleration")
+            ax.set_title(f'Joint {i+1}')
+        fig.suptitle('Joints desired acceleration', fontsize=11)
+        fig.tight_layout(rect=[0, 0, 1, 0.95])
