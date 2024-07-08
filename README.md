@@ -1,4 +1,11 @@
-## Robotic Dynamics Identification  
+<div align="center">
+
+## Robotic Dynamics Identification Toolkit
+[![Build Status](https://github.com/Justintime50/python-template/workflows/build/badge.svg)](https://github.com/Justintime50/python-template/actions)
+[![Coverage Status](https://coveralls.io/repos/github/Justintime50/python-template/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/python-template?branch=main)
+[![Licence](https://img.shields.io/github/license/justintime50/python-template)](LICENSE)
+</div>
+
 Python code and datasets for the identification of state-dependent dynamic model parameters in collaborative robotic manipulator systems.
 ### Features
 - trajectory data preprocessing
