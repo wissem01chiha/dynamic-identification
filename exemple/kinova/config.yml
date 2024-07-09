@@ -13,6 +13,8 @@ identification:
     has_backlash         : False
     has_actuator         : True
     has_ external_forces : False
+    has_joint_offset     : True
+    has_torque_offset    : True
 simulation:
   time_step : 0.001
   sampling_frequency : 1000

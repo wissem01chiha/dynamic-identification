@@ -109,7 +109,8 @@ class Robot():
             - qp: Joints Velocity vector.
             - q : Joints Position vector.
         Returns: 
-            - C : numpy.ndarray      
+            - C : numpy.ndarray 
+        # TODO ensure that the divion in the in derivates are not by a zero elmenent     
         """
         if q is None:
             q =self.q
@@ -127,8 +128,8 @@ class Robot():
         for i in range(7):
             for j in range(7):
                 for k in range(7):
-                    Christoffel = 1/2*( diff_M[i,j] + diff_M[i, k] - diff_M[j,k])
-                    C[i,j] = C[i,j] + Christoffel * qp[k]       
+                    christoffel = 1/2*( diff_M[i,j]+ diff_M[i, k]- diff_M[j,k])
+                    C[i,j] = C[i,j] + christoffel * qp[k]       
         return C 
     
     def computeGravityTorques(self, q=None):

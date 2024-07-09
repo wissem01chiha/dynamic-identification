@@ -4,20 +4,115 @@ import numpy as np
 from dynamics import Robot
 
 class Regressor:
-    """ 
-    Ref:
     
-    """
     def __init__(self, robot:Robot=None) -> None:
         if robot is None:
             self.robot = Robot()
         else:
             self.robot= robot   
         
-    def computeBasicRegressor(self):
-        regx = 0
-        return regx
+    def computeBasicRegressor(self,q:np.ndarray=None,v:np.ndarray=None,a:np.ndarray=None):
+        """ 
+        Compute the Regressor matrix of the robot 
+        This function builds the basic regressor of the 10(+4) parameters
+        'Ixx','Ixy','Ixz','Iyy','Iyz','Izz','mx','my','mz','m'+ ('ia','fs','fv') 
+        
+        Args:
+            - robot: (robot) a robot model.
+            - q: (ndarray) a configuration position vector 
+            - v: (ndarray) a configuration velocity vector  
+            - a: (ndarray) a configutation acceleration vector
+            - tau : (ndarray) of stacked torque measurements (Fx,Fy,Fz), None if the torque offsets are not identified 
+            - W_mod: (ndarray) basic regressor for 10(+4) parameters
+            
+        Returns:
+             - W ndarray (robot.model.nq * 13)
+        """
+        N = len(q) # nb of samples 
+        id_inertias=[]
+        for jj in range(len(self.robot.model.inertias.tolist())):
+            if self.robot.model.inertias.tolist()[jj].mass !=0 :
+                id_inertias.append(jj)
+        nv= self.robot.model.nv
+        add_col = 4
+        W = np.zeros([N*nv, (10+add_col)*nv])
+        W_mod = np.zeros([N*nv, (10+add_col)*nv])
+        for i in range(N):
+            W_temp = pin.computeJointTorqueRegressor(
+                self.robot.model, self.robot.data, q[i, :], v[i, :], a[i, :]
+            )
+            for j in range(W_temp.shape[0]):
+                W[j * N + i, 0 : 10 * nv] = W_temp[j, :]
 
+                if self.robot.params["has_friction"]:
+                    W[j * N + i, 10 * nv + 2 * j] = v[i, j]  # fv
+                    W[j * N + i, 10 * nv + 2 * j + 1] = np.sign(v[i, j])  # fs
+                else:
+                    W[j * N + i, 10 * nv + 2 * j] = 0  # fv
+                    W[j * N + i, 10 * nv + 2 * j + 1] = 0  # fs
+                if self.robot.params["has_actuator"]:
+                    W[j * N + i, 10 * nv + 2 * nv + j] = a[i, j]  # ia
+                else:
+                    W[j * N + i, 10 * nv + 2 * nv + j] = 0  # ia
+                if self.robot.params["has_joint_offset"]:
+                    W[j * N + i, 10 * nv + 2 * nv + nv + j] = 1  # off
+                else:
+                    W[j * N + i, 10 * nv + 2 * nv + nv + j] = 0  # off
+        for k in range(nv):
+            W_mod[:, (10 + add_col) * k + 9] = W[:, 10 * k + 0]  # m
+            W_mod[:, (10 + add_col) * k + 8] = W[:, 10 * k + 3]  # mz
+            W_mod[:, (10 + add_col) * k + 7] = W[:, 10 * k + 2]  # my
+            W_mod[:, (10 + add_col) * k + 6] = W[:, 10 * k + 1]  # mx
+            W_mod[:, (10 + add_col) * k + 5] = W[:, 10 * k + 9]  # Izz
+            W_mod[:, (10 + add_col) * k + 4] = W[:, 10 * k + 8]  # Iyz
+            W_mod[:, (10 + add_col) * k + 3] = W[:, 10 * k + 6]  # Iyy
+            W_mod[:, (10 + add_col) * k + 2] = W[:, 10 * k + 7]  # Ixz
+            W_mod[:, (10 + add_col) * k + 1] = W[:, 10 * k + 5]  # Ixy
+            W_mod[:, (10 + add_col) * k + 0] = W[:, 10 * k + 4]  # Ixx
+
+            W_mod[:, (10 + add_col) * k + 10] = W[:, 10 * nv + 2 * nv + k]  # ia
+            W_mod[:, (10 + add_col) * k + 11] = W[:, 10 * nv + 2 * k]  # fv
+            W_mod[:, (10 + add_col) * k + 12] = W[:, 10 * nv + 2 * k + 1]  # fs
+            W_mod[:, (10 + add_col) * k + 13] = W[:, 10 * nv + 2 * nv + nv + k]  # off
+            
+        return W_mod
+
+    def computeBasicRegressorCond(self):
+        """ """
+        
+    def computeGenralizedRegressor(self):
+        ''' '''
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    """ 
+    
+    
+    
+    
     def addActuatorInertia(self,W, robot, q, v, a, param):
         N = len(q) # nb of samples 
         nv = robot.model.nv
@@ -27,7 +122,7 @@ class Regressor:
         return W
     
     def addFriction(self,W, param):
-        """ only works with viscous friction else give error"""
+         only works with viscous friction else give error
         N = len(self.robot.model.q) # nb of samples 
         nv = self.robot.model.nv
         add_col = 4
@@ -37,13 +132,13 @@ class Regressor:
         return W
     
     def eliminateNonDynaffect(self,W, params_std, tol_e=1e-6):
-        """
+        
         This function eliminates columns which has L2 norm smaller than tolerance.
         Input:  W: (ndarray) joint torque regressor
             params_std: (dict) standard parameters
             tol_e: (float) tolerance
         Output: W_e: (ndarray) reduced regressor
-            params_r: [list] corresponding parameters to columns of reduced regressor"""
+            params_r: [list] corresponding parameters to columns of reduced regressor
         col_norm = np.diag(np.dot(W.T, W))
         idx_e = []
         params_e = []
@@ -95,77 +190,7 @@ class Regressor:
 #     return W_mod
 
 def build_regressor_basic(robot, q, v, a, param, tau=None):
-    """This function builds the basic regressor of the 10(+4) parameters
-    'Ixx','Ixy','Ixz','Iyy','Iyz','Izz','mx','my','mz','m'+ ('ia','fs','fv','off') using pinocchio
-    library depending on param.
-    Input:  robot: (robot) a robot extracted from an urdf (for instance)
-            q: (ndarray) a configuration position vector (size robot.model.nq)
-            v: (ndarray) a configuration velocity vector (size robot.model.nv)
-            a: (ndarray) a configutation acceleration vectore (size robot.model.na)
-            param: (dict) a dictionnary setting the options, i.e., here add two
-            parameters, 'ia' if the flag 'has_actuator_inertia' is true,'fs' and 'fv' if the flag 'has friction' is true, 'off' is the flag "has_joint_offset' is true
-            tau : (ndarray) of stacked torque measurements (Fx,Fy,Fz), None if the torque offsets are not identified 
-    Output: W_mod: (ndarray) basic regressor for 10(+4) parameters
-    """
-    # TODO : test phase with all the different cases between ia, fv+fs, off to see if all have been correctly handled + add similiar code for external wrench case (+ friction, ia,off,etc..)
-    
-    N = len(q) # nb of samples 
 
-    id_inertias=[]
-    for jj in range(len(robot.model.inertias.tolist())):
-        if robot.model.inertias.tolist()[jj].mass !=0 :
-            id_inertias.append(jj)
-    nb_in=len(id_inertias)
-
-    nb_in_total=len(robot.model.inertias)-1 # -1 if base link has inertia without external wrench, else -1 for freeflyer
-
-    nv=robot.model.nv
-
-    add_col = 4
-    #TODO: build regressor for the case of both joint torques and external wrenches. 
-    if param["is_joint_torques"]:
-        W = np.zeros([N*nv, (10+add_col)*nv])
-        W_mod = np.zeros([N*nv, (10+add_col)*nv])
-        for i in range(N):
-            W_temp = pin.computeJointTorqueRegressor(
-                robot.model, robot.data, q[i, :], v[i, :], a[i, :]
-            )
-            for j in range(W_temp.shape[0]):
-                W[j * N + i, 0 : 10 * nv] = W_temp[j, :]
-
-                if param["has_friction"]:
-                    W[j * N + i, 10 * nv + 2 * j] = v[i, j]  # fv
-                    W[j * N + i, 10 * nv + 2 * j + 1] = np.sign(v[i, j])  # fs
-                else:
-                    W[j * N + i, 10 * nv + 2 * j] = 0  # fv
-                    W[j * N + i, 10 * nv + 2 * j + 1] = 0  # fs
-
-                if param["has_actuator_inertia"]:
-                    W[j * N + i, 10 * nv + 2 * nv + j] = a[i, j]  # ia
-                else:
-                    W[j * N + i, 10 * nv + 2 * nv + j] = 0  # ia
-
-                if param["has_joint_offset"]:
-                    W[j * N + i, 10 * nv + 2 * nv + nv + j] = 1  # off
-                else:
-                    W[j * N + i, 10 * nv + 2 * nv + nv + j] = 0  # off
-
-        for k in range(nv):
-            W_mod[:, (10 + add_col) * k + 9] = W[:, 10 * k + 0]  # m
-            W_mod[:, (10 + add_col) * k + 8] = W[:, 10 * k + 3]  # mz
-            W_mod[:, (10 + add_col) * k + 7] = W[:, 10 * k + 2]  # my
-            W_mod[:, (10 + add_col) * k + 6] = W[:, 10 * k + 1]  # mx
-            W_mod[:, (10 + add_col) * k + 5] = W[:, 10 * k + 9]  # Izz
-            W_mod[:, (10 + add_col) * k + 4] = W[:, 10 * k + 8]  # Iyz
-            W_mod[:, (10 + add_col) * k + 3] = W[:, 10 * k + 6]  # Iyy
-            W_mod[:, (10 + add_col) * k + 2] = W[:, 10 * k + 7]  # Ixz
-            W_mod[:, (10 + add_col) * k + 1] = W[:, 10 * k + 5]  # Ixy
-            W_mod[:, (10 + add_col) * k + 0] = W[:, 10 * k + 4]  # Ixx
-
-            W_mod[:, (10 + add_col) * k + 10] = W[:, 10 * nv + 2 * nv + k]  # ia
-            W_mod[:, (10 + add_col) * k + 11] = W[:, 10 * nv + 2 * k]  # fv
-            W_mod[:, (10 + add_col) * k + 12] = W[:, 10 * nv + 2 * k + 1]  # fs
-            W_mod[:, (10 + add_col) * k + 13] = W[:, 10 * nv + 2 * nv + nv + k]  # off
 
     elif param["is_external_wrench"]:
         ft = param["force_torque"]
@@ -279,7 +304,7 @@ def get_index_eliminate(W, params_std, tol_e=1e-6):
 # Function for the total least square
 
 def build_total_regressor_current(W_b_u, W_b_l,W_l, I_u, I_l,param_standard_l, param):
-    """_This function computes the regressor associated to the Total Least Square algorithm when the measurements are joints currents. For more details see [Gautier 2013]_
+    _This function computes the regressor associated to the Total Least Square algorithm when the measurements are joints currents. For more details see [Gautier 2013]_
 
     Args:
         W_b_u (_array_): _base regressor matrix for unloaded case _
@@ -294,7 +319,7 @@ def build_total_regressor_current(W_b_u, W_b_l,W_l, I_u, I_l,param_standard_l, p
         _array_: _The total regressor matrix_
         _array_: _The normalized vector of standard parameters_
         _array_: _The residue associated_
-    """
+    
              
     # build the total regressor matrix for TLS
     # we have to add a minus in front of the regressors for TLS
@@ -367,7 +392,7 @@ def build_total_regressor_current(W_b_u, W_b_l,W_l, I_u, I_l,param_standard_l, p
     return W_tot, V_norm, residue
 
 def build_total_regressor_wrench(W_b_u, W_b_l,W_l, tau_u, tau_l,param_standard_l, param):
-    """_This function computes the regressor associated to the Total Least Square algorithm when the measurements are external wrenches. For more details see [Gautier 2013]_
+    This function computes the regressor associated to the Total Least Square algorithm when the measurements are external wrenches. For more details see [Gautier 2013]_
 
     Args:
         W_b_u (_array_): _base regressor matrix for unloaded case _
@@ -382,7 +407,7 @@ def build_total_regressor_wrench(W_b_u, W_b_l,W_l, tau_u, tau_l,param_standard_l
         _array_: _The total regressor matrix_
         _array_: _The normalized vector of standard parameters_
         _array_: _The residue associated_
-    """
+    
     W_tot =np.concatenate((-W_b_u, -W_b_l), axis=0)
 
     tau_meast_ul = np.reshape(tau_u,(len(tau_u),1))
@@ -423,3 +448,5 @@ def build_total_regressor_wrench(W_b_u, W_b_l,W_l, tau_u, tau_l,param_standard_l
     residue =np.matmul(W_tot,V_norm)
 
     return W_tot, V_norm, residue
+    
+    """

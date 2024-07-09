@@ -94,7 +94,7 @@ class TestRobot(unittest.TestCase):
         q = np.random.rand(100,7)
         qp = np.random.rand(100,7)
         tau_f1 = robot.computeFrictionTorques(qp,q)
-        robot.updateFrictionParams(np.random.rand(10))
+        robot.updateFrictionParams(np.random.rand(14))
         tau_f2 = robot.computeFrictionTorques(qp,q)
         self.assertEqual(np.any(tau_f1!=tau_f2), True)
         

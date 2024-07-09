@@ -200,3 +200,13 @@ def plot3Arrays(array1: np.ndarray, array2: np.ndarray, array3: np.ndarray,
     if title:
         fig.suptitle(title, fontsize=9)
     plt.tight_layout()
+    
+def plotElementWiseArray(array:np.ndarray, title=None,xlabel=None,ylabel= None):
+    plt.figure(figsize=(12,6))
+    sns.barplot(x= np.ones_like(range(len(array)))+range(len(array)),y=array)
+    if not(xlabel is None):
+        plt.xlabel(xlabel,fontsize=9)
+    if not(ylabel is None): 
+        plt.ylabel(ylabel,fontsize=9)
+    if not(title is None):
+        plt.title(title,fontsize=9)
