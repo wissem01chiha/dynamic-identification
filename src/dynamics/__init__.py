@@ -1,3 +1,3 @@
-from dynamics.Robot import *
-from dynamics.Regressor import *
-from dynamics.StateSpace import *
+from .Robot import *
+from .Regressor import *
+from .StateSpace import *

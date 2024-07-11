@@ -27,6 +27,7 @@ class IDIMNLS:
         
         if np.ndim(output) != 2 :
             logger.error("Target output should be 2 dimentional")
+            
         # Class Attributes
         self.time_step = time_step
         self.output = output
@@ -56,7 +57,7 @@ class IDIMNLS:
             tau_s = self.identificationModel(x)
         else:
             logger.error(\
-        'Identification Engine: Optimisation Variables number should be <= input vector size. ')
+        'Identification Engine: Optimisation Variables should be <= input vector size.')
         rmse = RMSE(self.output, tau_s) 
         cost = np.mean(rmse**2)
         return cost 
@@ -119,7 +120,8 @@ class IDIMNLS:
     def visualizeError(self,title=None, ylabel=None)->None:
         """Plot the root squred error between simulated and inputs"""
         if self.optimized_params is None:
-            logger.error("Identification Engine : No optimized parameters found. Run optimize() first.")
+            logger.error(\
+       "Identification Engine: No optimized parameters found.Run optimize() first.")
             return
         tau_s = self.identificationModel(self.optimized_params)
         rmse = RMSE(self.output,tau_s,1)

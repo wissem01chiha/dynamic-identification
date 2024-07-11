@@ -53,15 +53,15 @@ torque         = data.torque
 
 # Visualize the recorded trajectory data of the system.
 plot2Arrays(q, q_f, "true", "filtred", f"Joints Positions, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints positions'))
+plt.savefig(os.path.join(figureFolderPath,'joints_positions'))
 plot2Arrays(qp, qp_f, "true", "filtred", f"Joints Velocity, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints velocity'))
+plt.savefig(os.path.join(figureFolderPath,'joints_velocity'))
 plot2Arrays(qpp, qpp_f, "true", "filtred", f"Joints Acceleration, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints acceleration'))
+plt.savefig(os.path.join(figureFolderPath,'joints_acceleration'))
 plot2Arrays(torque, torque_f , "true", "filtred", f"Joints Torques, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints torques'))
+plt.savefig(os.path.join(figureFolderPath,'joints_torques'))
 plot2Arrays(current, current_f , "true", "filtred", f"Joints Current, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints current'))
+plt.savefig(os.path.join(figureFolderPath,'joints_current'))
 
 
 # Compute and plot the RMSE between the actual RNEA model (Blast) and the 
@@ -70,7 +70,7 @@ rmse_joint = RMSE(torque, data.torque_rne).flatten()
 rmse_time  = RMSE(torque, data.torque_rne,axis=1) 
 plotElementWiseArray(rmse_joint,'Error between Blast RNEA and Sensor Torques per Joint'\
     ,'Joint Index','RMSE')
-plt.savefig(os.path.join(figureFolderPath,'blast RNEA vs sensor torques'))
+plt.savefig(os.path.join(figureFolderPath,'blast_RNEA_vs_sensor_torques'))
 
 
 # Compute and plot the standard manipulator model : 
@@ -81,9 +81,9 @@ for i  in range(data.numRows):
 rmse_per_joint = RMSE(tau_sim,torque).flatten()
 plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model Error per Joint"\
     ,'Joint Index','RMSE')
-plt.savefig(os.path.join(figureFolderPath,'standard_model_error_per_joint'))
+plt.savefig(os.path.join(figureFolderPath,'standard_model_error_joint'))
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard Manipulator Model")
-plt.savefig(os.path.join(figureFolderPath,'standard model'))
+plt.savefig(os.path.join(figureFolderPath,'standard_model'))
 
 
 # Compute and plot the standard manipulator model with friction effect:
@@ -92,9 +92,12 @@ tau_f = kinova.computeFrictionTorques(qp,q)
 tau_sim = np.zeros_like(torque)
 for i  in range(data.numRows):
     tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q[i,:],qp[i,:],qpp[i,:]) + tau_f[i,:])
-model_error = RMSE(tau_sim,torque)
+rmse_per_joint = RMSE(tau_sim,torque).flatten()
+plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model with Friction Error per Joint"\
+    ,'Joint Index','RMSE')
+plt.savefig(os.path.join(figureFolderPath,'standard_model_friction_error_joint'))
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard manipulator model with friction")
-plt.savefig(os.path.join(figureFolderPath,'standard model with friction'))
+plt.savefig(os.path.join(figureFolderPath,'standard_model_with_friction'))
 
 
 # Compute and plot the standard manipulator model with stiffness:
@@ -102,9 +105,13 @@ plt.savefig(os.path.join(figureFolderPath,'standard model with friction'))
 tau_sim = np.zeros_like(torque)
 for i  in range(data.numRows):
     tau_s = kinova.computeStiffnessTorques(q[i,:])
-    tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q[i,:],qp[i,:],qpp[i,:]) + tau_s)
+    tau_sim[i,:] = 2.75*(kinova.computeDifferentialModel(q[i,:],qp[i,:],qpp[i,:]) + tau_s)
+rmse_per_joint = RMSE(tau_sim,torque).flatten()
+plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model with Stiffness Error per Joint"\
+    ,'Joint Index','RMSE')
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard manipulator model with stiffness")
-plt.savefig(os.path.join(figureFolderPath,'standard model with stiffness'))
+plt.savefig(os.path.join(figureFolderPath,'standard_model_stiffness_error_joint'))
+plt.savefig(os.path.join(figureFolderPath,'standard_model_stiffness'))
 
 
 # Compute and plot the standard manipulator model with stiffness and friction:
@@ -115,11 +122,14 @@ for i  in range(data.numRows):
     tau_s = kinova.computeStiffnessTorques(q[i,:])
     tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q[i,:],qp[i,:],qpp[i,:]) + tau_s + tau_f[i,:])
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard model with stiffness and friction")
-plt.savefig(os.path.join(figureFolderPath,'standard model with stiffness & friction'))
+plt.savefig(os.path.join(figureFolderPath,'standard_model_with_stiffness_friction'))
 
 
+# Compute and plot the standard manipulator model with actuator 
+# τ = M(Θ)Θddot + C(Θ,Θp)Θp + [k]Θ + G(Θ) + τf
 
-# Compute an plot the system state space model simulation
+ 
+# Compute and plot the system state space model simulation
 # x(k+1) = A(x) x(k) + B(x) u(k)
 # y(k)   = C x(k)
 """  

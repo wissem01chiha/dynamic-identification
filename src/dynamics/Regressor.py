@@ -1,5 +1,7 @@
 import pinocchio as pin
 import numpy as np
+import matplotlib.pyplot as plt 
+import seaborn as sns 
  
 from dynamics import Robot
 
@@ -22,13 +24,14 @@ class Regressor:
             - q: (ndarray) a configuration position vector 
             - v: (ndarray) a configuration velocity vector  
             - a: (ndarray) a configutation acceleration vector
-            - tau : (ndarray) of stacked torque measurements (Fx,Fy,Fz), None if the torque offsets are not identified 
+            - tau : (ndarray) of stacked torque measurements (Fx,Fy,Fz),
+                None if the torque offsets are not identified 
             - W_mod: (ndarray) basic regressor for 10(+4) parameters
             
         Returns:
              - W ndarray (robot.model.nq * 13)
         """
-        N = len(q) # nb of samples 
+        N = len(q) 
         id_inertias=[]
         for jj in range(len(self.robot.model.inertias.tolist())):
             if self.robot.model.inertias.tolist()[jj].mass !=0 :

@@ -93,12 +93,14 @@ class Kalman:
         self.Q = self.Q + self.alpha * (np.outer(y, y) - self.Q)
         self.R = self.R + self.beta * (np.outer(y, y) - self.R)
         
-    def visualizeEstimates(self):
+    def visualizeEstimates(self, title=None, ylabel =None):
         """Visualize the estimated states over time."""
         plt.figure(figsize=(12, 6))
         for i in range(self.x.shape[1]):
             plt.plot(self.x[:, i], label=f'Estimated state {i+1}')
         plt.xlabel('Time (ms)')
-        plt.ylabel('state values')
-        plt.title('Estimated states over time')
+        if not(title is None):
+            plt.title(title,fontsize=9)
+        if not(ylabel is None):
+            plt.ylabel(ylabel,fontsize=9)
         plt.legend()

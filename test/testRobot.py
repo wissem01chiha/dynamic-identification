@@ -103,6 +103,20 @@ class TestRobot(unittest.TestCase):
         q = np.random.rand(100,7)
         qp = np.random.rand(100,7)
         qpp = np.random.rand(100,7)
+        x = np.random.rand(209)
+        robot.setIdentificationModelData(q,qp,qpp)
+        tau = robot.computeIdentificationModel(x)
+        self.assertIsNotNone(tau)
+        
+    def test_identification_model_shape(self):
+        robot = Robot()
+        q = np.random.rand(100,7)
+        qp = np.random.rand(100,7)
+        qpp = np.random.rand(100,7)
+        x = np.random.rand(209)
+        robot.setIdentificationModelData(q,qp,qpp)
+        tau = robot.computeIdentificationModel(x)
+        self.assertEqual(tau.shape,(100,7))
         
 if __name__ == "__main__":
     unittest.main() 

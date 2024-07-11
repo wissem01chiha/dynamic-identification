@@ -261,8 +261,11 @@ class Robot():
         return tau
     
     def updateExternalForces(self, F:np.ndarray)->None:
-        """update the Pinnchoi external Forces vector."""
-        assert F.size == 6,'Force vector size should be 6'
+        """update the Pinnchoi external forces vector."""
+        if F.size < 6:
+            logger.error("Force vector size should be >= 6")
+        else:
+            F= F[:6]
         pinfext = pin.StdVec_Force()
         for i in range(self.model.njoints):
             linearFext = F[:3]
@@ -280,15 +283,28 @@ class Robot():
         
         return tau_sim
     
+    def setIdentificationModelData(self,q,qp,qpp)->None:
+        
+        self.q= q
+        self.v = qp 
+        self.a = qpp
+    
     
     def computeIdentificationModel(self,x:np.ndarray):
         """
         This function require the setup up of the joints tarjectory parmters previlouslly 
         ie self.q, v and a should be puted in the trajectoy or it will use the default.
         initlize the robot structure with the trajectory data from begin.
-        x : paramters: - 
-        this fuunction woroks for 1 step time  
-        """
+        Args:
+            x : paramters: [inertia, friction, stiffness, actuator, fext]
+                           [13n,     5n,       n,         10n,      6]
+        Returns:
+            tau : model output torque (Nsamples * n )
+        """ 
+        if (self.q is None) or  (self.qp is None) or (self.a is None) or \
+        np.ndim(self.q)!=2 or np.ndim(self.v)!=2 or np.ndim(self.a) !=2 :
+            logger.error('Identification Data not set Run : setIdentificationModelData()') 
+            
         if np.ndim(x) != 1:
             logger.error("X should be 1-dimensional array.")
             
@@ -296,68 +312,70 @@ class Robot():
         friction = self.params['identification']['problem_params']['has_friction']
         motor = self.params['identification']['problem_params']['has_actuator']
         stiffness = self.params['identification']['problem_params']['has_stiffness']
-        
-        if not(fext) :
-            self.updateInertiaParams(x)
+        n = self.model.nq
+        if not(fext):
+            self.updateInertiaParams(x[0:13*n])
             tau = self.computeTrajectoryTorques(self.q,self.v,self.a)
             if friction:
-                self.updateFrictionParams(x)
+                self.updateFrictionParams(x[13*n:18*n])
                 tau_f = self.computeFrictionTorques(self.v,self.q)
                 tau = tau + tau_f
                 if stiffness:
+                    self.updateStiffnessParams(x[18*n:19*n])
                     tau_s = self.computeStiffnessTorques(self.q)
                     tau = tau+tau_f-tau_s
                     if motor:
+                        self.updateActuatorParams(x[19*n:29*n])
                         tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
                         tau = tau_m + tau_f-tau_s
                 elif motor:
-                    self.updateActuatorParams(x)
+                    self.updateActuatorParams(x[19*n:29*n])
                     tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
                     tau = tau_m + tau_f
             else:
                 if stiffness:
-                    self.updateStiffnessParams(x)
+                    self.updateStiffnessParams(x[18*n:19*n])
                     tau_s = self.computeStiffnessTorques(self.q)
                     tau = tau -tau_s
                     if motor:
-                        self.updateActuatorParams(x)
+                        self.updateActuatorParams(x[19*n:29*n])
                         tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
                         tau = tau_m -tau_s
                 elif motor:
-                    self.updateActuatorParams(x)
+                    self.updateActuatorParams(x[19*n:29*n])
                     tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
                     tau = tau_m 
         else:
-            self.updateInertiaParams(x)
-            self.updateExternalForces(x) 
+            self.updateInertiaParams(x[0:13*n])
+            self.updateExternalForces(x[29*n:29*n+6]) 
             tau = self.computeTrajectoryTorques(self.q,self.v,self.a,self.fext)    
             if friction:
-                self.updateFrictionParams(x)
+                self.updateFrictionParams(x[13*n:18*n])
                 tau_f = self.computeFrictionTorques(self.v,self.q)
                 tau = tau + tau_f
                 if stiffness:
-                    self.updateStiffnessParams(x)
+                    self.updateStiffnessParams(x[18*n:19*n])
                     tau_s = self.computeStiffnessTorques(self.q)
                     tau = tau+tau_f-tau_s
                     if motor:
-                        self.updateActuatorParams(x)
+                        self.updateActuatorParams(x[19*n:29*n])
                         tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
                         tau = tau_m + tau_f-tau_s
                 elif motor:
-                    self.updateActuatorParams(x)
+                    self.updateActuatorParams(x[19*n:29*n])
                     tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
                     tau = tau_m + tau_f
             else:
                 if stiffness:
-                    self.updateStiffnessParams(x)
+                    self.updateStiffnessParams(x[18*n:19*n])
                     tau_s = self.computeStiffnessTorques(self.q)
                     tau = tau -tau_s
                     if motor:
-                        self.updateActuatorParams(x)
+                        self.updateActuatorParams(x[19*n:29*n])
                         tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
                         tau = tau_m -tau_s
                 elif motor:
-                    self.updateActuatorParams(x)
+                    self.updateActuatorParams(x[19*n:29*n])
                     tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
                     tau = tau_m    
         return tau
@@ -403,6 +421,7 @@ class Robot():
         
     def computeBaseInertiasParams(self):
         """  
+        #TODO to implement 
         Compute the manipulator Base inertial parameters 
         Returns
             base_params : numpy-ndarry 
@@ -412,32 +431,49 @@ class Robot():
         
     def updateFrictionParams(self, new_params)-> None:
         """
-        Update the robot friction parameters. 
+        update the robot friction parameters.
+        Args:
+            - new_params : ndarry of size min 14 (2n) max is 35(5n)
         """   
         friction_type= self.params['robot_params']['friction']
-        
-        if friction_type == 'viscous':
-            assert new_params.size == 2* self.model.nq # vector of 14
-            new_params = np.reshape(new_params,(2,self.model.nq))
-            self.params['friction_params']['viscous']['Fc']= new_params[0,:]
-            self.params['friction_params']['viscous']['Fs']= new_params[1,:]
-        elif friction_type == 'lugre':
-            assert new_params.size == 5* self.model.nq # vector of 35
-            new_params = np.reshape(new_params,(5,self.model.nq))
-            self.params['friction_params']['lugre']['Fc']= new_params[0,:]
-            self.params['friction_params']['lugre']['Fs']= new_params[1,:]
-            self.params['friction_params']['lugre']['sigma0'] = new_params[2,:]
-            self.params['friction_params']['lugre']['sigma1'] = new_params[3,:]
-            self.params['friction_params']['lugre']['sigma2'] = new_params[4,:]
+        n =  self.model.nq
+        if friction_type == 'viscous': # array of 14
+            if new_params.size < 2 * n:
+                logger.error(f"min parms number for friction model is {2 * n}")
+                return 
+            else:
+                new_params = new_params[0:2*n]
+            self.params['friction_params']['viscous']['Fc']= new_params[0:n]
+            self.params['friction_params']['viscous']['Fs']= new_params[n:2*n]
             
-        elif friction_type == 'maxwellSlip':
-            assert new_params.size == 6 
-            new_params = np.reshape(new_params,(5,self.model.nq))
-            self.params['friction_parms']['maxwellSlip']['k'] = new_params[0,:]
-            self.params['friction_parms']['maxwellSlip']['c'] = new_params[1,:]
-        elif friction_type == 'dahl':
-            assert new_params.size == 2
-            self.params['friction_parms']['dahl']['k'] = new_params[0]
+        elif friction_type == 'lugre':
+            if new_params.size < 5 * n: # array of 35
+                logger.error(f'min params number for friction model is {5 * n}')
+                return
+            else:
+                new_params = new_params[0:5*n]
+            self.params['friction_params']['lugre']['Fc']= new_params[0:n]
+            self.params['friction_params']['lugre']['Fs']= new_params[n:14]
+            self.params['friction_params']['lugre']['sigma0'] = new_params[14:21]
+            self.params['friction_params']['lugre']['sigma1'] = new_params[21:28]
+            self.params['friction_params']['lugre']['sigma2'] = new_params[28:35]
+            
+        elif friction_type == 'maxwellSlip': # array of 13
+            if new_params.size < 6 + n:
+                logger.error(f"min params number for friction model is {6 + n}")
+            else:
+                new_params = new_params[0:13]
+            self.params['friction_parms']['maxwellSlip']['k'] = new_params[0:3]
+            self.params['friction_parms']['maxwellSlip']['c'] = new_params[3:6]
+            self.params['friction_parms']['maxwellSlip']['sigma0'] = new_params[6:13]
+            
+        elif friction_type == 'dahl': # array of 14
+            if new_params.size < 2*n:
+                logger.error(f"min params number for friction model is {2*n}")
+            else:
+                new_params = new_params[0:14]
+            self.params['friction_parms']['dahl']['sigma0'] = new_params[0:7]
+            self.params['friction_parms']['dahl']['Fs'] = new_params[7:14]
         
     def updateStiffnessParams(self, new_params)-> None:
         """
@@ -446,7 +482,7 @@ class Robot():
             new_params (numpy ndarry)
         """ 
         assert new_params.size== self.model.nq,\
-            "Stiffness inputs paramters should be equal to robot joints number"
+            "stiffness inputs should be equal to robot joints number"
         self.params['stiffness_params'] = new_params
         
     def getStiffnessMatrix(self)->np.ndarray:
@@ -475,6 +511,7 @@ class Robot():
         for i in range(self.model.nq):
             motor_i = BLDC(I[i], kt[i], damping[i])
             tau_m[:,i] = motor_i.computeOutputTorque(q[:,i], qp[:,i], qpp[:,i])
+            
         return tau_m
     
     def updateActuatorParams(self, new_params:np.ndarray)->None:
