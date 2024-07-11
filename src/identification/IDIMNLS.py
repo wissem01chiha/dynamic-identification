@@ -121,7 +121,7 @@ class IDIMNLS:
         """Plot the root squred error between simulated and inputs"""
         if self.optimized_params is None:
             logger.error(\
-       "Identification Engine: No optimized parameters found.Run optimize() first.")
+       "Identification Engine: No optimized parameters found.Run optimize().")
             return
         tau_s = self.identificationModel(self.optimized_params)
         rmse = RMSE(self.output,tau_s,1)

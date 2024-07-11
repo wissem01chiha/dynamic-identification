@@ -26,7 +26,7 @@ sys.path.append(src_folder)
 if not os.path.exists(figureFolderPath):
     os.makedirs(figureFolderPath)
 
-from dynamics import Robot, StateSpace
+from dynamics import Robot, Regressor, StateSpace
 from utils import RobotData,  plot2Arrays, plotElementWiseArray, yaml2dict, RMSE
 
 mlogger  = logging.getLogger('matplotlib')
@@ -125,8 +125,9 @@ plot2Arrays(torque_f,tau_sim,"true","simulation","Standard model with stiffness 
 plt.savefig(os.path.join(figureFolderPath,'standard_model_with_stiffness_friction'))
 
 
-# Compute and plot the standard manipulator model with actuator 
+# Compute and plot the standard manipulator model with actuator effect
 # τ = M(Θ)Θddot + C(Θ,Θp)Θp + [k]Θ + G(Θ) + τf
+tau_sim = np.zeros_like(torque)
 
  
 # Compute and plot the system state space model simulation

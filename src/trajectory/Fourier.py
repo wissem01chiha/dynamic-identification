@@ -13,8 +13,8 @@ class FourierGenerator:
     def __init__(self,trajectory_params:dict) -> None:
         self.trajectory_params = trajectory_params
         
-    def computeTrajectoryStates(self,t,Q0=None)->np.ndarray:
-        
+    def computeTrajectoryState(self,t:float=0,Q0=None)->np.ndarray:
+        # t float the time date to evval the traj with in.
         pulsation = 2*np.pi*self.trajectory_params['frequancy']
         nbterms = self.trajectory_params['nbfourierterms']
         ndof = self.trajectory_params['ndof']
@@ -31,19 +31,19 @@ class FourierGenerator:
             for j in range(1, nbterms + 1):
                 Aij = self.trajectory_params['Aij'][i][j - 1]
                 Bij = self.trajectory_params['Bij'][i][j - 1]
-                
                 Cojt = np.cos(pulsation * j * t)
                 Sojt = np.sin(pulsation * j * t)
-
                 Q[i] += Aij / (pulsation * j) * Sojt - Bij / (pulsation * j) * Cojt
                 Qp[i] += Aij * Cojt + Bij * Sojt
                 Qpp[i] += Bij * j * Cojt - Aij * j * Sojt
-
+                
             Qpp[i] = pulsation * Qpp[i]
 
         return np.concatenate([Q, Qp, Qpp])
     
-    def computeTrajectoryCriterion(self, t_i, t_f, Q0:np.ndarray=None)->float:
+    
+    
+    def computeTrajectoryCriterion(self, t_i:float, t_f:float, Q0:np.ndarray=None)->float:
         
         nb_traj_samples = self.trajectory_params['samples']
         ndof =  self.trajectory_params['ndof']
@@ -51,7 +51,7 @@ class FourierGenerator:
         time_samples = np.linspace(t_i, t_f, nb_traj_samples)
         
         for i in range(nb_traj_samples):
-            augmented_state = self.computeTrajectoryStates(time_samples[i],Q0)
+            augmented_state = self.computeTrajectoryState(time_samples[i],Q0)
             Qpp = augmented_state[:ndof]
             Qp = augmented_state[ndof:2 * ndof]
             Q = augmented_state[2 * ndof:]
@@ -82,7 +82,7 @@ class FourierGenerator:
         time_samples = np.linspace(ti, tf, nb_traj_samples)
 
         for i in range(nb_traj_samples):
-            state = self.computeTrajectoryStates(time_samples[i],Q0)
+            state = self.computeTrajectoryState(time_samples[i],Q0)
             joint_state[3 * ndof * i:3 * ndof * (i + 1)] = state
             Q = state[2 * ndof:]
             
@@ -99,7 +99,16 @@ class FourierGenerator:
         
         return C, Ceq
         
-    def visualizeTrajectory(self, title=None):
-        """Plot the generated trajectory"""
+    def visualizeTrajectory(self, t, Q0, title=None):
         # option : display in title the condition number of the trajectory 
+        traj_state = self.computeTrajectoryStates(self,t,Q0)
+        
         plt.figure(figsize=(12, 6))
+        
+        if (title is None):
+            plt.title(title,fontsize=9)
+            
+    def saveTrajectory2file(self):
+        # for send to balst kinova 
+        """ """
+        

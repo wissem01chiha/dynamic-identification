@@ -301,7 +301,7 @@ class Robot():
         Returns:
             tau : model output torque (Nsamples * n )
         """ 
-        if (self.q is None) or  (self.qp is None) or (self.a is None) or \
+        if (self.q is None) or  (self.v is None) or (self.a is None) or \
         np.ndim(self.q)!=2 or np.ndim(self.v)!=2 or np.ndim(self.a) !=2 :
             logger.error('Identification Data not set Run : setIdentificationModelData()') 
             

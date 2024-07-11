@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 sys.path.append(src_folder)
 
-from identification import IDIMNLS, Kalman
+from identification import IDIMNLS
  
 
 class TestIDIMNLS(unittest.TestCase):

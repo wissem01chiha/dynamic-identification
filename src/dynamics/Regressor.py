@@ -1,9 +1,13 @@
 import pinocchio as pin
 import numpy as np
+import logging 
 import matplotlib.pyplot as plt 
 import seaborn as sns 
  
 from dynamics import Robot
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Regressor:
     
@@ -31,7 +35,10 @@ class Regressor:
         Returns:
              - W ndarray (robot.model.nq * 13)
         """
-        N = len(q) 
+        if q is None: 
+            N = len(self.robot.q)
+        else:
+            N = len(q) 
         id_inertias=[]
         for jj in range(len(self.robot.model.inertias.tolist())):
             if self.robot.model.inertias.tolist()[jj].mass !=0 :
@@ -47,17 +54,17 @@ class Regressor:
             for j in range(W_temp.shape[0]):
                 W[j * N + i, 0 : 10 * nv] = W_temp[j, :]
 
-                if self.robot.params["has_friction"]:
+                if self.robot.params['identification']['problem_params']['has_friction']:
                     W[j * N + i, 10 * nv + 2 * j] = v[i, j]  # fv
                     W[j * N + i, 10 * nv + 2 * j + 1] = np.sign(v[i, j])  # fs
                 else:
                     W[j * N + i, 10 * nv + 2 * j] = 0  # fv
                     W[j * N + i, 10 * nv + 2 * j + 1] = 0  # fs
-                if self.robot.params["has_actuator"]:
+                if self.robot.params['identification']['problem_params']["has_actuator"]:
                     W[j * N + i, 10 * nv + 2 * nv + j] = a[i, j]  # ia
                 else:
                     W[j * N + i, 10 * nv + 2 * nv + j] = 0  # ia
-                if self.robot.params["has_joint_offset"]:
+                if self.robot.params['identification']['problem_params']["has_joint_offset"]:
                     W[j * N + i, 10 * nv + 2 * nv + nv + j] = 1  # off
                 else:
                     W[j * N + i, 10 * nv + 2 * nv + nv + j] = 0  # off
@@ -80,44 +87,40 @@ class Regressor:
             
         return W_mod
 
-    def computeBasicRegressorCond(self):
-        """ """
-        
-    def computeGenralizedRegressor(self):
-        ''' '''
+    def computeReducedRegressort(self, tol_e=1e-6):
+        """ 
+        Eliminates columns which has L2 norm smaller than tolerance.
+        Args: 
+            - W: (ndarray) joint torque regressor
+            - tol_e: (float) tolerance
+        Returns: 
+            - W_e: (ndarray) reduced regressor
+        """
+        W = self.computeBasicRegressor()
+        col_norm = np.diag(np.dot(np.transpose(W), W))
+        idx_e = []
+        for i in range(col_norm.shape[0]):
+            if col_norm[i] < tol_e:
+                idx_e.append(i)
+        idx_e = tuple(idx_e)
+        Wred = np.delete(W, idx_e, 1)
+        return Wred 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    """ 
-    
-    
-    
+    def addJointOffset(self,W,  q, v, a, param):
+        if self.robot.params['identification']['problem_params']["has_joint_offset"]:
+            logger.error('Dynamics Engine : Robot has no joint offsets. ')
+            return 
+        W = self.computeBasicRegressor(q,v,a)
+        N = len(q)  
+        nv = self.robot.model.nv
+        add_col = 4
+        for k in range(nv):
+            W[:, (10 + add_col) * k + 13] = 1
+        return W
     
     def addActuatorInertia(self,W, robot, q, v, a, param):
-        N = len(q) # nb of samples 
+        if self.robot.params['identification']['problem_params']["has_friction"]:
+            N = len(q) # nb of samples 
         nv = robot.model.nv
         add_col = 4
         for k in range(nv):
@@ -125,171 +128,37 @@ class Regressor:
         return W
     
     def addFriction(self,W, param):
-         only works with viscous friction else give error
+        if self.robot.params['identification']['problem_params']["has_friction"]:
+            logger.error('Dynamics Engine : Robot joints has no friction.')
+            return 
         N = len(self.robot.model.q) # nb of samples 
         nv = self.robot.model.nv
         add_col = 4
         for k in range(nv):
             W[:, (10 + add_col) * k + 11] = self.robot.model.v[i, j]
             W[:, (10 + add_col) * k + 12] = np.sign(self.robot.model.v[i, j])
+            
         return W
     
-    def eliminateNonDynaffect(self,W, params_std, tol_e=1e-6):
-        
-        This function eliminates columns which has L2 norm smaller than tolerance.
-        Input:  W: (ndarray) joint torque regressor
-            params_std: (dict) standard parameters
-            tol_e: (float) tolerance
-        Output: W_e: (ndarray) reduced regressor
-            params_r: [list] corresponding parameters to columns of reduced regressor
-        col_norm = np.diag(np.dot(W.T, W))
-        idx_e = []
-        params_e = []
-        params_r = []
-        for i in range(col_norm.shape[0]):
-            if col_norm[i] < tol_e:
-                idx_e.append(i)
-                params_e.append(list(params_std.keys())[i])
-            else:
-                params_r.append(list(params_std.keys())[i])
-        idx_e = tuple(idx_e)
-        W_e = np.delete(W, idx_e, 1)
-        return W_e, params_r
     
-    def computeReducedRegressor(self,W, idx_e):
-        W_e = np.delete(W, idx_e, 1)
-        return W_e
+    
+    
+    
+    def computeGenralizedRegressor(self):
+        """ """
+        return 
+    
+    
+    
+    
 
+    """ 
+    
+    
+    
+    
 
-
-
-
-
-
-
-
-# def build_regressor_basic(N, robot, q, v, a):
-#     # TODO: reorgnize columns from ['m', 'mx','my','mz','Ixx','Ixy','Iyy','Ixz', 'Iyz','Izz']
-#     # to ['Ixx','Ixy','Ixz','Iyy','Iyz','Izz','mx','my','mz','m']
-#     W = np.zeros([N * robot.model.nv, 10 * robot.model.nv])
-#     for i in range(N):
-#         W_temp = pin.computeJointTorqueRegressor(
-#             robot.model, robot.data, q[i, :], v[i, :], a[i, :]
-#         )
-#         for j in range(W_temp.shape[0]):
-#             W[j * N + i, :] = W_temp[j, :]
-#     W_mod = np.zeros([N * robot.model.nv, 10 * robot.model.nv])
-#     for k in range(robot.model.nv):
-#         W_mod[:, 10 * k + 9] = W[:, 10 * k + 0]  # m
-#         W_mod[:, 10 * k + 8] = W[:, 10 * k + 3]  # mz
-#         W_mod[:, 10 * k + 7] = W[:, 10 * k + 2]  # my
-#         W_mod[:, 10 * k + 6] = W[:, 10 * k + 1]  # mx
-#         W_mod[:, 10 * k + 5] = W[:, 10 * k + 9]  # Izz
-#         W_mod[:, 10 * k + 4] = W[:, 10 * k + 8]  # Iyz
-#         W_mod[:, 10 * k + 3] = W[:, 10 * k + 6]  # Iyy
-#         W_mod[:, 10 * k + 2] = W[:, 10 * k + 7]  # Ixz
-#         W_mod[:, 10 * k + 1] = W[:, 10 * k + 5]  # Ixy
-#         W_mod[:, 10 * k + 0] = W[:, 10 * k + 4]  # Ixx
-#     return W_mod
-
-def build_regressor_basic(robot, q, v, a, param, tau=None):
-
-
-    elif param["is_external_wrench"]:
-        ft = param["force_torque"]
-        W = np.zeros([N * 6, (10 + add_col) * (nb_in_total)])
-        for i in range(N):
-            W_temp = pin.computeJointTorqueRegressor(
-                robot.model, robot.data, q[i, :], v[i, :], a[i, :]
-            )
-            for k in range(len(ft)):
-                if ft[k] == "Fx":
-                    j = 0
-                    for idx_in in id_inertias:
-                        W[j * N + i,  (idx_in-1)*10 : 10 * idx_in] = W_temp[j, (idx_in-1)*10 : 10 * idx_in]
-                elif ft[k] == "Fy":
-                    j = 1
-                    for idx_in in id_inertias:
-                        W[j * N + i,  (idx_in-1)*10 : 10 * idx_in] = W_temp[j, (idx_in-1)*10 : 10 * idx_in]
-                elif ft[k] == "Fz":
-                    j = 2
-                    for idx_in in id_inertias:
-                        W[j * N + i,  (idx_in-1)*10 : 10 * idx_in] = W_temp[j, (idx_in-1)*10 : 10 * idx_in]
-                elif ft[k] == "Mx":
-                    j = 3
-                    for idx_in in id_inertias:
-                        W[j * N + i,  (idx_in-1)*10 : 10 * idx_in] = W_temp[j, (idx_in-1)*10 : 10 * idx_in]
-                elif ft[k] == "My":
-                    j = 4
-                    for idx_in in id_inertias:
-                        W[j * N + i,  (idx_in-1)*10 : 10 * idx_in] = W_temp[j, (idx_in-1)*10 : 10 * idx_in]
-                elif ft[k] == "Mz":
-                    j = 5
-                    for idx_in in id_inertias:
-                        W[j * N + i,  (idx_in-1)*10 : 10 * idx_in] = W_temp[j, (idx_in-1)*10 : 10 * idx_in]
-                elif ft[k] == "All":
-                    for j in range(6):
-                        for idx_in in id_inertias:
-                            W[j * N + i,  (idx_in-1)*10 : 10 * idx_in] = W_temp[j, (idx_in-1)*10 : 10 * idx_in]
-                else:
-                    raise ValueError("Please enter valid parameters")
-                
-            for j in range(nb_in_total):
-                for k in range(6):
-                    if param["has_friction"]:
-                        W[k * N + i, 10 * nb_in_total + 2 * j] = v[i, j]  # fv
-                        W[k * N + i, 10 * nb_in_total + 2 * j + 1] = np.sign(v[i, j])  # fs
-                    else:
-                        W[k * N + i, 10 * nb_in_total + 2 * j] = 0  # fv
-                        W[k * N + i, 10 * nb_in_total + 2 * j + 1] = 0  # fs
-
-                    if param["has_actuator_inertia"]:
-                        W[k * N + i, 10 * nb_in_total + 2 * nb_in_total + j] = a[i, j]  # ia
-                    else:
-                        W[k * N + i, 10 * nb_in_total + 2 * nb_in_total + j] = 0  # ia
-
-                    if param["has_joint_offset"]:
-                        W[k * N + i, 10 * nb_in_total + 2 * nb_in_total + nb_in_total + j] = 1  # off
-                    else:
-                        W[k * N + i, 10 * nb_in_total + 2 * nb_in_total + nb_in_total + j] = 0  # off
-
-        W_mod = np.zeros([N * 6, (10 + add_col) * (nb_in_total)])
-
-        for k in range(nb_in_total):
-            W_mod[:, (10 + add_col) * k + 9] = W[:, 10 * k + 0]  # m
-            W_mod[:, (10 + add_col) * k + 8] = W[:, 10 * k + 3]  # mz
-            W_mod[:, (10 + add_col) * k + 7] = W[:, 10 * k + 2]  # my
-            W_mod[:, (10 + add_col) * k + 6] = W[:, 10 * k + 1]  # mx
-            W_mod[:, (10 + add_col) * k + 5] = W[:, 10 * k + 9]  # Izz
-            W_mod[:, (10 + add_col) * k + 4] = W[:, 10 * k + 8]  # Iyz
-            W_mod[:, (10 + add_col) * k + 3] = W[:, 10 * k + 6]  # Iyy
-            W_mod[:, (10 + add_col) * k + 2] = W[:, 10 * k + 7]  # Ixz
-            W_mod[:, (10 + add_col) * k + 1] = W[:, 10 * k + 5]  # Ixy
-            W_mod[:, (10 + add_col) * k + 0] = W[:, 10 * k + 4]  # Ixx
-
-            W_mod[:, (10 + add_col) * k + 10] = W[:, 10 * nb_in_total + 2 * nb_in_total + k]  # ia
-            W_mod[:, (10 + add_col) * k + 11] = W[:, 10 * nb_in_total + 2 * k]  # fv
-            W_mod[:, (10 + add_col) * k + 12] = W[:, 10 * nb_in_total + 2 * k + 1]  # fs
-            W_mod[:, (10 + add_col) * k + 13] = W[:, 10 * nb_in_total + 2 * nb_in_total + nb_in_total + k]  # off
-
-    return W_mod
-
-
-
-
-
-def add_joint_offset(W, robot, q, v, a, param):
-    N = len(q) # nb of samples 
-    nv = robot.model.nv
-    add_col = 4
-    for k in range(nv):
-        W[:, (10 + add_col) * k + 13] = 1
-    return W
-
-
-
-
-
+    
 def get_index_eliminate(W, params_std, tol_e=1e-6):
     col_norm = np.diag(np.dot(W.T, W))
     idx_e = []

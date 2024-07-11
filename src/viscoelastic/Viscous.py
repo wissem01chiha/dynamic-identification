@@ -10,7 +10,7 @@ def computeViscousFrictionForce(V, Fc, Fs):
     Fs (float or numpy array): Viscous friction coefficient.
     
     Returns:
-    numpy array: Friction force array.
+        numpy-array: Friction force array.
     """
     return Fc * np.sign(V) + Fs * V
 

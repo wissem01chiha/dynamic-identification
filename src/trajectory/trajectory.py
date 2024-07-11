@@ -33,14 +33,12 @@ class TrajectoryGenerator:
             logger.error('Trajectory engine: incorrect data dimensions!')
     
     def getTrajectoryData(self):
-        """
         
-        """
         
         return 
     
     
-    def plotTrajectoryData(self)->None:
+    def plotTrajectory(self)->None:
         sns.set(style="whitegrid")
         fig, axes = plt.subplots(3, 3, figsize=(12, 6))
         for i in range(7):
