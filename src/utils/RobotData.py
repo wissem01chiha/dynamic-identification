@@ -5,6 +5,8 @@ import seaborn as sns
 import logging
 from scipy.signal import butter, filtfilt
 
+from utils import computeCorrelation
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -96,26 +98,29 @@ class RobotData:
         return smoothed_data
     
     
-    def plotCorrelationGraph(self,variable='torque'):
+    def visualizeCorrelation(self,variable='torque'):
         """
         Plot the correlation graph between joints variable data given by 
-        varaible params 
+        variable parameter
         """
         if variable =='torque_cur':
-            observations = np.transpose(self.torque_cur)
-          
+            correlation_matrix = computeCorrelation(self.torque_cur)
+            title = 'Joints Recorded Torques-Current Correlations'
         elif variable == 'torque_rne':
-            observations = np.transpose(self.torque_rne)
-            x0 = self.torque_rne[0,:]
+            correlation_matrix = computeCorrelation(self.torque_rne)
+            title = 'Joints Blast RNEA Torques Correlations'
         elif variable =='torque':
-            observations = np.transpose(self.torque)
-            x0 = self.torque[0,:]
+            correlation_matrix = computeCorrelation(self.torque)
+            title = 'Joints Sensor Recorded Torques Correlations'
         else:
             logger.error('variable type not supported yet')
-        sns.set(style="whitegrid")
-    
-    
-    def plotVelocity(self)->None:
+            
+        plt.figure(figsize=(12, 6))
+        sns.heatmap(correlation_matrix, annot=True, fmt=".3f", cmap='YlGnBu', linewidths=0.5, \
+                linecolor='white', cbar_kws={"shrink": .8})
+        plt.title(title,fontsize=9)
+        
+    def visualizeVelocity(self)->None:
         """Plot the joints velocity recorded by the sensors."""
         sns.set(style="whitegrid")
         fig, axes = plt.subplots(3, 3, figsize=(12, 6))
@@ -127,7 +132,7 @@ class RobotData:
             ax.set_title(f'Joint {i+1}')
         fig.suptitle('Joints Recorded Velocity', fontsize=11)
         
-    def plotPosition(self)->None:
+    def visualizePosition(self)->None:
         """Plot the joints position recorded by the sensors."""
         sns.set(style="whitegrid")
         fig, axes = plt.subplots(3, 3, figsize=(12, 6))
@@ -140,7 +145,7 @@ class RobotData:
         fig.suptitle('Joints Recorded Position', fontsize=10)
         fig.tight_layout(rect = [0, 0, 1, 0.95])
         
-    def plotTorque(self)->None:  
+    def visualizeTorque(self)->None:  
         """Plot the joints torque"""
         sns.set(style="whitegrid") 
         fig, axes = plt.subplots(3, 3, figsize=(12, 6))
@@ -153,7 +158,7 @@ class RobotData:
         fig.suptitle('Joints Recorded Torque', fontsize=11)
         fig.tight_layout(rect=[0, 0, 1, 0.95])
           
-    def plotCurrent(self)-> None:   
+    def visualizeCurrent(self)-> None:   
         """Plot the joints current """ 
         sns.set(style="whitegrid")
         fig, axes = plt.subplots(3, 3, figsize=(12, 6))
@@ -166,7 +171,7 @@ class RobotData:
         fig.suptitle('Joints Recorded Current', fontsize=11)
         fig.tight_layout(rect=[0, 0, 1, 0.95])
     
-    def plotAcceleration(self)->None: 
+    def visualizeAcceleration(self)->None: 
         """Plot the joints desired accleration"""
         sns.set(style="whitegrid")
         fig, axes = plt.subplots(3, 3, figsize=(12, 6))   

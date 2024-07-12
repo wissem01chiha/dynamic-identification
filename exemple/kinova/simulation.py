@@ -63,6 +63,10 @@ plt.savefig(os.path.join(figureFolderPath,'joints_torques'))
 plot2Arrays(current, current_f , "true", "filtred", f"Joints Current, cutoff frequency = {cutoff_frequency} Hz")
 plt.savefig(os.path.join(figureFolderPath,'joints_current'))
 
+# Visualize 
+data.visualizeCorrelation('torque_rne')
+plt.savefig(os.path.join(figureFolderPath,'torque_correlation'))
+
 
 # Compute and plot the RMSE between the actual RNEA model (Blast) and the 
 # torque sensor output. 
