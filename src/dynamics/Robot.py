@@ -220,8 +220,6 @@ class Robot():
         if stiffCoeffsArray is None:
             logger.error("Stiffness coefficients are missing in the configuration file")
         nk = len(stiffCoeffsArray)
-        if nk != len(q):
-            logger.error("Number of stiffness coefficients must be equal to the number of model joints")
         tau_s = np.zeros_like(q)
         for i in range(nk):
             tau_s[i] = stiffCoeffsArray[i] * q[i]
@@ -251,12 +249,7 @@ class Robot():
                 tau[t,:] = tau_i
         else:
             for t in range(q.shape[0]):
-                pinfext = pin.StdVec_Force()
-                for i in range(self.model.njoints):
-                    linearFext = fext[t,i-1,:3]
-                    angularFext = fext[t,i-1,3:]
-                    pinfext.append(pin.Force(linearFext, angularFext))
-                tau_i = pin.rnea(self.model, self.data, q[t,:], qp[t,:], qpp[t,:], pinfext)
+                tau_i = pin.rnea(self.model, self.data, q[t,:], qp[t,:], qpp[t,:], fext)
                 tau[t,:] = tau_i    
         return tau
     
@@ -327,11 +320,11 @@ class Robot():
                     if motor:
                         self.updateActuatorParams(x[19*n:29*n])
                         tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
-                        tau = tau_m + tau_f-tau_s
+                        tau = tau_m - tau_f-tau_s
                 elif motor:
                     self.updateActuatorParams(x[19*n:29*n])
                     tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
-                    tau = tau_m + tau_f
+                    tau = tau_m - tau_f
             else:
                 if stiffness:
                     self.updateStiffnessParams(x[18*n:19*n])
@@ -360,11 +353,11 @@ class Robot():
                     if motor:
                         self.updateActuatorParams(x[19*n:29*n])
                         tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
-                        tau = tau_m + tau_f-tau_s
+                        tau = tau_m - tau_f-tau_s
                 elif motor:
                     self.updateActuatorParams(x[19*n:29*n])
                     tau_m = self.computeActuatorTorques(self.q,self.v,self.a)
-                    tau = tau_m + tau_f
+                    tau = tau_m - tau_f
             else:
                 if stiffness:
                     self.updateStiffnessParams(x[18*n:19*n])
@@ -463,17 +456,17 @@ class Robot():
                 logger.error(f"min params number for friction model is {6 + n}")
             else:
                 new_params = new_params[0:13]
-            self.params['friction_parms']['maxwellSlip']['k'] = new_params[0:3]
-            self.params['friction_parms']['maxwellSlip']['c'] = new_params[3:6]
-            self.params['friction_parms']['maxwellSlip']['sigma0'] = new_params[6:13]
+            self.params['friction_params']['maxwellSlip']['k'] = new_params[0:3]
+            self.params['friction_params']['maxwellSlip']['c'] = new_params[3:6]
+            self.params['friction_params']['maxwellSlip']['sigma0'] = new_params[6:13]
             
         elif friction_type == 'dahl': # array of 14
             if new_params.size < 2*n:
                 logger.error(f"min params number for friction model is {2*n}")
             else:
                 new_params = new_params[0:14]
-            self.params['friction_parms']['dahl']['sigma0'] = new_params[0:7]
-            self.params['friction_parms']['dahl']['Fs'] = new_params[7:14]
+            self.params['friction_params']['dahl']['sigma0'] = new_params[0:7]
+            self.params['friction_params']['dahl']['Fs'] = new_params[7:14]
         
     def updateStiffnessParams(self, new_params)-> None:
         """
@@ -530,6 +523,15 @@ class Robot():
         self.params['actuator_params']['Ta'] = new_params[3*n:4*n]
         self.params['actuator_params']['Tb'] = new_params[4*n:5*n]
         self.params['actuator_params']['Tck'] = new_params[5*n:10*n].reshape((n, 5))
+    
+    def getActuatorInertiasMatrix(self)->np.ndarray:
+        I = self.params['actuator_params']['inertia']
+        Im = np.eye(len(I))
+        for i in range(len(I)):
+            Im[i] = I[i]
+        return Im
+        
+        
  
 
 

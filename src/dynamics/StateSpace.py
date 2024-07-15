@@ -201,7 +201,8 @@ class StateSpace:
         return states 
     
     def linearize(self,q:np.ndarray, qp:np.ndarray, noise:bool=False):
-        """linearize by finite diffrence method the state-depend dynamics matrices.
+        """
+        linearize by finite diffrence method the state-depend dynamics matrices.
         approximate the matrixe A and B variation to fourier or taylor series.
         to use LPV system utilities
         """

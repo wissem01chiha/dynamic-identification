@@ -92,7 +92,7 @@ class Space():
                 self.gbest_position = particle.position
                 self.best_fitness_value = best_fitness_candidate
 
-    def move_particles(self):
+    def move_particles(self,W,c1,c2):
         d_positions = cuda.to_device(np.array([particle.position for particle in self.particles], dtype=np.float64))
         d_velocities = cuda.to_device(np.array([particle.velocity for particle in self.particles], dtype=np.float64))
         d_pbest_positions = cuda.to_device(np.array([particle.pbest_position for particle in self.particles], dtype=np.float64))
@@ -108,13 +108,38 @@ class Space():
             particle.velocity = d_velocities[i]
             
 class PSO:
-    def __init__(self, iter:int,particles:int,target_error:float,w:float,c1:float,c2:float) -> None:
+    def __init__(self, iterations: int, num_particles: int, target_error: float, w: float, c1: float, c2: float):
+        self.iterations = iterations
+        self.num_particles = num_particles
+        self.target_error = target_error
         self.w = w
         self.c1 = c1
         self.c2 = c2
-        self.iter =iter
-        self.particles = particles
-        
+        self.space = None
+    
+    def _initialize_particles(self, target, target_error):
+        self.space = Space(target, target_error, self.num_particles)
+        for _ in range(self.num_particles):
+            particle = Particle()
+            self.space.particles.append(particle)
+        self.space.set_pbest()
+        self.space.set_gbest()
+
+    def _update_particles(self):
+        for _ in range(self.iterations):
+            self.space.move_particles()
+            self.space.set_pbest()
+            self.space.set_gbest()
+
+            if abs(self.space.best_fitness_value - self.target_error) < 1e-06:
+                break
+    
+    def optimize(self, target, target_error):
+        self._initialize_particles(target, target_error)
+        self._update_particles()
+        return self.space.gbest_position.copy_to_host(), self.space.best_fitness_value
+
+__all__ = ['PSO']
 
 
 

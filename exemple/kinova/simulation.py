@@ -27,7 +27,7 @@ if not os.path.exists(figureFolderPath):
     os.makedirs(figureFolderPath)
 
 from dynamics import Robot, Regressor, StateSpace
-from utils import RobotData,  plot2Arrays, plotElementWiseArray, yaml2dict, RMSE
+from utils import RobotData,  plot2Arrays, plotElementWiseArray, yaml2dict, RMSE, MAE
 
 mlogger  = logging.getLogger('matplotlib')
 logging.basicConfig(level='INFO')
@@ -63,6 +63,13 @@ plt.savefig(os.path.join(figureFolderPath,'joints_torques'))
 plot2Arrays(current, current_f , "true", "filtred", f"Joints Current, cutoff frequency = {cutoff_frequency} Hz")
 plt.savefig(os.path.join(figureFolderPath,'joints_current'))
 
+# Visualize the Correlation between torques data
+data.visualizeCorrelation('torque')
+plt.savefig(os.path.join(figureFolderPath,'sensor_torques_correlation'))
+data.visualizeCorrelation('torque_rne')
+plt.savefig(os.path.join(figureFolderPath,'blast_rne_torques_correlation'))
+data.visualizeCorrelation('torque_cur')
+plt.savefig(os.path.join(figureFolderPath,'current_torques_correlation'))
 
 # Compute and plot the RMSE between the actual RNEA model (Blast) and the 
 # torque sensor output. 
@@ -77,7 +84,7 @@ plt.savefig(os.path.join(figureFolderPath,'blast_RNEA_vs_sensor_torques'))
 # τ = M(Θ)Θddot + C(Θ,Θp)Θp+ G(Θ) 
 tau_sim = np.zeros_like(torque)
 for i  in range(data.numRows):
-    tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q[i,:],qp[i,:],qpp[i,:]))
+    tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q_f[i,:],qp_f[i,:],qpp_f[i,:]))
 rmse_per_joint = RMSE(tau_sim,torque).flatten()
 plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model Error per Joint"\
     ,'Joint Index','RMSE')
@@ -91,7 +98,7 @@ plt.savefig(os.path.join(figureFolderPath,'standard_model'))
 tau_f = kinova.computeFrictionTorques(qp,q)
 tau_sim = np.zeros_like(torque)
 for i  in range(data.numRows):
-    tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q[i,:],qp[i,:],qpp[i,:]) + tau_f[i,:])
+    tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q_f[i,:],qp_f[i,:],qpp_f[i,:]) + tau_f[i,:])
 rmse_per_joint = RMSE(tau_sim,torque).flatten()
 plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model with Friction Error per Joint"\
     ,'Joint Index','RMSE')
@@ -105,7 +112,7 @@ plt.savefig(os.path.join(figureFolderPath,'standard_model_with_friction'))
 tau_sim = np.zeros_like(torque)
 for i  in range(data.numRows):
     tau_s = kinova.computeStiffnessTorques(q[i,:])
-    tau_sim[i,:] = 2.75*(kinova.computeDifferentialModel(q[i,:],qp[i,:],qpp[i,:]) + tau_s)
+    tau_sim[i,:] = 2.75*(kinova.computeDifferentialModel(q_f[i,:],qp_f[i,:],qpp_f[i,:]) + tau_s)
 rmse_per_joint = RMSE(tau_sim,torque).flatten()
 plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model with Stiffness Error per Joint"\
     ,'Joint Index','RMSE')
@@ -120,34 +127,68 @@ tau_sim = np.zeros_like(torque)
 tau_f = kinova.computeFrictionTorques(qp,q)
 for i  in range(data.numRows):
     tau_s = kinova.computeStiffnessTorques(q[i,:])
-    tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q[i,:],qp[i,:],qpp[i,:]) + tau_s + tau_f[i,:])
+    tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q_f[i,:],qp_f[i,:],qpp_f[i,:]) + tau_s + tau_f[i,:])
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard model with stiffness and friction")
-plt.savefig(os.path.join(figureFolderPath,'standard_model_with_stiffness_friction'))
+plt.savefig(os.path.join(figureFolderPath,'standard_model_stiffness_friction'))
 
 
-# Compute and plot the standard manipulator model with actuator effect
-# τ = M(Θ)Θddot + C(Θ,Θp)Θp + [k]Θ + G(Θ) + τf
-tau_sim = np.zeros_like(torque)
+# Compute and plot the standard manipulator model with actuator and friction:
+# No torsional elastic effects Θ = q 
+# τ = τm -  τf - Jm Θddot
+tau_sim =np.zeros_like(torque)
+tau_f = kinova.computeFrictionTorques(qp,q)
+tau_m = kinova.computeActuatorTorques(q,qp,qpp)
+tau_sim = tau_m - tau_f
+Jm = kinova.getActuatorInertiasMatrix()
+for i in range(tau_sim.shape[0]):
+    tau_sim[i,:] -= Jm @ qpp[i,:]
+plot2Arrays(torque_f,tau_sim,"true","simulation","Standard model with actuator and friction")
+plt.savefig(os.path.join(figureFolderPath,'standard_model_actuator_friction'))
 
+
+# Compute and plot the standard manipulator model with actuator, friction and stiffness
+# τj = τm(q,qdot,qddot) -  τf(qdot,q) - Jm qddot
+# τj = M(Θ)Θddot + C(Θ,Θp)Θp + [k](Θ-q) + G(Θ)
+# solve for Θ given q from data , them simulate (2)and compare τj_sim with the real one 
+# from data
+K = kinova.getStiffnessMatrix()
  
+# Compute and plot the standard manipulator regression model:
+# τ = W Θ
+reg = Regressor(kinova)
+x = np.random.rand(reg.param_vector_max_size)
+W = reg.computeFullRegressor(q_f,qp_f,qpp_f) 
+tau_sim = (W @ x).reshape((torque.shape[0],kinova.model.nq))
+plot2Arrays(torque_f,tau_sim,"true","simulation","Standard regression model")
+plt.savefig(os.path.join(figureFolderPath,'standard_regression_model'))
+
+# Compute and plot the non linear manipultaor  regression model 
+# τ = f(q,qp,qpp,x) 
+kinova.setIdentificationModelData(q_f,qp_f,qpp_f)
+x = np.random.rand(209)
+tau_sim = kinova.computeIdentificationModel(x)
+plot2Arrays(torque_f,tau_sim,"true","simulation","Manipulator Non Linear model")
+plt.savefig(os.path.join(figureFolderPath,'non_Linear_model'))
+
+
+
 # Compute and plot the system state space model simulation
 # x(k+1) = A(x) x(k) + B(x) u(k)
-# y(k)   = C x(k)
-"""  
-kinova_ss = StateSpace(kinova)
-tau_ss = torque
-x0 = kinova_ss.getStateVector(qp[0,:],q[0,:])
-states = kinova_ss.simulate(x0,tau_ss[:30000:50,:])
-plot2Arrays(MAE(0.001*np.transpose(states[7:14,:]),30),qp[:30000:50,:],'state','true',\
-    'Joints Velocity State Model Simulation')
-plt.savefig(os.path.join(figureFolderPath,'joints velocity state model simulation'))
-plot2Arrays(MAE(0.001*np.transpose(states[0:7,:]),30),q[0:30000:50,:],'state','true',\
-    'Joints Position State Model Simulation')
+# y(k)   = C x(k) 
+#kinova_ss = StateSpace(kinova)
+#tau_ss = torque
+#x0 = kinova_ss.getStateVector(qp_f[0,:],q_f[0,:])
+#states = kinova_ss.simulate(x0,tau_ss[:30000:50,:])
+#plot2Arrays(MAE(0.001*np.transpose(states[7:14,:]),30),qp[:30000:50,:],'state','true',\
+#    'Joints Velocity State Model Simulation')
+#plt.savefig(os.path.join(figureFolderPath,'joints velocity state model simulation'))
+#plot2Arrays(MAE(0.001*np.transpose(states[0:7,:]),30),q[0:30000:50,:],'state','true',\
+#   'Joints Position State Model Simulation')
 
-"""
+
 
 # Show all figures
-plt.show()
+#plt.show()
 
  
 

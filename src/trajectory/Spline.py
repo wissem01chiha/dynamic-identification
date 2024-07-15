@@ -6,14 +6,51 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+from utils import plotArray
+
 class SplineGenerator:
   
-    def __init__(self) -> None:
+    def __init__(self, trajectory_params) -> None:
+        
         pass
     
     def computeTrajectoryState(self,t,Q0=None)->np.ndarray:
-        states =1
+        """
+        > Computes the trajectory states at time date t 
+        """
+        states = 1
         return states
+    
+    def computeTrajectoryIdentifiability(self):
+        """ 
+        evaluates the rgression criteria ε(q,qp,qpp,x) , en fonction du trajectory certion computed 
+        pervoiously C(q,qp,qpp) for fixed x system paramter vector :
+        > if we minimize 
+        """
+        
+    def visualizeTrajectoryIdentifiability(self,ti,tf, torque, q, qp, qpp):
+        """ """
+        J, eps = self.computeTrajectoryIdentifiability(ti,tf, torque, q, qp, qpp)
+        plt.figure(size=(12,6))
+        
+    def computeFullTrajectory(self, ti: float, tf: float,Q0=None, Qp0=None, Qpp0=None):
+        return 
     
     def computeTrajectoryCriterion(self, t_i:float, t_f:float)->float:
         return 
+    
+    def computeTrajectoryConstraints(self,qmax,qmin,qpmax,qpmin,qppmin,qppmax,\
+        ti,tf,q0=None, qp0= None, qpp0=None):
+        """ """
+        return 
+    
+    def visualizeTrajectory(self, ti,tf, Q0=None, Qp0=None, Qpp0=None):
+        
+        q, qp, qpp = self.computeFullTrajectory(ti,tf,Q0,Qp0,Qpp0)
+        plotArray(q,'Computed Trajectory Joints Positions')
+        plotArray(qpp,'Computed Trajectory Joints Accelerations')
+        plotArray(qp,'Computed Trajectory Joints Velocity')
+        
+    def saveTrajectory2file(self):
+        # for send to balst kinova 
+        """ """

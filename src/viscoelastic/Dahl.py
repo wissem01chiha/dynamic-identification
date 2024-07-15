@@ -41,5 +41,8 @@ class Dahl:
         if v == 0:
             dFdt = 0
         else:
-            dFdt = self.sigma0 /v*(1- F/self.Fs*np.sign(v))
+            if self.Fs != 0 : 
+                dFdt = self.sigma0 /v
+            else:
+                dFdt = self.sigma0 /v*(1- F/self.Fs*np.sign(v))
         return dFdt

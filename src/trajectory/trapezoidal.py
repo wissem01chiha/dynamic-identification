@@ -1,5 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt 
+import seaborn as sns
+from matplotlib import pyplot as plt
 
 class Trapezoidal:
     """
@@ -108,4 +109,4 @@ class Trapezoidal:
         for j in range(3):
             for xc in x:
                 axs[j].axvline(x=xc, color="black", linestyle="dashed")
-        
+        plt.show()

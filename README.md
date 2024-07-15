@@ -8,7 +8,11 @@
 
 Python code and datasets for the identification of state-dependent dynamic model parameters in collaborative robotic manipulator systems.
 ### Features
-- trajectory data preprocessing
+- find optimized excitation trajectories with non-linear optimization
+- trajectory data processing
+- manipulator state space model implentation
+- state space identification based methods 
+- transfer function manipulator models
 - dynamic model including effects of frictions, actuator inertia, joint stiffness, and torque offset.
 - generation of optimal exciting trajectories.
 - calculation of physically consistent standard inertial parameters.
@@ -29,6 +33,7 @@ create a new conda environment and install all the dependencies:
 conda env create -f environment.yml
 conda activate dynamapp
 ```
+## Tests
 
 ### References
 - **[A three-loop physical parameter identification method of robot manipulators considering physical feasibility and nonlinear friction mode](https://link.springer.com/article/10.1007/s11071-024-09755-w)**, *Tangzhong Song, Lijin Fang,Guanghui Liu, Hanyu Pang*, 2024
@@ -48,11 +53,8 @@ Cheng*, 2021
 - **[Constrained State Estimation - A Review](https://arxiv.org/pdf/1807.03463v3)**, *Nesrine Amor, Ghualm Rasool, and Nidhal C. Bouaynaya*, arXiv, 2022
 - **[The Pinocchio C++ library](https://ieeexplore.ieee.org/document/8700380)**,*J.Carpentier, G.Saurel, G.Buondonno, J.Mirabel, F.Lamiraux, O.Stasse, N.Mansard*, 2019
 
-### Contributing
- 
-see the [CONTRIBUTING](CONTRIBUTING.md) guide.
-
-
+### Development
+See the [CONTRIBUTING](CONTRIBUTING.md) guide.
 ### License
 See [LICENSE](LICENSE) file.
 
