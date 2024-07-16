@@ -52,7 +52,7 @@ class LuGre:
             - Fss (float): Steady state friction force.
         """
         Fss = self.Fc * np.sign(self.v) + (self.Fs - self.Fc) * \
-        np.exp(-(self.v / self.vs) ** 2) * np.sign(self.v) + self.sigma2 * self.v
+        np.exp(-(self.v / max(np.abs(self.vs),1e-6)) ** 2) * np.sign(self.v) + self.sigma2 * self.v
         return Fss
 
     def _luGre(self, z, v):
@@ -67,8 +67,11 @@ class LuGre:
             - F (float): Friction force at the current time step.
             - z (float): Updated internal state z.
         """
-        gv = (self.Fc + (self.Fs - self.Fc) * np.exp(-(v / self.vs) ** 2)) / self.sigma0
-        z_dot = v - abs(v) * z / gv
+        gv = (self.Fc + (self.Fs - self.Fc) * np.exp(-(v / max(np.abs(self.vs),1e-3)) ** 2)) / self.sigma0
+        if np.abs(gv) < 1e-4:
+            z_dot = v - abs(v) * z 
+        else:
+            z_dot = v - abs(v) * z / gv
         z = z + z_dot * self.ts
         F = self.sigma0 * z + self.sigma1 * z_dot + self.sigma2 * v
         return F, z
