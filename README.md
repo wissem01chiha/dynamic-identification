@@ -6,10 +6,14 @@
 [![Licence](https://img.shields.io/github/license/justintime50/python-template)](LICENSE)
 </div>
 
-Python code and datasets for the identification of state-dependent dynamic model parameters in collaborative robotic manipulator systems.
+This project aims to provide an extensive framework for developing complex dynamic models for collaborative manipulators. The available solutions, which can be found here [softwares](/docs/README.md), do not support advanced modeling of friction, stiffness, noise, and robotic joint actuator/transmission systems. This project also aims to provide a comprehensive interface for state-space modeling approaches and transfer functions, rather than standard dynamic equations. Regading the complxity of this models, it offers a method to solve and optimize them,  to find the best trajectory directions and  configurations that excite the robot dynamics.
+### Getting started
+
+### Package structure
+all software base structures and functions are in the [source](/src/) folder, specific robot configuration/functions scripts are in [exemple](/exemple/) folder.
 ### Features
-- find optimized excitation trajectories with non-linear optimization
 - trajectory data processing
+- find optimized excitation trajectories with non-linear optimization
 - manipulator state space model implentation
 - state space identification based methods 
 - transfer function manipulator models
@@ -17,24 +21,30 @@ Python code and datasets for the identification of state-dependent dynamic model
 - generation of optimal exciting trajectories.
 - calculation of physically consistent standard inertial parameters.
 ### Documentation
+The computation of basic rigid body algorithms for the manipulator is done with [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/). For more information, refer to [Pinocchio's GitHub page](https://github.com/stack-of-tasks/pinocchio) or [pinocchio cheat sheet](docs/pinocchio_sheet.pdf).  
+
 see [documentation](docs/README.md) file.
 ### Examples
-Basic examples for [kinova Gen3-R07](https://www.kinovarobotics.com/uploads/User-Guide-Gen3-R07.pdf) robot can be found in the [examples](exemple/kinova/) directory.
+all simulation scripts examples are in the [exemple](/exemple/)
+ the, at the the for [kinova Gen3-R07](https://www.kinovarobotics.com/uploads/User-Guide-Gen3-R07.pdf) robot can be found in the [examples](exemple/kinova/) directory.
 ### Prerequisites
+the code was tested sucessfuly on the flowing platform : 
+  - Windows 11 ( python 3.12.4 - miniconda 4.5.0 - cuda 12.50)
+
 - CUDA Compilation Toolkit > 11
 - Python interpreter > 3.12
 - Conda > 4.5.0
 ### Installation 
-The computation of basic rigid body algorithms for the manipulator is done with [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/). For more information, refer to [Pinocchio's GitHub page](https://github.com/stack-of-tasks/pinocchio) or [pinocchio cheat sheet](docs/pinocchio_sheet.pdf).
-    
-
 create a new conda environment and install all the dependencies:  
 ```shell
 conda env create -f environment.yml
 conda activate dynamapp
 ```
 ## Tests
-
+to run all package tests 
+```shell
+python3 run_tests.py 
+``` 
 ### References
 - **[A three-loop physical parameter identification method of robot manipulators considering physical feasibility and nonlinear friction mode](https://link.springer.com/article/10.1007/s11071-024-09755-w)**, *Tangzhong Song, Lijin Fang,Guanghui Liu, Hanyu Pang*, 2024
 - **[Comprehensive modeling and identification of nonlinear joint dynamics for collaborative industrial robot manipulators](https://www.sciencedirect.com/science/article/pii/S0967066120300988)**, *Emil Madsen, Oluf Skov Rosenlund, David Brandt, Xuping Zhang*, 2020

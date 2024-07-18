@@ -20,9 +20,7 @@ class Regressor:
         self.param_vector_max_size = (10 + self.add_col) * self.robot.model.nv
         
     def computeBasicRegressor(self,q:np.ndarray=None,v:np.ndarray=None,a:np.ndarray=None):
-        """
-        
-        """ 
+
         id_inertias=[]
         for jj in range(len(self.robot.model.inertias.tolist())):
             if self.robot.model.inertias.tolist()[jj].mass !=0 :
@@ -174,22 +172,41 @@ class Regressor:
         reg_err = torque - np.dot(W,x)
         return np.linalg.norm(reg_err)
         
-    def computeDifferentialRegressor(self,q,v,a,x,dx=1e-3):
+    def computeDifferentialRegressor(self, q, v, a, dx=1e-2):
         """ 
-        this function diffrential the computeIdentificatoionModel of class robot.
-        assuming the model is not linear respect to parmter vector x :
-         τ = f(q,qp,qpp,x)
+        This function differentiates the computeIdentificationModel of the class robot.
+        Assuming the model is not linear with respect to parameter vector x:
+            τ = f(q, qp, qpp, x)
+        Args:
+            - q: ndarray, joint positions
+            - v: ndarray, joint velocities
+            - a: ndarray, joint accelerations
+            - dx: float, small perturbation for finite difference
+        Returns: 
+            - W: ndarray, (NSamples*ndof, NParams)  regressor matrix
         """
-        n = np.size(x)
-        N =len(q) 
-        W = np.zeros(N,self.param_vector_max_size)
-        x_dx =  x + dx
+        nx = 209
+        x = np.ones(nx)
+        N = len(q)
+        W = np.zeros((N*self.robot.model.nq, nx)) 
+        self.robot.setIdentificationModelData(q, v, a)
         tau = self.robot.computeIdentificationModel(x)
-        dtau = self.robot.computeIdentificationModel(x_dx)-tau
+        tau = tau.flatten()
+    
+        for i in range(nx):
+            x_dx = np.copy(x)
+            x_dx[i] += dx
+            tau_dx = self.robot.computeIdentificationModel(x_dx)
+            tau_dx = tau_dx.flatten()
+            diff = (tau_dx - tau) / dx
+    
+            if np.any(np.isnan(diff)) or np.any(np.isinf(diff)):
+                diff[np.isnan(diff)] = 0
+                diff[np.isinf(diff)] = 0
+            W[:, i] = diff
+        return W
         
-        
-        
-        
+    
     def addJointOffset(self,q,v,a,param):
         if self.robot.params['identification']['problem_params']["has_joint_offset"]:
             logger.error('Dynamics Engine : Robot has no joint offsets. ')

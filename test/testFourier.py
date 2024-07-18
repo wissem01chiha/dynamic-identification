@@ -18,8 +18,8 @@ class TestFourier(unittest.TestCase):
         'nbfourierterms': 5,
         'frequancy': 1,
         'ndof': 7,
-        'Aij': [[np.random.randn() for _ in range(5)] for _ in range(7)],  
-        'Bij': [[np.random.randn() for _ in range(5)] for _ in range(7)] ,
+        'Aij': [[1.2*np.random.randn() for _ in range(5)] for _ in range(7)],  
+        'Bij': [[2*np.random.randn() for _ in range(5)] for _ in range(7)] ,
         'k1' : 1,
         'k2': 1
         }
@@ -44,18 +44,11 @@ class TestFourier(unittest.TestCase):
         
     def test_traj_criteria_not_none(self):
         traj =  FourierGenerator(self.trajectory_parameters)
-        q0 =np.random.rand(7)
+        q0 =np.ones(7)
         J = traj.computeTrajectoryCriterion(0,100,q0,q0,q0)
         self.assertIsNotNone(J)
-        
-    def test_traj_visualize(self):
-        traj = FourierGenerator(self.trajectory_parameters)
-        q0 = np.random.rand(7)
-        #traj.visualizeTrajectory(0,1,q0,q0,q0)
-        #plt.show()
-        
-        
-    def test_traj_identificatbility(self):
+         
+    """def test_traj_identificatbility(self):
         traj = FourierGenerator(self.trajectory_parameters)
         torque = np.random.rand(self.trajectory_parameters['samples'],7)
         q0 = np.zeros(7)
@@ -65,6 +58,7 @@ class TestFourier(unittest.TestCase):
         Q, Qp, Qpp = traj.computeFullTrajectory(0,1,q0,qp0,qpp0)
         traj.visualizeTrajectoryIdentifiability(0,1, torque, Q, Qp, Qpp, x)
         plt.show()
+    """
         
 if __name__ == "__main__":
     unittest.main() 

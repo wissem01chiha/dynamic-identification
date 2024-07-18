@@ -1,5 +1,5 @@
 ## Contributing
-
+- cange function naming , classe, ... to algin with the coding standard 
 - Add more friction and/or rigid body contact models in the viscoelastic engine.
 - Add more test scripts in the `/test` folder.
 - Add exception handlers for zero division and/or NaN/Inf value assertions in friction scripts.

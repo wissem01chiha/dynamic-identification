@@ -1,5 +1,9 @@
 ## identification toolbox documentation index 
 
+### How to  generate an excitation trajectory
+### Add a new robot to the package
+### Data Acquisition and Processing
+
 in csv data file we use this nottaion :
 
 - torque : model from blast

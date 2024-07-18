@@ -41,7 +41,7 @@ class RobotData:
 
         self.velocity = dataTable.iloc[intIndex:fnlIndex:stepIndex, 8:15].to_numpy()
         self.torque = dataTable.iloc[intIndex:fnlIndex:stepIndex, 22:29].to_numpy()      # torque_sm : torque recorded from torque sensor
-        self.torque_cur = dataTable.iloc[intIndex:fnlIndex:stepIndex, 29:35].to_numpy()  # torque    : recorded using current
+        self.torque_cur = dataTable.iloc[intIndex:fnlIndex:stepIndex, 29:36].to_numpy()  # torque    : recorded using current
         self.torque_rne =  dataTable.iloc[intIndex:fnlIndex:stepIndex, 15:22].to_numpy() # torque    : from blast
         self.current = dataTable.iloc[intIndex:fnlIndex:stepIndex, 43:50].to_numpy()
         self.position = dataTable.iloc[intIndex:fnlIndex:stepIndex, 1:8].to_numpy()
@@ -88,6 +88,8 @@ class RobotData:
         smoothed_data = {}
         smoothed_data['velocity'] = filtfilt(b, a, self.velocity, axis=0)
         smoothed_data['torque'] = filtfilt(b, a, self.torque, axis=0)
+        smoothed_data['torque_rne'] = filtfilt(b,a,self.torque_rne,axis=0)
+        smoothed_data['torque_cur'] =filtfilt(b,a,self.torque_cur,axis=0)
         smoothed_data['current'] = filtfilt(b, a, self.current, axis=0)
         smoothed_data['position'] = filtfilt(b, a, self.position, axis=0)
         smoothed_data['temperature'] = filtfilt(b, a, self.temperature, axis=0)

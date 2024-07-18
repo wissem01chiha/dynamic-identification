@@ -17,7 +17,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt 
 import numpy as np 
 import logging
-import time
 
 figureFolderPath="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
 config_file_path="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
@@ -112,7 +111,7 @@ plt.savefig(os.path.join(figureFolderPath,'standard_model_with_friction'))
 tau_sim = np.zeros_like(torque)
 for i  in range(data.numRows):
     tau_s = kinova.computeStiffnessTorques(q[i,:])
-    tau_sim[i,:] = 2.75*(kinova.computeDifferentialModel(q_f[i,:],qp_f[i,:],qpp_f[i,:]) + tau_s)
+    tau_sim[i,:] = kinova.computeDifferentialModel(q_f[i,:],qp_f[i,:],qpp_f[i,:]) + tau_s
 rmse_per_joint = RMSE(tau_sim,torque).flatten()
 plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model with Stiffness Error per Joint"\
     ,'Joint Index','RMSE')

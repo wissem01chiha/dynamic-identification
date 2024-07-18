@@ -45,8 +45,8 @@ class TestStateSpace(unittest.TestCase):
         
     def test_visualize_pols_plot(self):
         model = StateSpace()
-        #model.visualizeStatePoles(np.random.rand(7),np.random.rand(7))
-        #plt.show()
+        model.visualizeStatePoles(np.random.rand(7),np.random.rand(7))
+        plt.show()
         
     def test_visulize_root_locus(self):
         model = StateSpace()

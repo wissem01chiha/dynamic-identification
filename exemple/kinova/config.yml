@@ -6,17 +6,15 @@ robot_params:
   has_joint_offset : True
   offset   : [3.92e-1, 1.37, 3.26e-1, -1.02e-1, -2.88e-2, 1.27e-1]
 identification:
-  dataFilePath : C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/data/kinova/identification_data/blast_traj.csv
+  dataFilePath : C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/data/kinova/validation_data/POLY3.csv
   problem_params:
     has_friction         : True
     has_stiffness        : True
     has_backlash         : False
-    has_actuator         : True
+    has_actuator         : False
     has_ external_forces : True
     has_joint_offset     : True
-    has_torque_offset    : True
-  trajectory_params: 
-    frequancy            : 300  
+    has_torque_offset    : True 
 simulation:
   time_step : 0.001
   sampling_frequency : 1000

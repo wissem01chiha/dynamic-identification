@@ -54,7 +54,7 @@ class FourierGenerator:
     
     def computeFullTrajectory(self, ti: float, tf: float,Q0=None, Qp0=None, Qpp0=None):
         """
-        > Computes the trajectory data between ti and tf 
+        > Computes the full trajectory data between ti and tf.
         """
         ndof = self.trajectory_params['ndof']
         nb_traj_samples = self.trajectory_params['samples']
@@ -69,39 +69,44 @@ class FourierGenerator:
     
     def computeTrajectoryCriterion(self, ti: float, tf: float, Q0=None, Qp0=None, Qpp0=None) -> float:
         """
-        Compute the trajectory identification criteria to be minimized.
-        - Condition Number of W close to 1
-        - Sum of Cond(W) and factor of equilibrating the magnitude of each W value
-        - cond(W) + inverse of small singular value of W
-        - k1*cond(W) + k2*cond(J)
+        Compute the trajectory identification criteria.
+        The criteria mesures how the target x parmters changes du to a variation in W or in mesured torques 
+        for a linear or /linearized system τ ≈ W(q,qp,qpp,x0)x
+        we use the Gramian matrix in calculations
+        
+        > J = k1 * sigmax(W) / sigmin(W) + k2 * sigmin(W)
         """
         reg = Regressor()
-        Q, Qp, Qpp = self.computeFullTrajectory(ti, tf, Q0, Qp0, Qpp0)
-        W = reg.computeFullRegressor(Q, Qp, Qpp)  # 1 , sizeX 
-        ndof = self.trajectory_params['ndof']
-        nsamples = self.trajectory_params['samples']
         k1 = self.trajectory_params['k1']
         k2 = self.trajectory_params['k2']
-        cov_matrix = 3 * np.eye(nsamples * ndof)  # should be (N.nq * N.nq)
+        Q, Qp, Qpp = self.computeFullTrajectory(ti, tf, Q0, Qp0, Qpp0) 
+        W = reg.computeDifferentialRegressor(Q, Qp, Qpp)
     
-        W = W.T @ np.linalg.inv(cov_matrix) @ W
-        S = np.linalg.svd(W, compute_uv=False)
+        WTW = W.T @ W 
+        C  = np.linalg.cond(WTW,p=2)
+        F = np.linalg.norm(W, 'fro')
+
+        S = np.linalg.svd(WTW, compute_uv=False)
         sig_min = np.min(S)
         sig_max = np.max(S)
-        C = 0 
-        J = k1 * C 
-        if sig_min < 1e-6:
-            W += 1e-6 * np.eye(W.shape[0])
-        if sig_min != 0:
-            C = sig_max / sig_min 
-            J += k2 * (1 / sig_min)
-        else: 
-            if conditionNumber(W,1e-6):
-                C = np.linalg.cond(W)
-                J += k1 * C 
-            else:
-                J = C + k2 * (np.max(W) / np.min(W)) 
-        return  J
+        
+        print(f'sigmax {sig_max}')
+        print(f'the max eigvalue {np.min(np.linalg.eigvals(WTW))}')
+        print(f'the cond number {C}')
+        print(f'the forbunis norm {F}')
+        
+    
+        #if sig_min < 1e-3:
+        #    WTW += 0.01* np.eye(WTW.shape[0])
+        #    S = np.linalg.svd(W, compute_uv=False)
+        #   sig_min = min(S)
+        #   sig_max = max(S)
+    
+        C = sig_max / sig_min if sig_min != 0 else np.inf
+        J = k1 * C
+    
+ 
+        return J
     
     def computeTrajectoryIdentifiability(self,ti,tf, torque, q, qp, qpp,x):
         """ 
@@ -119,8 +124,10 @@ class FourierGenerator:
             eps[i] = reg.computeRegressionCriterion(torque[i,:],q[i,:],qp[i,:],qpp[i,:],x)
         return  J, eps
     
+    
+    
+    
     def computeProba(self,eps_n,J_n, bound):
-        
         indices = np.where(J_n <= bound)[0]
         eps_n_= np.sum(np.abs(eps_n[indices]) <= 0.5)
         P = eps_n_ / len(eps_n)

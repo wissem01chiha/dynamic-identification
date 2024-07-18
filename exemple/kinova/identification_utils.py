@@ -1,11 +1,16 @@
+####################################################################################
+#
+#
+#
+# 
+# 
+####################################################################################
 import sys
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt 
 import numpy as np 
 import logging
-import time
-import nlopt 
 
 figureFolderPath = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
 config_file_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
@@ -36,6 +41,7 @@ qp_f           = fildata['velocity']
 qpp_f          = fildata['desiredAcceleration']
 current_f      = fildata['current']
 torque_f       = fildata['torque']
+torque_cur_f   = fildata['torque_cur'] 
 
 q              = data.position
 qp             = data.velocity
@@ -57,6 +63,37 @@ def objective_function1(x, grad):
     )
     iteration_counter += 1
     return np.sqrt(np.mean(rmse_time**2))
+
+
+
+
+    
+    
+    
+    
+def validation(x):
+    global kinova, q_f, qp_f, qpp_f, torque_f, figureFolderPath
+    kinova.setIdentificationModelData(q_f,qp_f,qpp_f)
+    tau_sim = kinova.computeIdentificationModel(x)
+    rmse_time  = RMSE(torque_f, tau_sim, axis=1)
+    r = np.sqrt(np.mean(rmse_time**2))
+    # rescale the torques values by the max values from datasehht that can the  
+    plot2Arrays(torque_f,tau_sim,"true","simulation",f"Manipulator Optimized Non Linear model NLopt-MaxNelder RMSE ={r}")
+    plt.savefig(os.path.join(figureFolderPath,'non_Linear_model_nlopt_best_poly'))
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def objective_function2(x, gard):
     global kinova, iteration_counter, q_f, qp_f, qpp_f, torque_f, data, torque
