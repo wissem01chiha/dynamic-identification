@@ -132,9 +132,34 @@ class StateSpace:
         z = np.concatenate(x,tau,axis=0)
         return z
     
-    def computeAugemntedStateMatrices(self, q_or_x:np.ndarray, qp:np.ndarray):
-        """ Computes and retuns """
+    def computeAugmentedStateMatrices(self, q_or_x: np.ndarray, qp: np.ndarray):
+        """
+        Computes and returns the augmented state-space matrices for the transformed state vector z = [x, u].
+
+        Params:
+            q_or_x (np.ndarray): State vector q or x.
+            qp (np.ndarray): State derivative vector (q_dot or x_dot).
+
+        Returns:
+            tuple: Augmented state-space matrices (A_aug, B_aug, C_aug, D_aug).
+        """
         A, B, C, D = self.computeStateMatrices(q_or_x)
+        n = A.shape[0]   
+        m = B.shape[1]   
+        A_aug = np.block([
+            [A, B],
+            [np.zeros((m, n)), np.zeros((m, m))]
+        ])
+        B_aug = np.block([
+        [B],
+        [np.eye(m)]
+        ])
+        C_aug = np.block([
+            [C, np.zeros((C.shape[0], m))]
+        ])
+        D_aug = D
+    
+        return A_aug, B_aug, C_aug, D_aug
         
     
     def getStateEigvals(self, q_or_x:np.ndarray, qp:np.ndarray=None):

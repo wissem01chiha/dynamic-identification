@@ -77,7 +77,7 @@ def discreteTimeDerivative(vector:np.ndarray, time_step:float, init_value=0):
         der_vector[i] = discreteTimeDerivative(vector[i],vector[i-1],time_step)
     return der_vector
 
-def RMSE(array1: np.ndarray, array2: np.ndarray,axis=0) -> np.ndarray:
+def RMSE(array1: np.ndarray, array2: np.ndarray=None,axis=0) -> np.ndarray:
     """
     Compute the RMSE between 2 arrays across all samples.
     
@@ -90,7 +90,10 @@ def RMSE(array1: np.ndarray, array2: np.ndarray,axis=0) -> np.ndarray:
     """
     if array1.shape != array2.shape:
         logger.error("Input arrays must have the same shape.")
-    differences = array1 - array2
+    if array2 is None:
+        differences = array1
+    else:
+        differences = array1 - array2
     squared_diff = differences ** 2        
     mean_squared_diff = np.mean(squared_diff, axis)
     rmse = np.sqrt(mean_squared_diff)

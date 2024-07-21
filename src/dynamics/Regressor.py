@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
  
 from dynamics import Robot
+from utils import RMSE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -172,7 +173,8 @@ class Regressor:
         reg_err = torque - np.dot(W,x)
         return np.linalg.norm(reg_err)
         
-    def computeDifferentialRegressor(self, q, v, a, dx=1e-2):
+    
+    def computeDifferentialRegressor(self, q, v, a, x,dx=1e-2):
         """ 
         This function differentiates the computeIdentificationModel of the class robot.
         Assuming the model is not linear with respect to parameter vector x:
@@ -185,8 +187,7 @@ class Regressor:
         Returns: 
             - W: ndarray, (NSamples*ndof, NParams)  regressor matrix
         """
-        nx = 209
-        x = np.ones(nx)
+        nx = np.size(x)
         N = len(q)
         W = np.zeros((N*self.robot.model.nq, nx)) 
         self.robot.setIdentificationModelData(q, v, a)
@@ -205,7 +206,15 @@ class Regressor:
                 diff[np.isinf(diff)] = 0
             W[:, i] = diff
         return W
-        
+    
+    def computeDiffError(self, q, v, a, x,dx=1e-3):
+        """ retun the gradient differentiation error """
+        self.robot.setIdentificationModelData(q, v, a)
+        f = self.robot.computeIdentificationModel(x)
+        flin = self.computeDifferentialRegressor(q,v,a,x,dx) @ x
+        flin = np.reshape(flin, (-1, self.robot.model.nq))
+        err_per_time = RMSE(flin, f,axis=1)
+        return np.sqrt(np.mean(err_per_time**2))
     
     def addJointOffset(self,q,v,a,param):
         if self.robot.params['identification']['problem_params']["has_joint_offset"]:

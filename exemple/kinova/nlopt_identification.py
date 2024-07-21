@@ -3,16 +3,15 @@ import numpy as np
 import nlopt 
 import identification_utils as iu
 
-initial_guess_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/initial_guess_nlopt_best.npy"  # File to save and load the initial guess
-
+initial_guess_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/initial_guess_nlopt_best_torque_sensor.npy"  # File to save and load the initial guess
 
 #####################################################################################
 # optimisation routines 
 #####################################################################################
 # Initialize the optimizer
 dim = 209  # Dimension of the input vector
-max_iter = 4000
-opt = nlopt.opt(nlopt.LN_NELDERMEAD, dim)  # Example optimizer (choose an appropriate one)
+max_iter = 4
+opt = nlopt.opt(nlopt.LN_NELDERMEAD, dim) 
 # Set the objective function
 opt.set_min_objective(iu.objective_function1)
 # Set optimization parameters (optional)
@@ -20,7 +19,7 @@ opt.set_maxeval(max_iter)  # Maximum number of evaluations
 opt.set_ftol_rel(1e-6)     # Relative tolerance on function value
 opt.set_xtol_rel(1e-6)
 # Define bounds if necessary (optional)
-lower_bounds = np.full(dim, -100)
+lower_bounds = np.full(dim,-100)
 upper_bounds = np.full(dim, 100)
 opt.set_lower_bounds(lower_bounds)
 opt.set_upper_bounds(upper_bounds)

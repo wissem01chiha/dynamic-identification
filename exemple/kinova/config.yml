@@ -6,7 +6,7 @@ robot_params:
   has_joint_offset : True
   offset   : [3.92e-1, 1.37, 3.26e-1, -1.02e-1, -2.88e-2, 1.27e-1]
 identification:
-  dataFilePath : C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/data/kinova/validation_data/POLY3.csv
+  dataFilePath : C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/data/kinova/identification_data/blast_traj.csv
   problem_params:
     has_friction         : True
     has_stiffness        : True
@@ -89,6 +89,4 @@ trajectory:
          [0.1, 1.2, 2.1, 0.1, 1.256],
          [0.1, 1.2, 2.1, 0.1, 1.256],
          [0.1, 1.2, 2.1, 0.1, 1.256]]
-  k1:  2
-  k2: 200
 

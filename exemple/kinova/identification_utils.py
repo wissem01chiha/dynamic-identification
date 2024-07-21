@@ -64,12 +64,6 @@ def objective_function1(x, grad):
     iteration_counter += 1
     return np.sqrt(np.mean(rmse_time**2))
 
-
-
-
-    
-    
-    
     
 def validation(x):
     global kinova, q_f, qp_f, qpp_f, torque_f, figureFolderPath
@@ -78,6 +72,10 @@ def validation(x):
     rmse_time  = RMSE(torque_f, tau_sim, axis=1)
     r = np.sqrt(np.mean(rmse_time**2))
     # rescale the torques values by the max values from datasehht that can the  
+    # save the values of the torque simulted or comuted from the model to csv file 
+    format = {'fmt': '%.4f', 'delimiter': ', ', 'newline': ',\n'}
+    np.savetxt('C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/model_simulation_torques.csv', tau_sim, **format)
+    
     plot2Arrays(torque_f,tau_sim,"true","simulation",f"Manipulator Optimized Non Linear model NLopt-MaxNelder RMSE ={r}")
     plt.savefig(os.path.join(figureFolderPath,'non_Linear_model_nlopt_best_poly'))
     plt.show()

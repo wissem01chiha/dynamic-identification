@@ -1,16 +1,14 @@
 import numpy as np
 import logging 
+import os
 import matplotlib.pyplot as plt 
 import seaborn as sns 
-import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 from dynamics import   Regressor
-from utils import conditionNumber, plotArray
-
-#from Optimizer import TrajectoryOptimizer
+from utils import plotArray
 
 class FourierGenerator:
     """
@@ -23,9 +21,7 @@ class FourierGenerator:
         self.trajectory_params = trajectory_params
         
     def computeTrajectoryState(self,t:float=0,Q0=None, Qp0=None, Qpp0=None):
-        """
-        > Computes the trajectory states at time date t 
-        """
+        """ Computes the trajectory states at time date t """
         pulsation = 2*np.pi*self.trajectory_params['frequancy']
         nbterms = self.trajectory_params['nbfourierterms']
         ndof = self.trajectory_params['ndof']
@@ -35,27 +31,20 @@ class FourierGenerator:
 
         if ndof != len(Q):
             logger.error('Trajectory Generation Engine :inconsistency in ndof!')
-
         for i in range(ndof):
             for j in range(1, nbterms + 1):
                 Aij = self.trajectory_params['Aij'][i][j - 1]
                 Bij = self.trajectory_params['Bij'][i][j - 1]
-                
                 Cojt = np.cos(pulsation * j * t)
                 Sojt = np.sin(pulsation * j * t)
-
                 Q[i] += Aij / (pulsation * j) * Sojt - Bij / (pulsation * j) * Cojt
                 Qp[i] += Aij * Cojt + Bij * Sojt
                 Qpp[i] += Bij * j * Cojt - Aij * j * Sojt
-
             Qpp[i] = pulsation * Qpp[i]
-
         return Q, Qp, Qpp
     
     def computeFullTrajectory(self, ti: float, tf: float,Q0=None, Qp0=None, Qpp0=None):
-        """
-        > Computes the full trajectory data between ti and tf.
-        """
+        """Computes the full trajectory data between ti and tf """
         ndof = self.trajectory_params['ndof']
         nb_traj_samples = self.trajectory_params['samples']
         time = np.linspace(ti, tf, nb_traj_samples)
@@ -67,48 +56,44 @@ class FourierGenerator:
             
         return Q, Qp, Qpp
     
-    def computeTrajectoryCriterion(self, ti: float, tf: float, Q0=None, Qp0=None, Qpp0=None) -> float:
+    def computeTrajectoryCriterion(self,ti:float,tf:float,x,Q0=None,Qp0=None,Qpp0=None)->float:
         """
         Compute the trajectory identification criteria.
-        The criteria mesures how the target x parmters changes du to a variation in W or in mesured torques 
+        The criteria mesures how the target x parmters changes du to a variation in W or
+        in mesured torques 
         for a linear or /linearized system τ ≈ W(q,qp,qpp,x0)x
-        we use the Gramian matrix in calculations
-        
-        > J = k1 * sigmax(W) / sigmin(W) + k2 * sigmin(W)
+        we use the Gramian matrix in calculations WTW wich is sysmetric square the cond number 
+        expressed as lamdamax/lamdmin
         """
         reg = Regressor()
-        k1 = self.trajectory_params['k1']
-        k2 = self.trajectory_params['k2']
         Q, Qp, Qpp = self.computeFullTrajectory(ti, tf, Q0, Qp0, Qpp0) 
-        W = reg.computeDifferentialRegressor(Q, Qp, Qpp)
-    
+        W = reg.computeDifferentialRegressor(Q, Qp, Qpp,x)
         WTW = W.T @ W 
-        C  = np.linalg.cond(WTW,p=2)
-        F = np.linalg.norm(W, 'fro')
+        eig_max = np.max(np.linalg.eigvals(WTW))
+        C = np.abs(np.abs(eig_max))
+        err = reg.computeDiffError(Q,Qp,Qpp,x)
+        print(err)
+        return C
+    
+    def computeTrajDiffError(self,ti:float,tf:float,x,Q0=None,Qp0=None,Qpp0=None):
+        reg = Regressor()
+        Q, Qp, Qpp = self.computeFullTrajectory(ti, tf, Q0, Qp0, Qpp0)
+        err = reg.computeDiffError(Q,Qp,Qpp,x)
+        return err
 
-        S = np.linalg.svd(WTW, compute_uv=False)
-        sig_min = np.min(S)
-        sig_max = np.max(S)
-        
-        print(f'sigmax {sig_max}')
-        print(f'the max eigvalue {np.min(np.linalg.eigvals(WTW))}')
-        print(f'the cond number {C}')
-        print(f'the forbunis norm {F}')
-        
+    def computeCriterionVsFrequency(self,fmin,fmax,ti,tf,x,Q0,Qp0,Qpp0,fsamples:int=1):
+        """ compute the criteria values for a base frequancy exitation value """
+        fhz = np.linspace(fmin,fmax,fsamples)
+        C = np.zeros_like(fhz)
+        logger.info(f'processing of {fsamples} sample points')
+        for i in range(fhz.size):
+            self.trajectory_params['frequancy'] = fhz[i]
+            C[i] = self.computeTrajectoryCriterion(ti,tf,x,Q0,Qp0,Qpp0)  
+                    
+        return fhz, C
     
-        #if sig_min < 1e-3:
-        #    WTW += 0.01* np.eye(WTW.shape[0])
-        #    S = np.linalg.svd(W, compute_uv=False)
-        #   sig_min = min(S)
-        #   sig_max = max(S)
-    
-        C = sig_max / sig_min if sig_min != 0 else np.inf
-        J = k1 * C
-    
- 
-        return J
-    
-    def computeTrajectoryIdentifiability(self,ti,tf, torque, q, qp, qpp,x):
+  
+    def computeTrajectoryIdentifiability(self,ti,tf,torque,q,qp,qpp,x):
         """ 
         evaluates the rgression criteria ε(qi,qpi,qppi,x) , en fonction du trajectory certain computed 
         pervoiously C(qi,qpi,qppi) for fixed x system paramter vector :
@@ -190,15 +175,20 @@ class FourierGenerator:
         
         return C, Ceq
         
-    def visualizeTrajectory(self, ti,tf, Q0=None, Qp0=None, Qpp0=None):
+    def visualizeTrajectory(self, ti,tf, Q0=None, Qp0=None, Qpp0=None, savePath=None):
 
         q, qp, qpp = self.computeFullTrajectory(ti,tf,Q0,Qp0,Qpp0)
-        J = self.computeTrajectoryCriterion(ti,tf,Q0,Qp0,Qpp0)
-        plotArray(q,f'Computed Trajectory Joints Positions, J = {J:.3f}')
-        plotArray(qpp,f'Computed Trajectory Joints Accelerations, J = {J:.3f}')
-        plotArray(qp,f'Computed Trajectory Joints Velocity, J = {J:.3f}')
+        plotArray(q,'Computed Trajectory Joints Positions')
+        plt.savefig(os.path.join(savePath,'computed_trajectory_positions'))
+        plotArray(qp,'Computed Trajectory Joints Velocity')
+        plt.savefig(os.path.join(savePath,'computed_trajectory_velocity'))
+        plotArray(qpp,'Computed Trajectory Joints Accelerations')
+        plt.savefig(os.path.join(savePath,'computed_trajectory_accelaertions'))
             
-    def saveTrajectory2file(self):
-        # for send to balst kinova 
-        """ """
+    def save2csv(self,ti:float,tf:float,filepath,Q0=None,Qp0=None,Qpp0=None):
+        # compute a given trajectory and save it to csv file : 
+        Q, Qp, Qpp = self.computeFullTrajectory(ti, tf, Q0, Qp0, Qpp0)
+        format = {'fmt': '%.2f', 'delimiter': ', ', 'newline': ',\n'}
+        traj_array = np.concatenate([Q,Qp,Qpp])
+        np.savetxt(filepath, traj_array, **format)
         
