@@ -1,6 +1,5 @@
 import numpy as np 
 from scipy.linalg import solve_discrete_are
-from numba import cuda
 import logging 
 
 def solveAlgebraicRiccatiEquation(A, B, Q, R):

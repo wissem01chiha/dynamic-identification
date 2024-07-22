@@ -39,7 +39,7 @@ qpp            = data.desiredAcceleration
 current        = data.current
 torque         = data.torque
 
-params_file_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/initial_guess_nlopt_best.npy"   
+params_file_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/initial_guess_nlopt_best.npy"   
 if os.path.exists(params_file_path):
     params = np.load(params_file_path)
     print("Loaded paramters values from file.")

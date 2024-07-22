@@ -13,7 +13,6 @@
 ##########################################################################
 import sys
 import os
-import seaborn as sns
 import matplotlib.pyplot as plt 
 import numpy as np 
 import logging
@@ -168,22 +167,6 @@ x = np.random.rand(209)
 tau_sim = kinova.computeIdentificationModel(x)
 plot2Arrays(torque_f,tau_sim,"true","simulation","Manipulator Non Linear model")
 plt.savefig(os.path.join(figureFolderPath,'non_Linear_model'))
-
-
-
-# Compute and plot the system state space model simulation
-# x(k+1) = A(x) x(k) + B(x) u(k)
-# y(k)   = C x(k) 
-#kinova_ss = StateSpace(kinova)
-#tau_ss = torque
-#x0 = kinova_ss.getStateVector(qp_f[0,:],q_f[0,:])
-#states = kinova_ss.simulate(x0,tau_ss[:30000:50,:])
-#plot2Arrays(MAE(0.001*np.transpose(states[7:14,:]),30),qp[:30000:50,:],'state','true',\
-#    'Joints Velocity State Model Simulation')
-#plt.savefig(os.path.join(figureFolderPath,'joints velocity state model simulation'))
-#plot2Arrays(MAE(0.001*np.transpose(states[0:7,:]),30),q[0:30000:50,:],'state','true',\
-#   'Joints Position State Model Simulation')
-
 
 
 # Show all figures

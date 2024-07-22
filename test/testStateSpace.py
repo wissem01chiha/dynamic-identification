@@ -50,7 +50,7 @@ class TestStateSpace(unittest.TestCase):
         
     def test_visulize_root_locus(self):
         model = StateSpace()
-        model.visualizeRootLocus(np.ones(7),np.ones(7))
+        model.visualizeRootLocus(2.8*np.ones(7),8*np.ones(7))
         plt.show()
     
 if __name__ == "__main__":

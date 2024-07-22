@@ -76,6 +76,7 @@ class StateSpace:
         and velocity or system state vector `x`, and torques vector at time date t. 
         """
         n = self.robot.model.nq
+        T = 1/self.robot.params['simulation']['sampling_frequency'] 
         if tau is None:
             x = q_or_x
             tau = qp_or_tau
@@ -85,11 +86,13 @@ class StateSpace:
         else:
             q = q_or_x
             qp = qp_or_tau
-            assert q.size == qp.size, "Input position and velocity vectors must have the same size"
+            assert q.size == qp.size,"Input position and velocity vectors must have the same size"
             A, B, _, _ = self.computeStateMatrices(q, qp)
             x_k = self.getStateVector(qp, q)
-            A = self.stabilize(A,B)
-            x_next = np.dot(A , x_k) + np.dot(B,tau)
+            At = (np.eye(2*n) + T*A)
+            Bt =  T * B
+            At = self.stabilize(At,Bt)
+            x_next = np.dot(At , x_k) + np.dot(Bt,tau)
         
         return x_next
     
@@ -203,7 +206,7 @@ class StateSpace:
             - input  : Input torque to the system (NSamples  * ndof )
             - noise  : 
             - verbose: logging display the current iteration 
-        Returns:
+        Return:
             - states : numpy-ndarry stroing iteration states vectors. ( 2.ndof * NSamples)
         """
         NSamples, ndof = input.shape
@@ -213,7 +216,7 @@ class StateSpace:
         states[:,0] = x0
         for i in range(1,NSamples):
             if verbose : 
-                logger.info(f'Updating state variable = {i}')
+                logger.info(f'Updating state variable = {i}/{NSamples}')
             states[:,i] = self.updateStateVector(states[:,i-1],input[i,:])
             if not(noise is None):
                 if noise =='gaussian':

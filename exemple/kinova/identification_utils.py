@@ -64,7 +64,19 @@ def objective_function1(x, grad):
     iteration_counter += 1
     return np.sqrt(np.mean(rmse_time**2))
 
-    
+def objective_function2(x, grad): 
+    global kinova, iteration_counter, q_f, qp_f, qpp_f, torque_f
+    kinova.setIdentificationModelData(q_f, qp_f, qpp_f)
+    tau_sim = kinova.computeIdentificationModel(x)
+    rmse_time  = RMSE(torque_cur_f, tau_sim, axis=1)
+     
+    print(
+        f"Iteration {iteration_counter}: "
+        f"RMSE = {np.sqrt(np.mean(rmse_time**2)):.5f}"
+    )
+    iteration_counter += 1
+    return np.sqrt(np.mean(rmse_time**2))
+ 
 def validation(x):
     global kinova, q_f, qp_f, qpp_f, torque_f, figureFolderPath
     kinova.setIdentificationModelData(q_f,qp_f,qpp_f)
