@@ -11,6 +11,8 @@ class HarmonicDrive():
         self.reductionRatio = N
         self.inputTorque    = Tinput
         self.inputVelocity  = Vinput
+        self.c1 = 1
+        self.c2 =2
         
     
     def getOutputVelocity(self):
@@ -23,9 +25,10 @@ class HarmonicDrive():
         T=1
         return T
     
-    def computeCompliance(self):
+    def computeCompliance(self, inputSpeed):
         """ """
         return 
+    
     
     
     

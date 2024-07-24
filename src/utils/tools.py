@@ -194,7 +194,7 @@ def plot3Arrays(array1: np.ndarray, array2: np.ndarray, array3: np.ndarray,
         ax.set_title(f'Joint {i+1}', fontsize=9)
         if legend1 or legend2 or legend3:
             ax.legend(fontsize=6)
-    
+        #ax.set_ylim(-1, 1)
     for j in range(ndof, len(axes)):
         fig.delaxes(axes[j])
     if title:

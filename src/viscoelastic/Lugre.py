@@ -1,9 +1,10 @@
 import numpy as np
+import math
 
 class LuGre:
     """
-    Class to compute LuGre Friction Model.
-
+    Class to compute LuGre Friction Model 
+    
     Params:
         - Fc (float): Coulomb friction coefficient.
         - Fs (float): Stribeck friction coefficient.
@@ -18,7 +19,7 @@ class LuGre:
         - z0 (float): Initial value of internal state z.
     """
 
-    def __init__(self, Fc, Fs, v,  sigma0, sigma1, sigma2,tspan,ts=0.001, tinit= 0, z0=0.0001,vs=0.1235,):
+    def __init__(self, Fc, Fs, v, sigma0, sigma1, sigma2, tspan, ts=0.001, tinit=0, z0=0.01, vs=0.1235):
         self.Fc = Fc
         self.Fs = Fs
         self.v = v
@@ -39,39 +40,40 @@ class LuGre:
             - F (numpy.ndarray): Friction force for the given velocity.
         """
         t = np.arange(self.tinit, self.tspan + self.ts, self.ts)
-        z = self.z0
-        F = np.zeros_like(t)
-        for j in range(len(t)):
-            F[j], z = self._luGre(z, self.v)
+        N = len(t)
+        
+        z = np.zeros(N, dtype=np.float32)
+        F = np.zeros(N, dtype=np.float32)
+        z[0] = self.z0
+
+        for idx in range(1, N):
+            v_safe = max(abs(self.vs), 1e-3)
+            sigma0_safe = max(abs(self.sigma0), 1e-6)
+            exp_input = -(self.v / v_safe) ** 2
+            exp_input_clipped = min(max(exp_input, -1e6), 1e6)  
+            gv = (self.Fc + (self.Fs - self.Fc) * math.exp(exp_input_clipped)) / sigma0_safe
+            if gv < 1e-4:
+                gv = 1e-4
+            z_dot = self.v - abs(self.v) * z[idx-1] / gv
+            z[idx] = z[idx-1] + z_dot * self.ts
+            if math.isnan(z[idx]) or math.isinf(z[idx]):
+                z[idx] = 0
+            F[idx] = self.sigma0 * z[idx] + self.sigma1 * z_dot + self.sigma2 * self.v
+            if math.isnan(F[idx]) or math.isinf(F[idx]):
+                F[idx] = 0
+
         return F
-    
+
     def computeSteadyForce(self):
         """
-        Compute the Lugre steady state friction force
+        Compute the LuGre steady state friction force
+
         Returns:
             - Fss (float): Steady state friction force.
         """
+        v_safe = max(np.abs(self.vs), 1e-6)  
+        exp_input = -(self.v / v_safe) ** 2
+        exp_input_clipped = np.clip(exp_input, -1e6, 1e6)  
         Fss = self.Fc * np.sign(self.v) + (self.Fs - self.Fc) * \
-        np.exp(-(self.v / max(np.abs(self.vs),1e-6)) ** 2) * np.sign(self.v) + self.sigma2 * self.v
+              np.exp(exp_input_clipped) * np.sign(self.v) + self.sigma2 * self.v
         return Fss
-
-    def _luGre(self, z, v):
-        """
-        Internal method to compute LuGre model at each time step.
-
-        Parameters:
-            - z (float): Internal state z.
-            - v (float): Joint velocity.
-
-        Returns:
-            - F (float): Friction force at the current time step.
-            - z (float): Updated internal state z.
-        """
-        gv = (self.Fc + (self.Fs - self.Fc) * np.exp(-(v / max(np.abs(self.vs),1e-3)) ** 2)) / self.sigma0
-        if np.abs(gv) < 1e-4:
-            z_dot = v - abs(v) * z 
-        else:
-            z_dot = v - abs(v) * z / gv
-        z = z + z_dot * self.ts
-        F = self.sigma0 * z + self.sigma1 * z_dot + self.sigma2 * v
-        return F, z

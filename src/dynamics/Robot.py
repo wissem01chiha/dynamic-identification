@@ -2,7 +2,7 @@ import os
 import numpy as np
 import logging
 import pinocchio as pin
-from utils import discreteTimeIntegral, yaml2dict, conditionNumber
+from utils import discreteTimeIntegral, yaml2dict, conditionNumber, MAE
 from viscoelastic import LuGre, MaxwellSlip, Dahl, computeViscousFrictionForce
 from models import BLDC
 
@@ -167,16 +167,20 @@ class Robot():
         assert ndof == self.model.nq,'Joints velocity data input msiamtch with model degree of freedom'
                 
         if frictionModel == 'lugre':
+            Fc = self.params['friction_params']['lugre']['Fc']
+            Fs = self.params['friction_params']['lugre']['Fs']
+            sigma0 = self.params['friction_params']['lugre']['sigma0']
+            sigma1= self.params['friction_params']['lugre']['sigma1']
+            sigma2= self.params['friction_params']['lugre']['sigma2']
+            qp_m = np.zeros_like(qp)
+            window_size = 10
             for k in range(ndof):
-                for t in range(NSamples):
-                    Fc = self.params['friction_params']['lugre']['Fc']
-                    Fs = self.params['friction_params']['lugre']['Fs']
-                    sigma0 = self.params['friction_params']['lugre']['sigma0']
-                    sigma1= self.params['friction_params']['lugre']['sigma1']
-                    sigma2= self.params['friction_params']['lugre']['sigma2']
-                    model = LuGre(Fc[k], Fs[k], qp[t,k],  sigma0[k], sigma1[k], sigma2[k],tspan,1/sampling)
+                for t in range(1, len(qp), window_size):
+                    model = LuGre(Fc[k], Fs[k], qp[t,k],sigma0[k], sigma1[k], sigma2[k],\
+                        t,t/(2*window_size),max(t-window_size,0))
                     F = model.computeFrictionForce() 
-                    tau_f[t,k] = F[t]
+                    tau_f[t:min(len(qp),t+window_size),k] = np.mean(F)
+                    
                 
         elif frictionModel == 'maxwellSlip':
   

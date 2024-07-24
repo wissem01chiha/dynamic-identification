@@ -28,7 +28,7 @@ mlogger  = logging.getLogger('matplotlib')
 logging.basicConfig(level='INFO')
 mlogger.setLevel(logging.WARNING)
 
-cutoff_frequency  = 3
+cutoff_frequency  = 4
 config_params  = yaml2dict(config_file_path)
 data           = RobotData(config_params['identification']['dataFilePath'])
 fildata        = data.lowPassfilter(cutoff_frequency)
@@ -57,8 +57,8 @@ iteration_counter =0
 def optimize_poles(x,grad):
     global kinova_ss, tau_ss, x0, iteration_counter 
     kinova_ss.robot.params['state_space_params']['poles']= x
-    states = kinova_ss.simulate(x0,tau_ss[:30000:1200])
-    rmse_time  = RMSE(0.001*np.transpose(states[7:14,:]), qp[:30000:1200], axis=1)
+    states = kinova_ss.simulate(x0,tau_ss[:30000:100])
+    rmse_time  = RMSE(0.001*np.transpose(states[7:14,:]), qp[:30000:100], axis=1)
     print(
         f"Iteration {iteration_counter}: "
         f"RMSE = {np.sqrt(np.mean(rmse_time**2)):.5f}"
@@ -67,7 +67,7 @@ def optimize_poles(x,grad):
     return np.sqrt(np.mean(rmse_time**2))
     
 dim = 14   
-max_iter = 2
+max_iter = 1
 
 opt = nlopt.opt(nlopt.LN_NELDERMEAD, dim) 
 opt.set_min_objective(optimize_poles)
@@ -99,16 +99,16 @@ print("Saved optimized parameters to file.")
 ####################################################################################
 # validation 
 kinova_ss.robot.params['state_space_params']['poles'] = x_opt
-states = kinova_ss.simulate(x0,tau_ss[:30000:50,:],verbose=True)
+states = kinova_ss.simulate(x0,tau_ss[:30000:100,:],verbose=True)
 
 nyquist_freq = 0.5 * 1000
-cutoff_frequency  = 300
+cutoff_frequency  = 100
 normal_cutoff = cutoff_frequency / nyquist_freq
-b, a = butter(4, normal_cutoff, btype='low', analog=False)
-#states =  filtfilt(b, a, states, axis=1)
+b, a = butter(3, normal_cutoff, btype='low', analog=False)
+states =  filtfilt(b, a, states, axis=1)
+print('finit filtring')
 
-
-plot2Arrays(0.001*np.transpose(states[7:14,:]), qp[:30000:50],'state','true',\
+plot2Arrays(0.001*np.transpose(states[7:14,:]), qp[:30000:100],'state','true',\
     'Joints Velocity State Model Simulation')
 plt.savefig(os.path.join(figure_folder_path,'joints velocity state model simulation'))
 #plot2Arrays(0.001*np.transpose(states[7:14,:]), q[:30000:200],'state','true',\

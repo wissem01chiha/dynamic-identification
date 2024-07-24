@@ -26,7 +26,7 @@ class BLDC:
         Motor - C.Jiang, X.Wang, Y.Ma, B.Xu - 2015.
     """
     def __init__(self,  inertia=0.558, torqueConstant=0.11, \
-        damping=0.14, Tck=None, Ta=0.22, Tb=0.21,Imax=5,Tmax=25):
+        damping=0.14, Tck=None, Ta=0.22, Tb=0.21,Imax=5,Tmax=39):
       
         if Tck is None:
             Tck = [0.015, 0.018, 0.023, 0.0201, 0.0147]
