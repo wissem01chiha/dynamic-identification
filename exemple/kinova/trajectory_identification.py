@@ -61,7 +61,7 @@ def computeTrajectoryError(traj_parms,grad):
     """
     global q0, qp0, qpp0, tspan, config_params, iteration_counter
     traj = FourierGenerator(config_params['trajectory'])
-    traj.trajectory_params['frequancy'] = traj_parms[0] 
+    #traj.trajectory_params['frequancy'] = traj_parms[0] 
     traj.trajectory_params['Aij'] = np.reshape(traj_parms[1:36],(-1,5))
     traj.trajectory_params['Bij'] = np.reshape(traj_parms[36:71],(-1,5))
     err = traj.computeTrajDiffError(0,tspan,x,q0,qp0,qpp0)
@@ -73,7 +73,7 @@ def computeTrajectoryError(traj_parms,grad):
     return err
 
 ###########################################################################
-max_iter = 20
+max_iter = 200
 opt = nlopt.opt(nlopt.LN_NELDERMEAD, 71) 
 opt.set_min_objective(computeTrajectoryError)
 opt.set_maxeval(max_iter)  # Maximum number of evaluations
@@ -81,8 +81,8 @@ opt.set_ftol_rel(1e-6)     # Relative tolerance on function value
 opt.set_xtol_rel(1e-6)
 lower_bounds = np.full(71,-100)
 upper_bounds = np.full(71, 100)
-opt.set_lower_bounds(lower_bounds)
-opt.set_upper_bounds(upper_bounds)
+#opt.set_lower_bounds(lower_bounds)
+#opt.set_upper_bounds(upper_bounds)
 
 if os.path.exists(traj_parms_path):
     initial_guess = np.load(traj_parms_path)

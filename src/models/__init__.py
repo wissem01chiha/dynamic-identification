@@ -1,3 +1,3 @@
 
 from .BLDC import *
-from .HarmonicDrive import *
+from .harmonic_drive import *

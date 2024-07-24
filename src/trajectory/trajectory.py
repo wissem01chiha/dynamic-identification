@@ -14,10 +14,8 @@ class TrajectoryGenerator:
         - ndof - robot degree of freedom
         - sampling - sampling time-genration frequancy
         nbWaypoints - number of genated pointed of the trakejctory  
-    Ref:
-    
     """
-    def __init__(self,ndof=7,sampling = 1000,ti=0,tf=1000) -> None:
+    def __init__(self,ndof=7,sampling=1000,ti=0,tf=1000) -> None:
         self.ndof = ndof
         self.sampling = sampling
         self.ti = 0 

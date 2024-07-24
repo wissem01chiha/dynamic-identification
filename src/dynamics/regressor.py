@@ -132,9 +132,7 @@ class Regressor:
         return W_mod
 
     def computeBasicSparseRegressor(self,q,v,a):
-        """ 
-        the torque of joint i do not depend on the torque of joint i-1  
-        """
+        """ the torque of joint i do not depend on the torque of joint i-1 """
         W = self.computeBasicRegressor(q,v,a)
         for ii in range(W.shape[0]):
             for jj in range(W.shape[1]):

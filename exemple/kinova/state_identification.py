@@ -9,9 +9,10 @@ import nlopt
 import logging
 from scipy.signal import butter, filtfilt
 
-figure_folder_path="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
-config_file_path="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
-state_poles_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/state_poles.npy"
+figure_folder_path ="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
+config_file_path  = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
+state_poles_path  = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/state_poles.npy"
+
 src_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),'../src'))
 
 sys.path.append(src_folder)

@@ -1,6 +1,5 @@
 import sys
 import os
-import seaborn as sns
 import matplotlib.pyplot as plt 
 import numpy as np 
 import logging
@@ -46,7 +45,7 @@ torque         = data.torque
 
 iteration_counter = 0
 start = 0
-end = 30000
+end = 29000
 
 
 def objective_function1(x, grad): 
@@ -78,7 +77,6 @@ def validation(x):
     global kinova, q_f, qp_f, qpp_f, torque_f, figureFolderPath, torque_rne, torque_cur_f, start, end
     kinova.setIdentificationModelData(q_f[start:end,:],qp_f[start:end,:],qpp_f[start:end,:])
     tau_sim = kinova.computeIdentificationModel(x)
-    tau_sim = np.clip(tau_sim,-39,39)
     rmse_time  = RMSE(torque_cur_f[start:end,:], tau_sim, axis=1)
     r = np.sqrt(np.mean(rmse_time**2))
     # rescale the torques values by the max values from datasehht that can the  [39 39 39 39 9 9 9]

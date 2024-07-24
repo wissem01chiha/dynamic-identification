@@ -14,22 +14,21 @@ class FourierGenerator:
     """
     Ref: 
         Fourier-based optimal excitation trajectories for the dynamic identification of robots
-        Kyung.Jo Park - Robotica - 2006.
-        Modeling, Identification, and Control of Robots, 
+        Kyung.Jo Park - Robotica - 2006. 
     """
     def __init__(self,trajectory_params:dict) -> None:
         self.trajectory_params = trajectory_params
         
-    def computeTrajectoryState(self,t:float=0,Q0=None, Qp0=None, Qpp0=None):
+    def computeTrajectoryState(self,t:float=0,q0=None, qp0=None, qpp0=None):
         """ Computes the trajectory states at time date t """
         pulsation = 2*np.pi*self.trajectory_params['frequancy']
         nbterms = self.trajectory_params['nbfourierterms']
         ndof = self.trajectory_params['ndof']
-        Q = np.zeros(ndof) if Q0 is None else np.array(Q0)
-        Qp = np.zeros(ndof) if Qp0 is None else np.array(Qp0)
-        Qpp = np.zeros(ndof) if Qpp0 is None else np.array(Qpp0)
+        q = np.zeros(ndof) if q0 is None else np.array(q0)
+        qp = np.zeros(ndof) if qp0 is None else np.array(qp0)
+        qpp = np.zeros(ndof) if qpp0 is None else np.array(qpp0)
 
-        if ndof != len(Q):
+        if ndof != len(q):
             logger.error('Trajectory Generation Engine :inconsistency in ndof!')
         for i in range(ndof):
             for j in range(1, nbterms + 1):
@@ -37,62 +36,121 @@ class FourierGenerator:
                 Bij = self.trajectory_params['Bij'][i][j - 1]
                 Cojt = np.cos(pulsation * j * t)
                 Sojt = np.sin(pulsation * j * t)
-                Q[i] += Aij / (pulsation * j) * Sojt - Bij / (pulsation * j) * Cojt
-                Qp[i] += Aij * Cojt + Bij * Sojt
-                Qpp[i] += Bij * j * Cojt - Aij * j * Sojt
-            Qpp[i] = pulsation * Qpp[i]
-        return Q, Qp, Qpp
+                q[i] += Aij / (pulsation * j) * Sojt - Bij / (pulsation * j) * Cojt
+                qp[i] += Aij * Cojt + Bij * Sojt
+                qpp[i] += Bij * j * Cojt - Aij * j * Sojt
+            qpp[i] = pulsation * qpp[i]
+        return q, qp, qpp
     
-    def computeFullTrajectory(self, ti: float, tf: float,Q0=None, Qp0=None, Qpp0=None):
+    def computeFullTrajectory(self, ti: float, tf: float,q0=None, qp0=None, qpp0=None):
         """Computes the full trajectory data between ti and tf """
         ndof = self.trajectory_params['ndof']
         nb_traj_samples = self.trajectory_params['samples']
         time = np.linspace(ti, tf, nb_traj_samples)
-        Q = np.zeros((nb_traj_samples,ndof))
-        Qp = np.zeros((nb_traj_samples,ndof))
-        Qpp = np.zeros((nb_traj_samples,ndof))
+        q = np.zeros((nb_traj_samples,ndof))
+        qp = np.zeros((nb_traj_samples,ndof))
+        qpp = np.zeros((nb_traj_samples,ndof))
         for i in range(nb_traj_samples):
-            Q[i,:], Qp[i,:], Qpp[i,:] = self.computeTrajectoryState(time[i],Q0,Qp0,Qpp0)
+            q[i,:], qp[i,:], qpp[i,:] = self.computeTrajectoryState(time[i],q0,qp0,qpp0)
             
-        return Q, Qp, Qpp
+        return q, qp, qpp
     
-    def computeTrajectoryCriterion(self,ti:float,tf:float,x,Q0=None,Qp0=None,Qpp0=None)->float:
+    def computeTrajDiffError(self,ti:float,tf:float,x,q0=None,qp0=None,qpp0=None):
+        reg = Regressor()
+        q, qp, qpp = self.computeFullTrajectory(ti, tf, q0, qp0, qpp0)
+        err = reg.computeDiffError(q,qp,qpp,x)
+        return err
+    
+    def computeTrajectoryError(self,x,tspan,new_traj_params=None,q0=None,qp0=None,qpp0=None,verbose=False):
+        """
+        this function  compute the best forier paramters (ie trajectory) on wich the differentiation 
+        error du non linear torques function est min , this is designed to work with nlopt
+        traj_parms = 7*10 = 70 
+        """
+        if not(new_traj_params is None):
+            k = self.trajectory_params['ndof'] * self.trajectory_params['nbfourierterms']
+            self.trajectory_params['Aij'] = np.reshape(new_traj_params[0:k],(-1,5))
+            self.trajectory_params['Bij'] = np.reshape(new_traj_params[k:2*k],(-1,5))
+        err = self.computeTrajDiffError(0,tspan,x,q0,qp0,qpp0)
+        if verbose:
+            print( f"RMSE = {err:.5f}")
+         
+        return err
+    
+    def visualizeTrajectory(self, ti,tf, q0=None, qp0=None, qpp0=None, savePath=None):
+        """Compute and plot a given trajectory"""
+
+        q, qp, qpp = self.computeFullTrajectory(ti,tf,q0,qp0,qpp0)
+        plotArray(q,'Computed Trajectory Joints Positions')
+        plt.savefig(os.path.join(savePath,'computed_trajectory_positions'))
+        plotArray(qp,'Computed Trajectory Joints Velocity')
+        plt.savefig(os.path.join(savePath,'computed_trajectory_velocity'))
+        plotArray(qpp,'Computed Trajectory Joints Accelerations')
+        plt.savefig(os.path.join(savePath,'computed_trajectory_accelaertions'))
+            
+    def save2csv(self,ti:float,tf:float,file_path,q0=None,qp0=None,qpp0=None):
+        """ compute a given trajectory and save it to csv file.""" 
+
+        q, qp, qpp = self.computeFullTrajectory(ti,tf,q0,qp0,qpp0)
+        format = {'fmt': '%.2f', 'delimiter': ', ', 'newline': ',\n'}
+        traj_array = np.concatenate([q,qp,qpp])
+        np.savetxt(file_path, traj_array, **format)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def computeTrajectoryCriterion(self,ti:float,tf:float,x,q0=None,qp0=None,qpp0=None)->float:
         """
         Compute the trajectory identification criteria.
         The criteria mesures how the target x parmters changes du to a variation in W or
         in mesured torques 
         for a linear or /linearized system τ ≈ W(q,qp,qpp,x0)x
         we use the Gramian matrix in calculations WTW wich is sysmetric square the cond number 
-        expressed as lamdamax/lamdmin
+        expressed as lamdamax/lamdmin.
         """
         reg = Regressor()
-        Q, Qp, Qpp = self.computeFullTrajectory(ti, tf, Q0, Qp0, Qpp0) 
-        W = reg.computeDifferentialRegressor(Q, Qp, Qpp,x)
+        q, qp, qpp = self.computeFullTrajectory(ti, tf, q0, qp0, qpp0) 
+        W = reg.computeDifferentialRegressor(q, qp, qpp,x)
         WTW = W.T @ W 
         eig_max = np.max(np.linalg.eigvals(WTW))
         C = np.abs(np.abs(eig_max))
-        err = reg.computeDiffError(Q,Qp,Qpp,x)
-        print(err)
         return C
     
-    def computeTrajDiffError(self,ti:float,tf:float,x,Q0=None,Qp0=None,Qpp0=None):
-        reg = Regressor()
-        Q, Qp, Qpp = self.computeFullTrajectory(ti, tf, Q0, Qp0, Qpp0)
-        err = reg.computeDiffError(Q,Qp,Qpp,x)
-        return err
 
-    def computeCriterionVsFrequency(self,fmin,fmax,ti,tf,x,Q0,Qp0,Qpp0,fsamples:int=1):
-        """ compute the criteria values for a base frequancy exitation value """
-        fhz = np.linspace(fmin,fmax,fsamples)
-        C = np.zeros_like(fhz)
-        logger.info(f'processing of {fsamples} sample points')
-        for i in range(fhz.size):
-            self.trajectory_params['frequancy'] = fhz[i]
-            C[i] = self.computeTrajectoryCriterion(ti,tf,x,Q0,Qp0,Qpp0)  
-                    
-        return fhz, C
-    
-  
+
+ 
+
     def computeTrajectoryIdentifiability(self,ti,tf,torque,q,qp,qpp,x):
         """ 
         evaluates the rgression criteria ε(qi,qpi,qppi,x) , en fonction du trajectory certain computed 
@@ -157,11 +215,11 @@ class FourierGenerator:
         time = np.linspace(ti, tf, nb_traj_samples)
 
         for i in range(nb_traj_samples):
-            state = self.computeTrajectoryState(time[i],Q0)
+            state = self.computeTrajectoryState(time[i],q0)
             joint_state[3 * ndof * i:3 * ndof * (i + 1)] = state
-            Q = state[2 * ndof:]
+            q = state[2 * ndof:]
             
-            HT1 = getattr(self, f'HT_dh{self.robot.nbDOF}_world_{self.robot.name}')(Q, \
+            HT1 = getattr(self, f'HT_dh{self.robot.nbDOF}_world_{self.robot.name}')(q, \
                 self.robot.numerical_parameters['Geometry'])
             
             cartesian_state1[i] = -HT1[2, 3] + 0.3
@@ -175,20 +233,5 @@ class FourierGenerator:
         
         return C, Ceq
         
-    def visualizeTrajectory(self, ti,tf, Q0=None, Qp0=None, Qpp0=None, savePath=None):
 
-        q, qp, qpp = self.computeFullTrajectory(ti,tf,Q0,Qp0,Qpp0)
-        plotArray(q,'Computed Trajectory Joints Positions')
-        plt.savefig(os.path.join(savePath,'computed_trajectory_positions'))
-        plotArray(qp,'Computed Trajectory Joints Velocity')
-        plt.savefig(os.path.join(savePath,'computed_trajectory_velocity'))
-        plotArray(qpp,'Computed Trajectory Joints Accelerations')
-        plt.savefig(os.path.join(savePath,'computed_trajectory_accelaertions'))
-            
-    def save2csv(self,ti:float,tf:float,filepath,Q0=None,Qp0=None,Qpp0=None):
-        # compute a given trajectory and save it to csv file : 
-        Q, Qp, Qpp = self.computeFullTrajectory(ti, tf, Q0, Qp0, Qpp0)
-        format = {'fmt': '%.2f', 'delimiter': ', ', 'newline': ',\n'}
-        traj_array = np.concatenate([Q,Qp,Qpp])
-        np.savetxt(filepath, traj_array, **format)
         

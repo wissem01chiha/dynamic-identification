@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 import numpy as np 
 import logging
 
+base_dir = os.path.dirname(os.path.realpath(__file__))
+
 figureFolderPath="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
 config_file_path="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
 src_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),'../src'))

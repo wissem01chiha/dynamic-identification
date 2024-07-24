@@ -6,7 +6,7 @@ robot_params:
   has_joint_offset : True
   offset   : [3.92e-1, 1.37, 3.26e-1, -1.02e-1, -2.88e-2, 1.27e-1]
 identification:
-  dataFilePath : /home/wissem/dynamic-identification/data/kinova/identification_data/blast_smoothedTorCur.csv
+  dataFilePath : /home/wissem/dynamic-identification/data/kinova/validation_data/blast_traj_AHA.csv
   problem_params:
     has_friction         : True
     has_stiffness        : False
@@ -24,8 +24,8 @@ optimisation:
     W  : 0.5
     c1 : 0.8
     c2 : 0.9 
-    r1: -0.2
-    r2: 1.1
+    r1 : -0.2
+    r2 : 1.1
     iter: 100  
   cmaes:
 stiffness_params: [0.25, 0.26, 0.369, 0.125, 0.258, 0.123, 0.11] 
@@ -74,8 +74,8 @@ state_space_params:
         -2.34472352e-01, -8.16376366e-01, -9.34581208e-01, -6.70722799e-01,
         -1.84597460e-01, -5.69609866e-01]
 trajectory:
-  frequancy      : 10
-  samples        : 500
+  frequancy      : 1
+  samples        : 1000
   ndof           : 7 
   nbfourierterms : 5
   Aij : [[0.1, 1.2, 2.1, 0.1, 1.256],
