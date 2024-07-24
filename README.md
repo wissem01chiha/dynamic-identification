@@ -41,6 +41,11 @@ conda env create -f environment.yml
 conda activate dynamapp
 ```
 ## Tests
+.. on Linux platforms:
+```shell 
+  chmod u+x run_tests.sh
+  ./run_tests.sh
+``` 
 to run all package tests 
 ```shell
 python3 run_tests.py 

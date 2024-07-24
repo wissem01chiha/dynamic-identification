@@ -205,7 +205,7 @@ class Regressor:
             W[:, i] = diff
         return W
     
-    def computeDiffError(self, q, v, a, x,dx=1e-3):
+    def computeDifferentiationError(self, q, v, a, x,dx=1e-3):
         """ retun the gradient differentiation error """
         self.robot.setIdentificationModelData(q, v, a)
         f = self.robot.computeIdentificationModel(x)

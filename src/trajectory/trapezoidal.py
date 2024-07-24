@@ -1,8 +1,12 @@
 import numpy as np
-import seaborn as sns
+import logging 
 from matplotlib import pyplot as plt
 
-class Trapezoidal:
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class TrapezoidalGenerator:
     """
     Base class for trapezoidal trajectories generation 
     Args:
@@ -40,7 +44,7 @@ class Trapezoidal:
         self.Nf = Nf
         self.ts = 0.01
 
-    def Trapezoidal(self):
+    def TrapezoidalGenerator(self):
         self.initConfig()
         if self.nwaypoints == 1:
             print("Number of waypoints needs to be more 1!")
@@ -92,7 +96,7 @@ class Trapezoidal:
                 q_ = np.append(q_, q_[i - 1] + qd_[i - 1] * ts)
         return q_, qd_, qdd_
 
-    def plotTrajectory(self):
+    def visualizeTrajectory(self):
         time_slot = np.linspace(
             0.0, (np.sum(self.Nf) + 1) * self.ts, num=(np.sum(self.Nf) + 1)
         )

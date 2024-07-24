@@ -11,11 +11,21 @@
 # Author: Wissem CHIHA ©
 # 2024
 ##########################################################################
+
+import argparse
 import sys
 import os
 import matplotlib.pyplot as plt 
 import numpy as np 
 import logging
+
+parser = argparse.ArgumentParser(description=\
+'simulate manipulator inverse dynamics different models with default paramters')
+parser.add_argument('--v',type=bool)
+parser.add_argument('--data_file',type=str,default='b')
+parser.add_argument('--show_figures', type=bool,default=False)
+parser.add_argument('cutoff_frequency', type=float, default=3)
+args = parser.parse_args()
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -171,8 +181,8 @@ plot2Arrays(torque_f,tau_sim,"true","simulation","Manipulator Non Linear model")
 plt.savefig(os.path.join(figureFolderPath,'non_Linear_model'))
 
 
-# Show all figures
-#plt.show()
+if args.show_figures:
+    plt.show()
 
  
 
@@ -207,33 +217,7 @@ plt.savefig(os.path.join(figureFolderPath,'non_Linear_model'))
 
 
 
-""" 
-tau = kinova.computeTrajectoryTorques(q,qp,qpp,-0.11*np.ones((q.shape[0],q.shape[1],6)))
-plot2Arrays(data.torque_rne,tau,"blast","Pinocchoi","Blast RNEA vs Pinnochoi RNEA ")
-plot2Arrays(fildata['torque'],tau,"Sensor","Pinocchoi","Sensor vs Pinnochoi RNEA ")
-    def kalmanFilter(self,variable='torque'):
-        Filtering Robot Data torques uisng an adaptive kalman filter
-        if variable =='torque_cur':
-            observations = np.transpose(self.torque_cur)
-            x0 = self.torque_cur[0,:]
-        elif variable == 'torque_rne':
-            observations = np.transpose(self.torque_rne)
-            x0 = self.torque_rne[0,:]
-        elif variable =='torque':
-            observations = np.transpose(self.torque)
-            x0 = self.torque[0,:]
-        else:
-            logger.error('variable type not supported yet')
-        F = np.eye(self.ndof)
-        H = np.random.randn(self.ndof, self.ndof)
-        Q = np.eye(self.ndof) * 0.01   
-        R = np.eye(self.ndof) * 0.1   
-        P = np.eye(self.ndof)   
-        kf = Kalman(F, H, Q, R, P, x0)
-        estimated_states, innovations = kf.filter(observations)
-        
-        return estimated_states, innovations
-"""
+
 
  
 

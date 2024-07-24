@@ -28,7 +28,7 @@ class IDIMNLS:
         if np.ndim(output) != 2 :
             logger.error("Target output should be 2 dimentional")
             
-        # Class Attributes
+
         self.time_step = time_step
         self.output = output
         self.nVars = nVars
@@ -41,7 +41,8 @@ class IDIMNLS:
         return (f"IDIMNLS Model with {self.nVars} optimization variables,"
                 f"output shape: {self.output.shape}, "
                 f"time step: {self.time_step}")
-        
+    
+
     def computeLsCostFunction(self, x:np.ndarray):
         """
         The object function to be minimized with least squares.

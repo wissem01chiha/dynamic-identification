@@ -18,14 +18,26 @@ class IDIMMLE:
         self.max_iterations =max_iterations
         self.epsilon =epsilon
 
-    def computeLikelihoodFunction(self, theta):
+    def set_maxeval(self,n):
+        self.max_iterations = n
+
+    def set_ftol_rel(self,e):
+        self.epsilon = e
+
+    def set_lower_bounds(self,lb):
+        self.lb = 1
+
+    def set_upper_bounds(self,ub):
+        self.ub = 0.5
+
+    def _computeLikelihoodFunction(self, theta):
         
         residuals = self.Y - np.dot(self.X, theta)
         likelihood = np.exp(-0.5 * np.dot(residuals.T, residuals))
         return likelihood
 
-    def optimize(self):
-        
+    def optimize(self, init_guess):
+        """ """
         theta = np.zeros(self.X.shape[1])   
         for i in range(self.max_iterations):
             likelihood_gradient = np.dot(self.X.T, np.dot(self.X, theta) - self.Y)

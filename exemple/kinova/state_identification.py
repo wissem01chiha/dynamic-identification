@@ -9,9 +9,9 @@ import nlopt
 import logging
 from scipy.signal import butter, filtfilt
 
-figure_folder_path ="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
-config_file_path  = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
-state_poles_path  = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/state_poles.npy"
+figure_folder_path ="/home/wissem/dynamic-identification/figure/kinova"
+config_file_path  = "/home/wissem/dynamic-identification/exemple/kinova/config.yml"
+state_poles_path  = "/home/wissem/dynamic-identification/autogen/state_poles.npy"
 
 src_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),'../src'))
 
@@ -29,7 +29,7 @@ mlogger  = logging.getLogger('matplotlib')
 logging.basicConfig(level='INFO')
 mlogger.setLevel(logging.WARNING)
 
-cutoff_frequency  = 4
+cutoff_frequency  = 1
 config_params  = yaml2dict(config_file_path)
 data           = RobotData(config_params['identification']['dataFilePath'])
 fildata        = data.lowPassfilter(cutoff_frequency)
@@ -53,13 +53,15 @@ kinova_ss = StateSpace(kinova)
 tau_ss = torque
 x0 = kinova_ss.getStateVector(qp_f[0,:],q_f[0,:])
 
+start =0 
+end = 1000
 ###########################################################################################
 iteration_counter =0
 def optimize_poles(x,grad):
     global kinova_ss, tau_ss, x0, iteration_counter 
     kinova_ss.robot.params['state_space_params']['poles']= x
-    states = kinova_ss.simulate(x0,tau_ss[:30000:100])
-    rmse_time  = RMSE(0.001*np.transpose(states[7:14,:]), qp[:30000:100], axis=1)
+    states = kinova_ss.simulate(x0,tau_ss[start:end])
+    rmse_time  = RMSE(np.transpose(states[7:14,:]), qp[start:end], axis=1)
     print(
         f"Iteration {iteration_counter}: "
         f"RMSE = {np.sqrt(np.mean(rmse_time**2)):.5f}"
@@ -100,16 +102,16 @@ print("Saved optimized parameters to file.")
 ####################################################################################
 # validation 
 kinova_ss.robot.params['state_space_params']['poles'] = x_opt
-states = kinova_ss.simulate(x0,tau_ss[:30000:100,:],verbose=True)
+states = kinova_ss.simulate(x0,tau_ss[start:end,:],verbose=True)
 
 nyquist_freq = 0.5 * 1000
-cutoff_frequency  = 100
+cutoff_frequency  = 10
 normal_cutoff = cutoff_frequency / nyquist_freq
-b, a = butter(3, normal_cutoff, btype='low', analog=False)
-states =  filtfilt(b, a, states, axis=1)
+#b, a = butter(3, normal_cutoff, btype='low', analog=False)
+#states =  filtfilt(b, a, states, axis=1)
 print('finit filtring')
 
-plot2Arrays(0.001*np.transpose(states[7:14,:]), qp[:30000:100],'state','true',\
+plot2Arrays(0.001*np.transpose(states[7:14,:]), qp[start:end,:],'state','true',\
     'Joints Velocity State Model Simulation')
 plt.savefig(os.path.join(figure_folder_path,'joints velocity state model simulation'))
 #plot2Arrays(0.001*np.transpose(states[7:14,:]), q[:30000:200],'state','true',\

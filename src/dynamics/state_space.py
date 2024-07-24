@@ -81,8 +81,10 @@ class StateSpace:
             x = q_or_x
             tau = qp_or_tau
             A, B, _, _ = self.computeStateMatrices(x)
-            A = self.stabilize(A,B)
-            x_next = np.dot(A,x) + np.dot(B,tau)
+            At = (np.eye(2*n) + T*A)
+            Bt =  T * B
+            At = self.stabilize(At,Bt)
+            x_next = np.dot(At , x) + np.dot(Bt,tau)
         else:
             q = q_or_x
             qp = qp_or_tau
@@ -197,8 +199,10 @@ class StateSpace:
         states = 0
         return states
     
+    def computeStateTransitionMatrix(self,tf, ti=0):
+        """ compute the state transition matrix of the system """
     
-    def simulate(self, x0:np.ndarray, input:np.ndarray=None, noise=None, verbose:bool=False):
+    def simulate(self, x0:np.ndarray, nput:np.ndarray=None,noise=None,verbose:bool=False):
         """ 
         Simulate the system response with a given input torque.
         Args:

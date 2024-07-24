@@ -11,8 +11,8 @@ from utils import plotArray
 class SplineGenerator:
   
     def __init__(self, trajectory_params) -> None:
+        self.trajector_params = trajectory_params
         
-        pass
     
     def computeTrajectoryState(self,t,Q0=None)->np.ndarray:
         """
@@ -27,14 +27,11 @@ class SplineGenerator:
         pervoiously C(q,qp,qpp) for fixed x system paramter vector :
         > if we minimize 
         """
+
         
-    def visualizeTrajectoryIdentifiability(self,ti,tf, torque, q, qp, qpp):
+    def computeFullTrajectory(self,ti:float,tf:float,q0=None,qp0=None,qpp0=None):
         """ """
-        J, eps = self.computeTrajectoryIdentifiability(ti,tf, torque, q, qp, qpp)
-        plt.figure(size=(12,6))
-        
-    def computeFullTrajectory(self, ti: float, tf: float,Q0=None, Qp0=None, Qpp0=None):
-        return 
+        return  q, qp ,qpp
     
     def computeTrajectoryCriterion(self, t_i:float, t_f:float)->float:
         return 

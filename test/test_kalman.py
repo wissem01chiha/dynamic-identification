@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.append(src_folder)
 
 
 # Define system matrices

@@ -61,10 +61,10 @@ def computeTrajectoryError(traj_parms,grad):
     """
     global q0, qp0, qpp0, tspan, config_params, iteration_counter
     traj = FourierGenerator(config_params['trajectory'])
-    #traj.trajectory_params['frequancy'] = traj_parms[0] 
+    traj.trajectory_params['frequancy'] = traj_parms[0] 
     traj.trajectory_params['Aij'] = np.reshape(traj_parms[1:36],(-1,5))
     traj.trajectory_params['Bij'] = np.reshape(traj_parms[36:71],(-1,5))
-    err = traj.computeTrajDiffError(0,tspan,x,q0,qp0,qpp0)
+    err = traj.computeDifferentiationError(0,tspan,x,q0,qp0,qpp0)
     print(
         f"Iteration {iteration_counter}: "
         f"RMSE = {err:.5f}"
@@ -73,7 +73,7 @@ def computeTrajectoryError(traj_parms,grad):
     return err
 
 ###########################################################################
-max_iter = 200
+max_iter = 1
 opt = nlopt.opt(nlopt.LN_NELDERMEAD, 71) 
 opt.set_min_objective(computeTrajectoryError)
 opt.set_maxeval(max_iter)  # Maximum number of evaluations
