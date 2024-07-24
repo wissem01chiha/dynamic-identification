@@ -3,7 +3,7 @@ import numpy as np
 import nlopt 
 import identification_utils as iu
 
-initial_guess_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/initial_guess_nlopt_best_torque_current.npy"   
+initial_guess_path = "/home/wissem/dynamic-identification/autogen/initial_guess_nlopt_best_torque_current.npy"   
 
 #####################################################################################
 # optimisation routines 

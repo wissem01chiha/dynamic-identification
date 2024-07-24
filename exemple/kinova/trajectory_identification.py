@@ -17,10 +17,10 @@ import nlopt
 import matplotlib.pyplot as plt 
 import numpy as np 
  
-traj_parms_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/traj_paramters.npy"
-figureFolderPath="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
-config_file_path="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
-params_file_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/initial_guess_nlopt_best_torque_sensor.npy"   
+traj_parms_path = "/home/wissem/dynamic-identification/autogen/traj_paramters.npy"
+figureFolderPath="/home/wissem/dynamic-identification/figure/kinova"
+config_file_path="/home/wissem/dynamic-identification/exemple/kinova/config.yml"
+params_file_path = "/home/wissem/dynamic-identification/autogen/initial_guess_nlopt_best_torque_current.npy"   
 src_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),'../src'))
 sys.path.append(src_folder)
 if not os.path.exists(figureFolderPath):
@@ -47,7 +47,7 @@ else:
 
 config_params  = yaml2dict(config_file_path)
 traj = FourierGenerator(config_params['trajectory'])
-tspan = 1
+tspan = (traj.trajectory_params['samples'] +1)* 0.001
 q0 = np.zeros(7)
 qp0 =np.zeros(7)
 qpp0 = np.zeros(7)
@@ -105,7 +105,7 @@ traj.trajectory_params['Bij'] = np.reshape(best_traj_parms[36:71],(-1,5))
 
 traj.visualizeTrajectory(0,tspan,q0,qp0,qpp0,figureFolderPath)
 q, qp, qpp = traj.computeFullTrajectory(0,tspan,q0,qp0,qpp0)
-np.savetxt('C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/computed_fourier_traj_position.csv',q)
-np.savetxt('C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/computed_fourier_traj_velocity.csv',qp)
-np.savetxt('C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/computed_fourier_traj_acceleration.csv',qpp)
+np.savetxt('/home/wissem/dynamic-identification/autogen/computed_fourier_traj_position.csv',q)
+np.savetxt('/home/wissem/dynamic-identification/autogen/computed_fourier_traj_velocity.csv',qp)
+np.savetxt('/home/wissem/dynamic-identification/autogen/computed_fourier_traj_acceleration.csv',qpp)
 plt.show()

@@ -1,5 +1,5 @@
-from .Math import *
-from .RobotData import *
-from .Tools import *
-from .Solver import *
+from .math import *
+from .robot_data import *
+from .tools import *
+from .solver import *
  

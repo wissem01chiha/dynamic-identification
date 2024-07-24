@@ -31,7 +31,7 @@ class Robot():
             logger.warning("No configuration file provided using default file.")
  
         dir = os.path.dirname(os.path.abspath(__file__))
-        configFilePath = os.path.join(os.path.dirname(os.path.dirname(dir)), 'exemple\\kinova\\config.yml')
+        configFilePath = os.path.join(os.path.dirname(os.path.dirname(dir)), 'exemple/kinova/config.yml')
 
         if not os.path.isfile(configFilePath):
             logger.error(f"Config file does not exist at the provided path: {configFilePath}")

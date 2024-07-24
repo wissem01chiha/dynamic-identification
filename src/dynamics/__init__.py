@@ -1,3 +1,3 @@
-from .Robot import *
-from .Regressor import *
-from .StateSpace import *
+from .robot import *
+from .regressor import *
+from .state_space import *

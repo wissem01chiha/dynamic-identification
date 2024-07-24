@@ -1,4 +1,4 @@
-urdfFilePath: C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/gen3.urdf
+urdfFilePath: /home/wissem/dynamic-identification/exemple/kinova/gen3.urdf
 robot_params:
   base_frame: world
   tool_frame: bracelet_link
@@ -6,7 +6,7 @@ robot_params:
   has_joint_offset : True
   offset   : [3.92e-1, 1.37, 3.26e-1, -1.02e-1, -2.88e-2, 1.27e-1]
 identification:
-  dataFilePath : C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/data/kinova/identification_data/blast_traj.csv
+  dataFilePath : /home/wissem/dynamic-identification/data/kinova/identification_data/blast_smoothedTorCur.csv
   problem_params:
     has_friction         : True
     has_stiffness        : False
@@ -74,8 +74,8 @@ state_space_params:
         -2.34472352e-01, -8.16376366e-01, -9.34581208e-01, -6.70722799e-01,
         -1.84597460e-01, -5.69609866e-01]
 trajectory:
-  frequancy      : 300
-  samples        : 30000
+  frequancy      : 10
+  samples        : 500
   ndof           : 7 
   nbfourierterms : 5
   Aij : [[0.1, 1.2, 2.1, 0.1, 1.256],

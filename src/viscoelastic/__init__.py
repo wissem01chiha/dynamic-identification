@@ -1,17 +1,16 @@
 import sys 
 
-from .Dahl import *
-from .cuLugre import *
-from .Lugre import * 
-from .Maxwell import *
-from .MaxwellSlip import *
-from .Backlash import *
-from .Viscous import *
+from .dahl import *
+from .lugre import * 
+from .maxwell import *
+from .maxwell_slip import *
+from .backlash import *
+from .viscous import *
 
-__all__ = ['Dahl', 'Lugre', 'Maxwell', 'MaxwellSlip', 'Backlash', 'Viscous']
+__all__ = ['Dahl', 'Lugre', 'maxwell', 'MaxwellSlip', 'Backlash', 'viscous']
 
 if 'cuda' in sys.argv:
     __all__.append('cuLugre')
-    import cuLugre
+    from .cuLugre import *
 else:
     cuLugre = None

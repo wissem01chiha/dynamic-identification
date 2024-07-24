@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np 
 import logging
 
-figureFolderPath = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
-config_file_path = "C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
+figureFolderPath = "/home/wissem/dynamic-identification/figure/kinova"
+config_file_path = "/home/wissem/dynamic-identification/exemple/kinova/config.yml"
 
 src_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '../src'))
 sys.path.append(src_folder)
@@ -112,7 +112,7 @@ def validation(x):
     torque_cur_f[:,6] = 1/39 * torque_cur_f[:,6]
     # save the values of the torque simulted or comuted from the model to csv file 
     format = {'fmt': '%.4f', 'delimiter': ', ', 'newline': ',\n'}
-    np.savetxt('C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/autogen/model_simulation_torques_current.csv', tau_sim, **format)
+    np.savetxt('/home/wissem/dynamic-identification/autogen/model_simulation_torques_current.csv', tau_sim, **format)
     torque_error = np.abs(torque_cur_f[start:end,:]- tau_sim)
     blast_torque_error =np.abs(torque_rne[start:end,:] - torque_cur_f[start:end,:])
     plot3Arrays(torque_cur_f[start:end,:],tau_sim,torque_rne[start:end,:],"current","simulation","blast",f"Manipulator Optimized Non Linear model NLopt-MaxNelder RMSE ={r}")
