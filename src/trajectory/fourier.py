@@ -64,6 +64,12 @@ class FourierGenerator:
         err = reg.computeDifferentiationError(q,qp,qpp,x)
         return err
     
+    def computeConstraintedDifferentiationError(self,ti:float,tf:float,x,q0=None,qp0=None,qpp0=None):
+        reg = Regressor()
+        q, qp, qpp = self._computeTrajectoryConstraints(ti,tf,1.57,-1.57,1.2,-1.2,5.2,-5.2, q0, qp0, qpp0)
+        err = reg.computeDifferentiationError(q,qp,qpp,x)
+        return err
+    
     def computeTrajectoryError(self,x,tspan,new_traj_params=None,q0=None,qp0=None,\
                                qpp0=None,verbose=False):
       
@@ -77,7 +83,7 @@ class FourierGenerator:
          
         return err
     
-    def computeTrajectoryConstraints(self,ti,tf,qmax,qmin,qpmax,qpmin,qppmin,qppmax,\
+    def _computeTrajectoryConstraints(self,ti,tf,qmax,qmin,qpmax,qpmin,qppmin,qppmax,\
         q0=None, qp0= None, qpp0=None):
         """ Computes the trajectory with taking constraintes into account """
 
@@ -89,12 +95,9 @@ class FourierGenerator:
         qpp = np.zeros((nb_traj_samples,ndof))
         for i in range(nb_traj_samples):
             q[i,:], qp[i,:], qpp[i,:] = self.computeTrajectoryState(time[i],q0,qp0,qpp0)
-            if np.any(q[i,:]>qmax) or np.any(q[i,:]<qmin) :
-                q[i,:] = np.clip(q[i,:],qmin,qmax)
-            if np.any(qp[i,:]>qpmax) or np.any(qp[i,:]<qpmin) :
-                qp[i,:] = np.clip(qp[i,:],qpmin,qpmax)
-            if np.any(qpp[i,:]>qppmax) or np.any(qpp[i,:]<qppmin) :
-                qpp[i,:] = np.clip(qpp[i,:],qppmin,qppmax)
+            q[i,:] = np.clip(q[i,:],qmin,qmax)
+            qp[i,:] = np.clip(qp[i,:],qpmin,qpmax)
+            qpp[i,:] = np.clip(qpp[i,:],qppmin,qppmax)
 
         return q, qp ,qpp
     
@@ -119,7 +122,7 @@ class FourierGenerator:
         traj_array = np.concatenate([q,qp,qpp])
         np.savetxt(file_path, traj_array, **format)
 
-
+    
 
 
 

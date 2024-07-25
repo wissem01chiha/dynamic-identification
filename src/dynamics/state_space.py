@@ -65,12 +65,13 @@ class StateSpace:
             x - numpy-ndaryy (2.ndof * 1)
         """
         assert np.size(qp) == np.size(q),"position and velocity vector sizes must be equal"
-        assert np.all(q.shape==qp.shape), "position and velocity vector shapes must be equal"
+        assert np.all(q.shape==qp.shape),"position and velocity vector shapes must be equal"
         x = np.concatenate((q, qp), axis=0)
         assert x.ndim == 1, "The state vector x should be 1-dimensional"
         return x
     
-    def updateStateVector(self, q_or_x: np.ndarray, qp_or_tau: np.ndarray, tau: np.ndarray = None):
+    def updateStateVector(self,q_or_x: np.ndarray,qp_or_tau:np.ndarray,tau:np.ndarray = None,\
+                          sys_poles=None):
         """ 
         Compute the discrete state vector at time date t + 1 given position 
         and velocity or system state vector `x`, and torques vector at time date t. 
@@ -83,8 +84,8 @@ class StateSpace:
             A, B, _, _ = self.computeStateMatrices(x)
             At = (np.eye(2*n) + T*A)
             Bt =  T * B
-            At = self.stabilize(At,Bt)
-            x_next = np.dot(At , x) + np.dot(Bt,tau)
+            At = self.stabilize(At,Bt,sys_poles)
+            x_next = np.dot(At, x) + np.dot(Bt,tau)
         else:
             q = q_or_x
             qp = qp_or_tau
@@ -93,7 +94,7 @@ class StateSpace:
             x_k = self.getStateVector(qp, q)
             At = (np.eye(2*n) + T*A)
             Bt =  T * B
-            At = self.stabilize(At,Bt)
+            At = self.stabilize(At,Bt,sys_poles)
             x_next = np.dot(At , x_k) + np.dot(Bt,tau)
         
         return x_next
@@ -137,11 +138,12 @@ class StateSpace:
         z = np.concatenate(x,tau,axis=0)
         return z
     
-    def computeAugmentedStateMatrices(self, q_or_x: np.ndarray, qp: np.ndarray):
+    def computeAugmentedStateMatrices(self, q_or_x: np.ndarray,qp: np.ndarray):
         """
-        Computes and returns the augmented state-space matrices for the transformed state vector z = [x, u].
+        Computes and returns the augmented state-space matrices for the 
+        transformed state vector z = [x, u].
 
-        Params:
+        Args:
             q_or_x (np.ndarray): State vector q or x.
             qp (np.ndarray): State derivative vector (q_dot or x_dot).
 
@@ -151,17 +153,9 @@ class StateSpace:
         A, B, C, D = self.computeStateMatrices(q_or_x)
         n = A.shape[0]   
         m = B.shape[1]   
-        A_aug = np.block([
-            [A, B],
-            [np.zeros((m, n)), np.zeros((m, m))]
-        ])
-        B_aug = np.block([
-        [B],
-        [np.eye(m)]
-        ])
-        C_aug = np.block([
-            [C, np.zeros((C.shape[0], m))]
-        ])
+        A_aug = np.block([[A, B],[np.zeros((m, n)), np.zeros((m, m))]])
+        B_aug = np.block([[B],[np.eye(m)]])
+        C_aug = np.block([[C, np.zeros((C.shape[0], m))]])
         D_aug = D
     
         return A_aug, B_aug, C_aug, D_aug
@@ -181,8 +175,7 @@ class StateSpace:
         
     def computeReducedStateMatrices(self, q:np.ndarray, qp:np.ndarray, tau:np.ndarray):
         """ 
-        computes the new transformed system by diagonalized the state matrix
-        A 
+        computes the new transformed system by diagonalized the state matrix A 
         """ 
         A, B, C, D = self.computeStateMatrices(q,qp)
         x = self.getStateVector(qp,q)
@@ -202,7 +195,7 @@ class StateSpace:
     def computeStateTransitionMatrix(self,tf, ti=0):
         """ compute the state transition matrix of the system """
     
-    def simulate(self, x0:np.ndarray, nput:np.ndarray=None,noise=None,verbose:bool=False):
+    def simulate(self, x0:np.ndarray, input:np.ndarray=None,noise=None,verbose:bool=False):
         """ 
         Simulate the system response with a given input torque.
         Args:
@@ -220,13 +213,13 @@ class StateSpace:
         states[:,0] = x0
         for i in range(1,NSamples):
             if verbose : 
-                logger.info(f'Updating state variable = {i}/{NSamples}')
+                logger.info(f'updating state variable = {i}/{NSamples}')
             states[:,i] = self.updateStateVector(states[:,i-1],input[i,:])
             if not(noise is None):
                 if noise =='gaussian':
-                    states[:,i]+= np.random.normal(0, 0.08, 2*n) 
+                    states[:,i]+= self.computeGaussianNoise(2*n) 
                 elif noise == 'poisson':
-                    states[:,i]+= np.random.poisson(0.08, 2*n)
+                    states[:,i]+= self.computePoissonNoise(2*n)
                 else:
                     logger.error('Noise Model not Supported.')
             

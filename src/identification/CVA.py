@@ -6,6 +6,8 @@ class CVA:
     Canonical Variate Analysis:
         This technique maximizes the correlation between past and future data, 
         leading to a state-space model that captures the system dynamics effectively.
+        
+        .. https://web.mit.edu/braatzgroup/canonical_variate_analysis_based_contributions_for_fault_identification.pdf
     """
     def __init__(self, num_vars:int=1) -> None:
         self.num_vars = num_vars

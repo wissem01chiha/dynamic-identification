@@ -6,18 +6,23 @@
 [![Licence](https://img.shields.io/github/license/justintime50/python-template)](LICENSE)
 </div>
 
-This project aims to provide an extensive framework for developing complex dynamic models for collaborative manipulators. The available solutions, which can be found here [softwares](/docs/README.md), do not support advanced modeling of friction, stiffness, noise, and robotic joint actuator/transmission systems. This project also aims to provide a comprehensive interface for state-space modeling approaches and transfer functions, rather than standard dynamic equations. Regading the complxity of this models, it offers a method to solve and optimize them,  to find the best trajectory directions and  configurations that excite the robot dynamics.
+The main objective of this project is to provide an extensive framework for modeling and identificationof the dynamics of 
+collaborative serial manipulators.The code extends the classical linear identification methods (IDDIM, CLOE, ...) to non linear dynamics
+The available solutions, which can be found here [softwares](/docs/README.md), do not support advanced modeling of friction, stiffness, noise, 
+ and robotic joint actuator/transmission systems. This project also aims to provide a comprehensive interface for state-space modeling 
+ approaches and transfer functions, rather than standard inverse dynamics equations. Regading the complxity of this models, it offers a method to 
+ solve and optimize them,  to find the best trajectory directions and joints configurations that excite the robot dynamics.
 ### Getting started
 
 ### Package structure
 all software base structures and functions are in the [source](/src/) folder, specific robot configuration/functions scripts are in [exemple](/exemple/) folder.
 ### Features
 - trajectory data processing
-- find optimized excitation trajectories with non-linear optimization
-- manipulator state space model implentation
+- compute optimized excitation trajectories with non-linear optimization
+- compute manipulator state space model 
 - state space identification based methods 
-- transfer function manipulator models
-- dynamic model including effects of frictions, actuator inertia, joint stiffness, and torque offset.
+- computation of manipulators transfer functions 
+- dynamic modeling with effects of frictions, actuator inertia, joint stiffness, and torque offset.
 - generation of optimal exciting trajectories.
 - calculation of physically consistent standard inertial parameters.
 ### Documentation
@@ -28,13 +33,14 @@ see [documentation](docs/README.md) file.
 all simulation scripts examples are in the [exemple](/exemple/)
  the, at the the for [kinova Gen3-R07](https://www.kinovarobotics.com/uploads/User-Guide-Gen3-R07.pdf) robot can be found in the [examples](exemple/kinova/) directory.
 ### Prerequisites
-the code was tested sucessfuly on the flowing platform : 
-  - Windows 11 ( python 3.12.4 - miniconda 4.5.0 - cuda 12.50)
+the code was tested sucessfuly on the flowing platform : Windows 11 ( python 3.12.4 - miniconda 4.5.0 - cuda 12.50)
 
 - CUDA Compilation Toolkit > 11
 - Python interpreter > 3.12
 - Conda > 4.5.0
 ### Installation 
+the code will be soon available to installation with python package magners like pip or conda, 
+now:
 create a new conda environment and install all the dependencies:  
 ```shell
 conda env create -f environment.yml

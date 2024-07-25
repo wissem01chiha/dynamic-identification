@@ -3,15 +3,14 @@
 # with pataerts stored in config.yml file
 # all figures are saved in figure/pyDynamapp 
 #
-#
-#
-#
+# models paramters used the defaults stored in the autogen directory if not 
+# empty output error 'run identification first or provide paramters files path 
+# 
 # TODO: replace all models computing function with 
 # 'computeIdentificationModel' function from class Robot.
 # Author: Wissem CHIHA ©
 # 2024
 ##########################################################################
-
 import argparse
 import sys
 import os
@@ -24,17 +23,17 @@ parser = argparse.ArgumentParser(description=\
 parser.add_argument('--v',type=bool)
 parser.add_argument('--data_file',type=str,default='b')
 parser.add_argument('--show_figures', type=bool,default=False)
-parser.add_argument('cutoff_frequency', type=float, default=3)
+parser.add_argument('--cutoff_frequency', type=float, default=3)
 args = parser.parse_args()
 
-base_dir = os.path.dirname(os.path.realpath(__file__))
+base_dir = os. getcwd()
+figure_path = os.path.join(base_dir,"figure/kinova") 
+config_file_path = os.path.join(base_dir,"exemple/kinova/config.yml")  
 
-figureFolderPath="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/figure/kinova"
-config_file_path="C:/Users/chiha/OneDrive/Bureau/Dynamium/dynamic-identification/exemple/kinova/config.yml"
-src_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),'../src'))
+src_folder = os.path.join(base_dir,"src")
 sys.path.append(src_folder)
-if not os.path.exists(figureFolderPath):
-    os.makedirs(figureFolderPath)
+if not os.path.exists(figure_path):
+    os.makedirs(figure_path)
 
 from dynamics import Robot, Regressor
 from utils import RobotData,  plot2Arrays, plotElementWiseArray, yaml2dict, RMSE, MAE
@@ -43,12 +42,13 @@ mlogger  = logging.getLogger('matplotlib')
 logging.basicConfig(level='INFO')
 mlogger.setLevel(logging.WARNING)
 
-cutoff_frequency  = 3
+cutoff_frequency  = args.cutoff_frequency
 config_params  = yaml2dict(config_file_path)
+
 data           = RobotData(config_params['identification']['dataFilePath'])
 fildata        = data.lowPassfilter(cutoff_frequency)
 kinova         = Robot()
-q_f            = fildata ['position']
+q_f            = fildata['position']
 qp_f           = fildata['velocity']
 qpp_f          = fildata['desiredAcceleration']
 current_f      = fildata['current']
@@ -60,26 +60,25 @@ qpp            = data.desiredAcceleration
 current        = data.current
 torque         = data.torque
 
-
 # Visualize the recorded trajectory data of the system.
 plot2Arrays(q, q_f, "true", "filtred", f"Joints Positions, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints_positions'))
+plt.savefig(os.path.join(figure_path,'joints_positions'))
 plot2Arrays(qp, qp_f, "true", "filtred", f"Joints Velocity, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints_velocity'))
+plt.savefig(os.path.join(figure_path,'joints_velocity'))
 plot2Arrays(qpp, qpp_f, "true", "filtred", f"Joints Acceleration, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints_acceleration'))
+plt.savefig(os.path.join(figure_path,'joints_acceleration'))
 plot2Arrays(torque, torque_f , "true", "filtred", f"Joints Torques, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints_torques'))
+plt.savefig(os.path.join(figure_path,'joints_torques'))
 plot2Arrays(current, current_f , "true", "filtred", f"Joints Current, cutoff frequency = {cutoff_frequency} Hz")
-plt.savefig(os.path.join(figureFolderPath,'joints_current'))
+plt.savefig(os.path.join(figure_path,'joints_current'))
 
 # Visualize the Correlation between torques data
 data.visualizeCorrelation('torque')
-plt.savefig(os.path.join(figureFolderPath,'sensor_torques_correlation'))
+plt.savefig(os.path.join(figure_path,'sensor_torques_correlation'))
 data.visualizeCorrelation('torque_rne')
-plt.savefig(os.path.join(figureFolderPath,'blast_rne_torques_correlation'))
+plt.savefig(os.path.join(figure_path,'blast_rne_torques_correlation'))
 data.visualizeCorrelation('torque_cur')
-plt.savefig(os.path.join(figureFolderPath,'current_torques_correlation'))
+plt.savefig(os.path.join(figure_path,'current_torques_correlation'))
 
 # Compute and plot the RMSE between the actual RNEA model (Blast) and the 
 # torque sensor output. 
@@ -87,7 +86,7 @@ rmse_joint = RMSE(torque, data.torque_rne).flatten()
 rmse_time  = RMSE(torque, data.torque_rne,axis=1) 
 plotElementWiseArray(rmse_joint,'Error between Blast RNEA and Sensor Torques per Joint'\
     ,'Joint Index','RMSE')
-plt.savefig(os.path.join(figureFolderPath,'blast_RNEA_vs_sensor_torques'))
+plt.savefig(os.path.join(figure_path,'blast_RNEA_vs_sensor_torques'))
 
 
 # Compute and plot the standard manipulator model : 
@@ -98,9 +97,9 @@ for i  in range(data.numRows):
 rmse_per_joint = RMSE(tau_sim,torque).flatten()
 plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model Error per Joint"\
     ,'Joint Index','RMSE')
-plt.savefig(os.path.join(figureFolderPath,'standard_model_error_joint'))
+plt.savefig(os.path.join(figure_path,'standard_model_error_joint'))
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard Manipulator Model")
-plt.savefig(os.path.join(figureFolderPath,'standard_model'))
+plt.savefig(os.path.join(figure_path,'standard_model'))
 
 
 # Compute and plot the standard manipulator model with friction effect:
@@ -112,9 +111,9 @@ for i  in range(data.numRows):
 rmse_per_joint = RMSE(tau_sim,torque).flatten()
 plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model with Friction Error per Joint"\
     ,'Joint Index','RMSE')
-plt.savefig(os.path.join(figureFolderPath,'standard_model_friction_error_joint'))
+plt.savefig(os.path.join(figure_path,'standard_model_friction_error_joint'))
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard manipulator model with friction")
-plt.savefig(os.path.join(figureFolderPath,'standard_model_with_friction'))
+plt.savefig(os.path.join(figure_path,'standard_model_with_friction'))
 
 
 # Compute and plot the standard manipulator model with stiffness:
@@ -127,8 +126,8 @@ rmse_per_joint = RMSE(tau_sim,torque).flatten()
 plotElementWiseArray(rmse_per_joint,"Standard Manipulator Model with Stiffness Error per Joint"\
     ,'Joint Index','RMSE')
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard manipulator model with stiffness")
-plt.savefig(os.path.join(figureFolderPath,'standard_model_stiffness_error_joint'))
-plt.savefig(os.path.join(figureFolderPath,'standard_model_stiffness'))
+plt.savefig(os.path.join(figure_path,'standard_model_stiffness_error_joint'))
+plt.savefig(os.path.join(figure_path,'standard_model_stiffness'))
 
 
 # Compute and plot the standard manipulator model with stiffness and friction:
@@ -139,7 +138,7 @@ for i  in range(data.numRows):
     tau_s = kinova.computeStiffnessTorques(q[i,:])
     tau_sim[i,:] = 3*(kinova.computeDifferentialModel(q_f[i,:],qp_f[i,:],qpp_f[i,:]) + tau_s + tau_f[i,:])
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard model with stiffness and friction")
-plt.savefig(os.path.join(figureFolderPath,'standard_model_stiffness_friction'))
+plt.savefig(os.path.join(figure_path,'standard_model_stiffness_friction'))
 
 
 # Compute and plot the standard manipulator model with actuator and friction:
@@ -153,7 +152,7 @@ Jm = kinova.getActuatorInertiasMatrix()
 for i in range(tau_sim.shape[0]):
     tau_sim[i,:] -= Jm @ qpp[i,:]
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard model with actuator and friction")
-plt.savefig(os.path.join(figureFolderPath,'standard_model_actuator_friction'))
+plt.savefig(os.path.join(figure_path,'standard_model_actuator_friction'))
 
 
 # Compute and plot the standard manipulator model with actuator, friction and stiffness
@@ -170,7 +169,7 @@ x = np.random.rand(reg.param_vector_max_size)
 W = reg.computeFullRegressor(q_f,qp_f,qpp_f) 
 tau_sim = (W @ x).reshape((torque.shape[0],kinova.model.nq))
 plot2Arrays(torque_f,tau_sim,"true","simulation","Standard regression model")
-plt.savefig(os.path.join(figureFolderPath,'standard_regression_model'))
+plt.savefig(os.path.join(figure_path,'standard_regression_model'))
 
 # Compute and plot the non linear manipultaor  regression model 
 # τ = f(q,qp,qpp,x) 
@@ -178,8 +177,7 @@ kinova.setIdentificationModelData(q_f,qp_f,qpp_f)
 x = np.random.rand(209)
 tau_sim = kinova.computeIdentificationModel(x)
 plot2Arrays(torque_f,tau_sim,"true","simulation","Manipulator Non Linear model")
-plt.savefig(os.path.join(figureFolderPath,'non_Linear_model'))
-
+plt.savefig(os.path.join(figure_path,'non_Linear_model'))
 
 if args.show_figures:
     plt.show()
