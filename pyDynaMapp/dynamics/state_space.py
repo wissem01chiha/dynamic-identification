@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import place_poles
-from dynamics import Robot
+from ..dynamics import Robot
  
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,11 +15,8 @@ class StateSpace:
     Args:
         robot  - Manipulator Base model 
     """
-    def __init__(self,robot:Robot=None) -> None:
-        if robot is None:
-            self.robot = Robot()
-        else:
-            self.robot =robot
+    def __init__(self,urdf_file_path,config_file_path) -> None:
+        self.robot = Robot(urdf_file_path,config_file_path)
             
     def computeStateMatrices(self, q_or_x: np.ndarray, qp: np.ndarray = None):
         """
@@ -82,9 +79,9 @@ class StateSpace:
             x = q_or_x
             tau = qp_or_tau
             A, B, _, _ = self.computeStateMatrices(x)
+            A = self.stabilize(A,B,sys_poles)
             At = (np.eye(2*n) + T*A)
             Bt =  T * B
-            At = self.stabilize(At,Bt,sys_poles)
             x_next = np.dot(At, x) + np.dot(Bt,tau)
         else:
             q = q_or_x
@@ -99,18 +96,20 @@ class StateSpace:
         
         return x_next
     
-    def computeStateInputVector(self, q:np.ndarray, qp:np.ndarray, qpp:np.ndarray, \
+    def computeStateInputVector(self, q:np.ndarray, qp:np.ndarray, qpp:np.ndarray=None, \
         tau:np.ndarray=None, noise:bool=False):
         """Computes the state space input torques vector U. """
         n = self.robot.model.nq
         tau_g = self.robot.computeGravityTorques(q)
-        tau_f = self.robot.computeFrictionTorques(qp)
-        tau_m = self.robot.computeActuatorTorques(q,qp,qpp)
-        if tau is None:
-            tau = tau_m
-        u = tau_f + tau_g - tau
-        # adress the problem where some values in u are grater than others(outliers) wich can lead to 
-        # numercial issues 
+        tau_f = self.robot.computeFrictionTorques(qp,q)
+        if qpp is None:
+            if tau is None:
+                logger.error('input joint  torque should be not none')
+            else:
+                u = tau_f + tau_g - tau
+        else:
+            tau_m = self.robot.computeActuatorTorques(q,qp,qpp)
+            u = tau_f + tau_g - tau_m
         return u    
         
     def computeObsMatrix(self, q_or_x:np.ndarray, qp: np.ndarray=None):
@@ -188,14 +187,19 @@ class StateSpace:
         D_hat =1    
     
     def lsim(self, x0:np.ndarray, input:np.ndarray):
-        """ simualte the ss system by computing the full analytic equation and iteragte it """
+        """
+        simualte the ss system by computing the full analytic equation and iteragte it.
+        #TODO:need to compute the state transition matrix and the expiontenial of the 
+        # matrix A 
+        """
         states = 0
         return states
     
     def computeStateTransitionMatrix(self,tf, ti=0):
         """ compute the state transition matrix of the system """
     
-    def simulate(self, x0:np.ndarray, input:np.ndarray=None,noise=None,verbose:bool=False):
+    def simulate(self, x0:np.ndarray, input:np.ndarray,system_poles=None,\
+        noise=None,verbose:bool=False,steps:int=1000):
         """ 
         Simulate the system response with a given input torque.
         Args:
@@ -206,15 +210,22 @@ class StateSpace:
         Return:
             - states : numpy-ndarry stroing iteration states vectors. ( 2.ndof * NSamples)
         """
-        NSamples, ndof = input.shape
         n = self.robot.model.nq
-        assert ndof == n, "ndof msitamtech"
+        if input is None:
+            NSamples = steps
+        else:
+            NSamples, ndof = input.shape
+            assert ndof == n, "msitamtech error between degree of freedom in robot data"
         states = np.zeros((2*n,NSamples))
         states[:,0] = x0
         for i in range(1,NSamples):
             if verbose : 
                 logger.info(f'updating state variable = {i}/{NSamples}')
-            states[:,i] = self.updateStateVector(states[:,i-1],input[i,:])
+            q = states[0:n,0:i]
+            qp = states[n:2*n,0:i]
+        
+            joint_torque = self.computeStateInputVector(q,qp,tau=input[0:i-1,:])
+            states[:,i] = self.updateStateVector(states[:,i-1],joint_torque,sys_poles=system_poles)
             if not(noise is None):
                 if noise =='gaussian':
                     states[:,i]+= self.computeGaussianNoise(2*n) 
@@ -224,6 +235,38 @@ class StateSpace:
                     logger.error('Noise Model not Supported.')
             
         return states 
+    
+    def lsim_place(self,coeffs,x0:np.ndarray, input:np.ndarray=None,\
+        noise=None,verbose:bool=False):
+        """
+        simulate the state space system with state depend poles varing
+        given 3 parmters of polynme it compuytes the state-dependent system poles 
+        like :
+            k(x(t)) = α_0 + α_1 x(t) + α_2x(t)^2+ α_3 x(t)^3   
+        Args: 
+            coefs : numpy ndarry of 3 constant coefficents
+        """
+        ncofs = coeffs.size
+        NSamples, ndof = input.shape
+        n = self.robot.model.nq
+        assert ndof == n, "msitamtech error between degree of freedom in robot data"
+        states = np.zeros((2*n,NSamples))
+        states[:,0] = np.zeros(14)
+        for i in range(1,NSamples):
+            if verbose : 
+                logger.info(f'updating state variable = {i}/{NSamples}')
+            system_poles = coeffs[0]
+            for k in range(ncofs):
+                system_poles +=  coeffs[k] * np.power(states[:,i-1],k)
+            system_poles = np.clip(system_poles,-1,0)
+            # ensure that no posles is reprated more than the rank of B wich is assumed as 7 
+            # if so add a random offset of +0.0001 to the rest of poles 
+            system_poles += 1e-7*np.random.rand(system_poles.size)
+            states[:,i] = self.updateStateVector(states[:,i-1],input[i,:],\
+                sys_poles=system_poles)
+        
+        return states
+    
     
     def linearize(self,q:np.ndarray, qp:np.ndarray, noise:bool=False):
         """
@@ -257,7 +300,8 @@ class StateSpace:
         pole_counts = {pole: desired_poles.count(pole) for pole in set(desired_poles)}
         for pole, count in pole_counts.items():
             if count > rank_B:
-                logger.error(f"The pole {pole} is repeated {count} times, more than the rank of B ({rank_B}).")
+                logger.error(\
+            f"The pole {pole} is repeated {count} times, more than the rank of B ({rank_B}).")
         eigenvalues = np.linalg.eigvals(A)
         if np.any(np.abs(eigenvalues) < 1) :
             result = place_poles(A, B, desired_poles)

@@ -1,5 +1,5 @@
 import numpy as np
-from utils import columnVector
+from ..utils import columnVector
 
 class Dahl:
     """

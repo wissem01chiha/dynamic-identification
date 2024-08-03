@@ -1,3 +1,5 @@
 from .dynamics import *
 from .identification import *
-__name__ = "pyDynaMapp"
+from .viscoelastic import *
+from .trajectory import *
+from .models import *

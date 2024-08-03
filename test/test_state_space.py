@@ -4,12 +4,15 @@ import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 
-src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.append(src_folder)
-
-from dynamics import StateSpace
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+ 
+from pyDynaMapp.dynamics import StateSpace
 
 class TestStateSpace(unittest.TestCase):
+    
+    def setUp(self) -> None:
+        self.urdf_file_path = 
+        self.config_file_path = 
     
     def test_state_matrices_not_none(self):
         model = StateSpace()

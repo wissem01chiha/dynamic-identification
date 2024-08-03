@@ -7,7 +7,7 @@ import unittest
 src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 sys.path.append(src_folder)
 
-from trajectory import FourierGenerator
+from pyDynaMapp.trajectory import FourierGenerator
 
 class TestFourier(unittest.TestCase):
     

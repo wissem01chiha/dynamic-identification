@@ -3,7 +3,7 @@ from scipy.integrate import odeint
 
 class HarmonicDrive():
     """
-    HarmonicDrive 
+    HarmonicDrive Base Class model
     Ref:
 
     """
@@ -12,7 +12,7 @@ class HarmonicDrive():
         self.inputTorque    = Tinput
         self.inputVelocity  = Vinput
         self.c1 = 1
-        self.c2 =2
+        self.c2 = 2
         
     
     def getOutputVelocity(self):
@@ -26,7 +26,7 @@ class HarmonicDrive():
         return T
     
     def computeCompliance(self, inputSpeed):
-        """ """
+        """Compute the  """
         return 
     
     

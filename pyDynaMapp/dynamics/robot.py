@@ -2,9 +2,9 @@ import os
 import numpy as np
 import logging
 import pinocchio as pin
-from utils import discreteTimeIntegral, yaml2dict, conditionNumber, MAE
-from viscoelastic import LuGre, MaxwellSlip, Dahl, computeViscousFrictionForce
-from models import BLDC
+from ..utils import discreteTimeIntegral, yaml2dict, conditionNumber
+from ..viscoelastic import LuGre, MaxwellSlip, Dahl, computeViscousFrictionForce
+from ..models import BLDC
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,8 +15,8 @@ class Robot():
     Base class for Robot models.
     
     Args:
-        - urdfFilePath   : Manipulator 
-        - configFilePath : Manipulator configuration file path 
+        - urdf_file_path   : Manipulator 
+        - config_file_path : Manipulator configuration file path 
         - model          : Pinocchio multibody model of the manipulator
         - params         : Model static paramters
         - data           : Pinocchio multibody data model
@@ -25,29 +25,22 @@ class Robot():
         - a              : Joints acceleration vector.
         
     """
-    def __init__(self,q=None,v=None,a=None,configFilePath=None)->None:
+    def __init__(self,urdf_file_path,config_file_path,q=None,v=None,a=None,)->None:
         
-        if configFilePath ==None:
-            logger.warning("No configuration file provided using default file.")
- 
-        dir = os.path.dirname(os.path.abspath(__file__))
-        configFilePath = os.path.join(os.path.dirname(os.path.dirname(dir)), 'exemple/kinova/config.yml')
-
-        if not os.path.isfile(configFilePath):
-            logger.error(f"Config file does not exist at the provided path: {configFilePath}")
+        if not os.path.isfile(config_file_path):
+            logger.error(f"Config file does not exist at the provided path: {config_file_path}")
         
-        self.params = yaml2dict(configFilePath)
-        
-        urdfFilePath = self.params['urdfFilePath']  
-        if urdfFilePath is None:
+        self.params = yaml2dict(config_file_path)
+         
+        if urdf_file_path is None:
             logger.error("URDF file path not set in configuration file.")        
-        if not os.path.isfile(urdfFilePath):
-            logger.error(f"URDF file does not exist at the provided path: {urdfFilePath}")
+        if not os.path.isfile(urdf_file_path):
+            logger.error(f"URDF file does not exist at the provided path: {urdf_file_path}")
         
         # Class Attributes
-        self.urdfFilePath = urdfFilePath
-        self.configFilePath = configFilePath
-        self.model = pin.buildModelFromUrdf(self.urdfFilePath)
+        self.urdf_file_path = urdf_file_path
+        self.config_file_path = config_file_path
+        self.model = pin.buildModelFromUrdf(self.urdf_file_path)
         self.data =  self.model.createData()
         fext = pin.StdVec_Force()
         for i in range(self.model.njoints):

@@ -1,5 +1,5 @@
 import numpy as np 
-from dynamics import StateSpace 
+from ..dynamics import StateSpace 
 
 class N4SID:
     """

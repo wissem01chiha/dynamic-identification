@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np 
 
-src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.append(src_folder)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from viscoelastic import Dahl
+from pyDynaMapp.viscoelastic import Dahl
 
 class TestDahl(unittest.TestCase):
     def test_force_not_none(self):

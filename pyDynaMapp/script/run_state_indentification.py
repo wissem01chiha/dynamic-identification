@@ -17,17 +17,23 @@ parser.add_argument('--data_file',type=str,default='b')
 parser.add_argument('--iteration',type=int,default=10)
 args = parser.parse_args()
 
-base_dir = os. getcwd()
+base_dir = os.getcwd()
 figure_path = os.path.join(base_dir,"figure/kinova") 
 config_file_path = os.path.join(base_dir,"exemple/kinova/config.yml")
 state_poles_path = os.path.join(base_dir,"autogen/state_poles.npy")  
 
-src_folder = os.path.join(base_dir,"src")
-sys.path.append(src_folder)
+pkg_dir = os.path.join(base_dir,'pyDynaMapp')
+sys.path.append(pkg_dir)
+
+config_file_path = os.path.join(pkg_dir,"robot/kinova/config.yml")
+state_poles_path = os.path.join(pkg_dir,"autogen/state_poles.npy")  
+data_file_path = os.path.join(pkg_dir,"data/kinova/identification_data/blast_traj.csv")
+urdf_file_path =  os.path.join(pkg_dir,"robot/kinova/gen3.urdf")
 if not os.path.exists(figure_path):
     os.makedirs(figure_path)
 
-from dynamics import Robot,  StateSpace
+from dynamics.robot import Robot
+from dynamics.state_space import  StateSpace
 from utils import RobotData,  plot2Arrays, yaml2dict, RMSE
 
 dynamics_logger = logging.getLogger('dynamics')
@@ -39,9 +45,9 @@ mlogger.setLevel(logging.WARNING)
 
 cutoff_frequency  = args.cutoff_frequency
 config_params  = yaml2dict(config_file_path)
-data           = RobotData(config_params['identification']['dataFilePath'])
+data           = RobotData(data_file_path)
 fildata        = data.lowPassfilter(cutoff_frequency)
-kinova         = Robot()
+kinova         = Robot(urdf_file_path,config_file_path)
 q_f            = fildata ['position']
 qp_f           = fildata['velocity']
 qpp_f          = fildata['desiredAcceleration']
@@ -53,40 +59,50 @@ qpp            = data.desiredAcceleration
 current        = data.current
 torque         = data.torque
 
-kinova_ss = StateSpace(kinova)
+kinova_ss = StateSpace(urdf_file_path,config_file_path)
 tau_ss = torque
-x0 = kinova_ss.getStateVector(qp_f[0,:],q_f[0,:])
 
-start =0 
-end = 1000
+
+start = 0
+step  = 2000
+end = 30000
+x0 = kinova_ss.getStateVector(qp_f[start,:],q_f[start,:])
+max_iter = args.iteration
+dim = 14
+
 ###################################################################
 # define optimisation routines 
 iteration_counter = 0
 def optimize_poles(x,grad):
-    global kinova_ss, tau_ss, x0, iteration_counter 
-    kinova_ss.robot.params['state_space_params']['poles']= x
-    states = kinova_ss.simulate(x0,tau_ss[start:end])
-    rmse_time  = RMSE(np.transpose(states[7:14,:]), qp[start:end], axis=1)
+    """ given 3 parmters of polynme it compuytes the state-dependent system poles 
+    like :
+    k(x(t)) = α_0 + α_1 x(t) + α_2x(t)^2+ α_3 x(t)^3   
+    """
+    global kinova_ss, tau_ss, x0, iteration_counter, qp_f
+    states = kinova_ss.simulate(x0,tau_ss[start:end:step],verbose=False,system_poles=x)
+    rmse_time  = RMSE(np.transpose(states[7:14,:]), qp_f[start:end:step], axis=1)
     print(
-        f"Iteration {iteration_counter}:"
+        f"Iteration {iteration_counter}/{max_iter}: "
         f"RMSE = {np.sqrt(np.mean(rmse_time**2)):.5f}"
     )
     iteration_counter +=1
     return np.sqrt(np.mean(rmse_time**2))
     
-dim = 14   
-max_iter = args.iteration
 
-opt = nlopt.opt(nlopt.LN_NELDERMEAD, dim) 
+
+
+opt = nlopt.opt(nlopt.LN_NEWUOA, dim) 
 opt.set_min_objective(optimize_poles)
 opt.set_maxeval(max_iter)  
-opt.set_ftol_rel(1e-6)     
-opt.set_xtol_rel(1e-6)
+opt.set_ftol_rel(1e-9)     
+opt.set_xtol_rel(1e-9)
+
 # Define bounds if necessary (optional)
-lower_bounds = np.full(dim,-1)
+lower_bounds = np.full(dim, -1)
 upper_bounds = np.full(dim, 0)
 opt.set_lower_bounds(lower_bounds)
 opt.set_upper_bounds(upper_bounds)
+
 # Initial guess for the optimization
 if os.path.exists(state_poles_path):
     initial_guess = np.load(state_poles_path)
@@ -106,19 +122,14 @@ np.save(state_poles_path, x_opt)
 print("Saved optimized parameters to file.")
 ####################################################################################
 # validation 
-kinova_ss.robot.params['state_space_params']['poles'] = x_opt
-states = kinova_ss.simulate(x0,tau_ss[start:end,:],verbose=True)
+print('validation process : ...') 
+states = kinova_ss.simulate(x0,tau_ss[start:end:step,:],verbose=True,system_poles=x_opt)
+rmse_time  = RMSE(np.transpose(states[7:14,:]), qp_f[start:end:step], axis=1)
+ 
 
-nyquist_freq = 0.5 * 1000
-normal_cutoff = cutoff_frequency / nyquist_freq
-#b, a = butter(3, normal_cutoff, btype='low', analog=False)
-#states =  filtfilt(b, a, states, axis=1)
-print('finit filtring')
-
-plot2Arrays(0.001*np.transpose(states[7:14,:]), qp[start:end,:],'state','true',\
-    'Joints Velocity State Model Simulation')
-plt.savefig(os.path.join(figure_path,'joints velocity state model simulation'))
-#plot2Arrays(0.001*np.transpose(states[7:14,:]), q[:30000:200],'state','true',\
-#   'Joints Position State Model Simulation')
+plot2Arrays(np.transpose(states[7:14,:]), qp_f[start:end:step,:],'state','true',\
+    f'Joints Velocity State Model Simulation, RMSE =  {np.sqrt(np.mean(rmse_time**2)):.5f}')
+plt.savefig(os.path.join(figure_path,'joints_velocity_state_model_simulation'))
+ 
 if args.show_figures:
     plt.show()

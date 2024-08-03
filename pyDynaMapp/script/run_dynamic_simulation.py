@@ -26,7 +26,7 @@ parser.add_argument('--show_figures', type=bool,default=False)
 parser.add_argument('--cutoff_frequency', type=float, default=3)
 args = parser.parse_args()
 
-base_dir = os. getcwd()
+base_dir = os.getcwd()
 figure_path = os.path.join(base_dir,"figure/kinova") 
 config_file_path = os.path.join(base_dir,"exemple/kinova/config.yml")  
 

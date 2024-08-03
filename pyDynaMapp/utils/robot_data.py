@@ -8,24 +8,24 @@ from scipy.signal import butter, filtfilt
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from utils import computeCorrelation
+from ..utils import computeCorrelation
 
 class RobotData:
     """
     Initialize the RobotData object by loading and processing data from a CSV file.
     
     Args:
-        - dataFileName (str): Path to the CSV data file.
+        - data_file_path (str): Path to the CSV data file.
         - ndof (int) : number of freedom degree of the manipulator.
         - time_step (float) : step time beteewn tow conscutive sample of data
         - intIndex (int): Initial index for data slicing.
         - stepIndex (int): Step index for periodic data selection.
         - fnlIndex (int): Final index for data slicing.
     """
-    def __init__(self, dataFileName,ndof=7,time_step=1e-3, intIndex=None, stepIndex=1, fnlIndex=None):
+    def __init__(self, data_file_path,ndof=7,time_step=1e-3, intIndex=None, stepIndex=1, fnlIndex=None):
         
         try:
-            dataTable = pd.read_csv(dataFileName)
+            dataTable = pd.read_csv(data_file_path)
         except Exception as e:
             logger.error(f"Error loading data: {e}")
             
@@ -100,8 +100,44 @@ class RobotData:
         
         return smoothed_data
     
-    def computeTorqueNoise(self)->tuple:
-        """ """
+    def computeTorqueNoise(self,variable='torque',method='std')->float:
+        """
+        Estimates the Noise level in torque sensor mesurements.
+        The noise model is assumed to be a white gaussian noise.
+        """
+        if method =='std':
+            if variable =='torque_cur':
+                noise_level = np.std(self.torque_cur)
+            elif variable == 'torque_rne':
+                noise_level = np.std(self.torque_rne)
+            else:
+                noise_level =np.std(self.torque)
+            
+        elif method=='mad':
+            if variable =='torque_cur':
+                mad = np.median(np.abs(self.torque_cur-np.median(self.torque_cur,axis=0)),axis=0)
+                noise_level = np.mean(mad)*1.4826
+            elif variable == 'torque_rne':
+                mad = np.median(np.abs(self.torque_rne-np.median(self.torque_rne,axis=0)),axis=0)
+                noise_level = np.mean(mad)*1.4826
+            else:
+                mad = np.median(np.abs(self.torque-np.median(self.torque,axis=0)),axis=0)
+                noise_level = np.mean(mad)*1.4826
+             
+        return noise_level
+    
+    def computePositionNoise(self,method='std')->tuple:
+        """
+        Estimates the Noise level in torque sensor mesurements.
+        The noise model is assumed to be a white gaussian noise.
+        """
+        if method =='std':
+            noise_level = np.std(self.position)
+        elif method=='mad':
+            mad = np.median(np.abs(self.position-np.median(self.position,axis=0)),axis=0)
+            noise_level = np.mean(mad)*1.4826
+    
+        return noise_level
     
     def visualizeCorrelation(self,variable='torque'):
         """

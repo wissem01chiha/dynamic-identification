@@ -17,7 +17,7 @@ parser.add_argument('--v',type=bool,default=False)
 parser.add_argument('--cutoff_frequency', type=float, default=3)
 parser.add_argument('--show_figures', type=bool,default=False)
 parser.add_argument('--data_file',type=str,default='blast_traj.csv')
-parser.add_argument('--filter',type=bool,default=True)
+parser.add_argument('--filter_output',type=bool,default=False)
 args = parser.parse_args()
 
 base_dir = os. getcwd()
@@ -27,13 +27,17 @@ sys.path.append(pkg_dir)
 figure_path = os.path.join(pkg_dir ,"figure/kinova") 
 config_file_path = os.path.join(pkg_dir,"robot/kinova/config.yml")
 state_poles_path = os.path.join(pkg_dir,"autogen/state_poles.npy")  
+data_file_path = os.path.join(pkg_dir,"data/kinova/identification_data/blast_traj.csv")
+urdf_file_path =  os.path.join(pkg_dir,"robot/kinova/gen3.urdf")
+
+
 
 if not os.path.exists(figure_path):
     os.makedirs(figure_path)
 
 from dynamics.robot import Robot
 from dynamics.state_space import StateSpace
-from utils import RobotData, plot2Arrays, yaml2dict, MAE
+from utils import RobotData, plot2Arrays, plotArray, yaml2dict, MAE
 
 if not(args.v):
     dynamics_logger = logging.getLogger('dynamics')
@@ -41,9 +45,9 @@ if not(args.v):
 
 cutoff_frequency = args.cutoff_frequency
 config_params  = yaml2dict(config_file_path)
-data           = RobotData(config_params['identification']['dataFilePath'])
+data           = RobotData(data_file_path)
 fildata        = data.lowPassfilter(cutoff_frequency)
-kinova         = Robot()
+kinova         = Robot(urdf_file_path,config_file_path)
 q_f            = fildata['position']
 qp_f           = fildata['velocity']
 qpp_f          = fildata['desiredAcceleration']
@@ -55,22 +59,27 @@ qpp            = data.desiredAcceleration
 current        = data.current
 torque         = data.torque
  
-kinova_ss = StateSpace(kinova)
+kinova_ss = StateSpace(urdf_file_path,config_file_path)
 tau_ss    = torque
 x0        = kinova_ss.getStateVector(qp_f[0,:],q_f[0,:])
 start     = 0
-step      = 100
-end       = 30000
-
-states = kinova_ss.simulate(x0,tau_ss[start:end:step,:],verbose=True)
+step      = 1
+end       = 600
+ 
+states = kinova_ss.simulate(x0=x0,input=tau_ss[start:end:step,:],verbose=True)
 nyquist_freq = 0.5 * data.samplingRate
-
-if args.filter:
+ 
+if args.filter_output:
     normal_cutoff = cutoff_frequency / nyquist_freq
-    b, a = butter(1, normal_cutoff, btype='low', analog=False)
-    #states =  filtfilt(b,a,states,axis=1)
+    b, a = butter(3, normal_cutoff, btype='low', analog=False)
+    states =  filtfilt(b,a,states,axis=1)
+    
+states[7:14,0:10]=0
+# compute the error between the actual state velocity and the real ones :
+vel_error = np.abs(np.transpose(states[7:14,:])-qp_f[start:end:step,:])
+plotArray(vel_error,'absolute error velocity')
 
-plot2Arrays(4*MAE(np.transpose(np.clip(states[7:14,:],np.min(qp_f),np.max(qp_f))),10),qp_f[start:end:step,:],'state','true',\
+plot2Arrays(0.01*np.transpose(states[7:14,:]),qp_f[start:end:step,:],'state','true',\
 f'Joints Velocity State Model Simulation, window = {step}, cutoff = {cutoff_frequency}, sampling ={data.samplingRate}')
 plt.savefig(os.path.join(figure_path,'joints velocity state model simulation'))
 if args.v :

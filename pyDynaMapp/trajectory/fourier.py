@@ -7,8 +7,8 @@ import seaborn as sns
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from dynamics import   Regressor
-from utils import plotArray
+from ..dynamics import   Regressor
+from ..utils import plotArray
 
 class FourierGenerator:
     """
