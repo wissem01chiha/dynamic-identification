@@ -35,8 +35,8 @@ sys.path.append(src_folder)
 if not os.path.exists(figure_path):
     os.makedirs(figure_path)
 
-from dynamics import Robot, Regressor
-from utils import RobotData,  plot2Arrays, plotElementWiseArray, yaml2dict, RMSE, MAE
+from ..dynamics import Robot, Regressor
+from ..utils import RobotData,  plot2Arrays, plotElementWiseArray, yaml2dict, RMSE
 
 mlogger  = logging.getLogger('matplotlib')
 logging.basicConfig(level='INFO')
@@ -45,20 +45,20 @@ mlogger.setLevel(logging.WARNING)
 cutoff_frequency  = args.cutoff_frequency
 config_params  = yaml2dict(config_file_path)
 
-data           = RobotData(config_params['identification']['dataFilePath'])
-fildata        = data.lowPassfilter(cutoff_frequency)
-kinova         = Robot()
-q_f            = fildata['position']
-qp_f           = fildata['velocity']
-qpp_f          = fildata['desiredAcceleration']
-current_f      = fildata['current']
-torque_f       = fildata['torque']
+data         = RobotData(config_params['identification']['dataFilePath'])
+fildata      = data.lowPassfilter(cutoff_frequency)
+kinova       = Robot()
+q_f          = fildata['position']
+qp_f         = fildata['velocity']
+qpp_f        = fildata['desiredAcceleration']
+current_f    = fildata['current']
+torque_f     = fildata['torque']
 
-q              = data.position
-qp             = data.velocity
-qpp            = data.desiredAcceleration
-current        = data.current
-torque         = data.torque
+q            = data.position
+qp           = data.velocity
+qpp          = data.desiredAcceleration
+current      = data.current
+torque       = data.torque
 
 # Visualize the recorded trajectory data of the system.
 plot2Arrays(q, q_f, "true", "filtred", f"Joints Positions, cutoff frequency = {cutoff_frequency} Hz")

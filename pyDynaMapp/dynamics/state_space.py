@@ -1,16 +1,20 @@
+import os
+import sys
 import logging
 import numpy as np 
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import place_poles
-from ..dynamics import Robot
- 
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from dynamics import Robot
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class StateSpace:
-    """
-    Base class for state space identification models 
+    """Base class for state space identification models 
     
     Args:
         robot  - Manipulator Base model 
@@ -68,7 +72,7 @@ class StateSpace:
         return x
     
     def updateStateVector(self,q_or_x: np.ndarray,qp_or_tau:np.ndarray,tau:np.ndarray = None,\
-                          sys_poles=None):
+                          state_poles=None):
         """ 
         Compute the discrete state vector at time date t + 1 given position 
         and velocity or system state vector `x`, and torques vector at time date t. 
@@ -79,7 +83,7 @@ class StateSpace:
             x = q_or_x
             tau = qp_or_tau
             A, B, _, _ = self.computeStateMatrices(x)
-            A = self.stabilize(A,B,sys_poles)
+            A = self.stabilize(A,B,state_poles)
             At = (np.eye(2*n) + T*A)
             Bt =  T * B
             x_next = np.dot(At, x) + np.dot(Bt,tau)
@@ -89,49 +93,30 @@ class StateSpace:
             assert q.size == qp.size,"Input position and velocity vectors must have the same size"
             A, B, _, _ = self.computeStateMatrices(q, qp)
             x_k = self.getStateVector(qp, q)
+            A = self.stabilize(A,B,state_poles)
             At = (np.eye(2*n) + T*A)
             Bt =  T * B
-            At = self.stabilize(At,Bt,sys_poles)
             x_next = np.dot(At , x_k) + np.dot(Bt,tau)
         
         return x_next
     
-    def computeStateInputVector(self, q:np.ndarray, qp:np.ndarray, qpp:np.ndarray=None, \
-        tau:np.ndarray=None, noise:bool=False):
-        """Computes the state space input torques vector U. """
+    def computeStateInputVector(self,states:np.ndarray,input_torque:np.ndarray=None):
+        """
+        Computes the state space input torques vector U.
+        the input at the time date "i"  require data of i-1,i-2,...,1 states vectors  
+        Returns:
+            - U numpy.ndarry ( ndof * NSamples ) 
+        """
         n = self.robot.model.nq
+        q = states[0:n,:].T
+        qp = states[n:2*n,:].T
         tau_g = self.robot.computeGravityTorques(q)
         tau_f = self.robot.computeFrictionTorques(qp,q)
-        if qpp is None:
-            if tau is None:
-                logger.error('input joint  torque should be not none')
-            else:
-                u = tau_f + tau_g - tau
-        else:
-            tau_m = self.robot.computeActuatorTorques(q,qp,qpp)
-            u = tau_f + tau_g - tau_m
+        u =  tau_f +tau_g -input_torque
+        u = np.clip(u,-39,39)
         return u    
         
-    def computeObsMatrix(self, q_or_x:np.ndarray, qp: np.ndarray=None):
-        """Compute the observaliblite matrix of the robot"""
-        n = self.robot.model.nq
-        if qp is None:
-            A, _, C, _ = self.computeStateMatrices(q_or_x)
-        else:
-            A, _, C, _ = self.computeStateMatrices(q_or_x, qp)
-        obs_matrix = C
-        for i in range(1, 2*n):
-            obs_matrix = np.vstack((obs_matrix, C * np.linalg.matrix_power(A, i)))        
-        return obs_matrix
-    
-    def computeCtlbMatrix(self, qp:np.ndarray, q:np.ndarray):
-        """ Compute the controllabilty matrix of the robot"""
-        n = self.robot.model.nq
-        ctlb_matrix = B
-        A, B, _, _ = self.computeStateMatrices(q,qp)
-        return ctlb_matrix
-    
-    def getAugmentedStateVector(self, q:np.ndarray, qp :np.ndarray, tau:np.ndarray):
+    def getAugmentedStateVector(self,q:np.ndarray,qp:np.ndarray,tau:np.ndarray):
         """ Compute the Augemnted state vector"""
         x= self.getStateVector(qp,q)
         z = np.concatenate(x,tau,axis=0)
@@ -159,73 +144,60 @@ class StateSpace:
     
         return A_aug, B_aug, C_aug, D_aug
         
-    
-    def getStateEigvals(self, q_or_x:np.ndarray, qp:np.ndarray=None):
-        """ Returns the system eigvalues"""
-        if qp is None: 
-            assert q_or_x.size == 2*self.robot.model.nq
-            A, _, _, _ = self.computeStateMatrices(q_or_x)
-            eigvals = np.linalg.eigvals(A)
-        else:
-            A, _, _, _ = self.computeStateMatrices(q_or_x, qp)
-            eigvals = np.linalg.eigvals(A)
+    def computeStateEigvals(self, q_or_x:np.ndarray, qp:np.ndarray=None):
+        """ Returns the dynamics system eigvalues"""
+        assert q_or_x.size == 2*self.robot.model.nq
+        A, _, _, _ = self.computeStateMatrices(q_or_x,qp)
+        eigvals = np.linalg.eigvals(A)
+        eigvals = np.linalg.eigvals(A)
             
         return eigvals 
         
     def computeReducedStateMatrices(self, q:np.ndarray, qp:np.ndarray, tau:np.ndarray):
-        """ 
-        computes the new transformed system by diagonalized the state matrix A 
+        """ computes the new transformed system by diagonalized the state matrix A 
         """ 
         A, B, C, D = self.computeStateMatrices(q,qp)
         x = self.getStateVector(qp,q)
-        xdot =self.updateStateVector(q,qp,tau)
+        xdot = self.updateStateVector(q,qp,tau)
         A_hat = np.eye(1)
         xdot_ht = 1
-        x_hat =1
+        x_hat = 1
         B_hat = 1
         C_hat = 1
-        D_hat =1    
-    
-    def lsim(self, x0:np.ndarray, input:np.ndarray):
-        """
-        simualte the ss system by computing the full analytic equation and iteragte it.
-        #TODO:need to compute the state transition matrix and the expiontenial of the 
-        # matrix A 
-        """
-        states = 0
-        return states
-    
+        D_hat =1   
+         
     def computeStateTransitionMatrix(self,tf, ti=0):
-        """ compute the state transition matrix of the system """
-    
-    def simulate(self, x0:np.ndarray, input:np.ndarray,system_poles=None,\
-        noise=None,verbose:bool=False,steps:int=1000):
+        """ compute the state transition matrix of the system
+        Args:
+            - tf : final integartion time 
+            - ti: initial intergartion time 
         """ 
-        Simulate the system response with a given input torque.
+        A,_,_,_ = self.computeStateMatrices(q_or_x,qp)
+        STM = 1
+        return STM
+        
+    def lsim(self, x0:np.ndarray, input:np.ndarray,system_poles=None,noise='gaussian',\
+        verbose:bool=False):
+        """ Simulate the system response with a given input torque.
         Args:
             - x0     : initial system state. ( 2.ndof * 1 )
             - input  : Input torque to the system (NSamples  * ndof )
-            - noise  : 
+            - noise  : additive state noise model 
             - verbose: logging display the current iteration 
         Return:
             - states : numpy-ndarry stroing iteration states vectors. ( 2.ndof * NSamples)
         """
         n = self.robot.model.nq
-        if input is None:
-            NSamples = steps
-        else:
-            NSamples, ndof = input.shape
-            assert ndof == n, "msitamtech error between degree of freedom in robot data"
-        states = np.zeros((2*n,NSamples))
+        NSamples, ndof = input.shape
+        assert ndof == n, "msitamtech error between degree of freedom in robot data"
+        states = np.empty((2*n,NSamples))
         states[:,0] = x0
         for i in range(1,NSamples):
             if verbose : 
-                logger.info(f'updating state variable = {i}/{NSamples}')
-            q = states[0:n,0:i]
-            qp = states[n:2*n,0:i]
-        
-            joint_torque = self.computeStateInputVector(q,qp,tau=input[0:i-1,:])
-            states[:,i] = self.updateStateVector(states[:,i-1],joint_torque,sys_poles=system_poles)
+                logger.info(f'updating state variable = {i}/{NSamples}') 
+            joint_torque = self.computeStateInputVector(states[:,:i],input[:i,:])
+            states[:,i] = self.updateStateVector(q_or_x=states[:,i-1],\
+                qp_or_tau=joint_torque[i-1,:],state_poles=system_poles)
             if not(noise is None):
                 if noise =='gaussian':
                     states[:,i]+= self.computeGaussianNoise(2*n) 
@@ -236,52 +208,50 @@ class StateSpace:
             
         return states 
     
-    def lsim_place(self,coeffs,x0:np.ndarray, input:np.ndarray=None,\
-        noise=None,verbose:bool=False):
+    def llsim(self,gain_matrix:np.ndarray,input_torque:np.ndarray=None,\
+        noise='gaussian',verbose:bool=False):
         """
-        simulate the state space system with state depend poles varing
-        given 3 parmters of polynme it compuytes the state-dependent system poles 
-        like :
-            k(x(t)) = α_0 + α_1 x(t) + α_2x(t)^2+ α_3 x(t)^3   
-        Args: 
-            coefs : numpy ndarry of 3 constant coefficents
+        this method is extention of   place_poles for state depend 
+        varing systems, over a samples block (window_size)
+        
+        Returns:
+            gains_matrix  : numpy.ndarrry (2*ndof, Numblocks) 
         """
-        ncofs = coeffs.size
-        NSamples, ndof = input.shape
+        NSamples, ndof = input_torque.shape
         n = self.robot.model.nq
         assert ndof == n, "msitamtech error between degree of freedom in robot data"
-        states = np.zeros((2*n,NSamples))
-        states[:,0] = np.zeros(14)
-        for i in range(1,NSamples):
-            if verbose : 
-                logger.info(f'updating state variable = {i}/{NSamples}')
-            system_poles = coeffs[0]
-            for k in range(ncofs):
-                system_poles +=  coeffs[k] * np.power(states[:,i-1],k)
-            system_poles = np.clip(system_poles,-1,0)
-            # ensure that no posles is reprated more than the rank of B wich is assumed as 7 
-            # if so add a random offset of +0.0001 to the rest of poles 
-            system_poles += 1e-7*np.random.rand(system_poles.size)
-            states[:,i] = self.updateStateVector(states[:,i-1],input[i,:],\
-                sys_poles=system_poles)
+        _ , Numblocks = gain_matrix.shape 
+        blockSamples = NSamples//Numblocks
+        states = np.empty((2*n,NSamples))
         
+        for i  in range(Numblocks):
+            if verbose :
+                logger.info(f'processing block {i}/{Numblocks}')
+            states[:,max(i-1,0)*blockSamples:blockSamples] = self.lsim(states[:,i*blockSamples],\
+                input_torque[max(i-1,0)*blockSamples:i*blockSamples,:],gain_matrix[:,i],noise=noise)
+            
         return states
     
-    
-    def linearize(self,q:np.ndarray, qp:np.ndarray, noise:bool=False):
+    def linearize(self,states_matrix:np.ndarray):
+        """ Computes a- equivalent LTI system by avaraging the state depend 
+        Linear system. 
+        Args:
+            states_matrix : (2*ndof, NSamples)
         """
-        linearize by finite diffrence method the state-depend dynamics matrices.
-        approximate the matrixe A and B variation to fourier or taylor series.
-        to use LPV system utilities
-        """
-        A,_,_,_ = self.computeStateMatrices(q,qp)
+        ndof, NSamples = states_matrix.shape
+        A_avg = np.zeros((2*ndof,2*ndof))
+        B_avg = np.zeros((2*ndof,ndof))
+        C_avg = np.zeros((ndof, 2*ndof))
+        D_avg = np.zeros((ndof, ndof))        
+        for i in range(NSamples):
+            A,B,C,D = self.computeStateMatrices(q_or_x=states_matrix[:,i])
+            A_avg += A
+            B_avg += B
+            C_avg += C
+            D_avg += D
         
-        return 
+        return A_avg/NSamples, B_avg/NSamples, C_avg/NSamples ,D_avg/NSamples
     
-    def computeluenbergerObserver(self):
-        """ Computes the luenberger observer for the default sytem"""
-        L = 0 
-        return L 
     
     def stabilize(self,A,B,desired_poles:np.ndarray= None):
         """ 
@@ -311,6 +281,35 @@ class StateSpace:
             A_new = A
         return A_new
     
+    def computeObsMatrix(self, q_or_x:np.ndarray, qp: np.ndarray=None):
+        """Compute the observaliblite matrix of the robot"""
+        n = self.robot.model.nq
+        A, _, C, _= self.computeStateMatrices(q_or_x, qp)
+        obs_matrix = C
+        for i in range(1,2*n):
+            obs_matrix = np.vstack((obs_matrix, C*np.linalg.matrix_power(A,i)))        
+        return obs_matrix
+    
+    def computeCtlbMatrix(self, qp:np.ndarray, q:np.ndarray):
+        """Compute the controllabilty matrix of the robot"""
+        n = self.robot.model.nq
+        ctlb_matrix = B
+        A, B, _, _ = self.computeStateMatrices(q,qp)
+        return ctlb_matrix
+    
+    def computeGaussianNoise(self,length):
+        mean = self.robot.params['noise_params']['gauss']['mean']
+        stdv = self.robot.params['noise_params']['gauss']['stdv']
+        noise_array = np.random.normal(mean,stdv,length)
+        
+        return noise_array
+    
+    def computePoissonNoise(self,length):
+        lamda = self.robot.params['noise_params']['lamda']
+        noise_array = np.random.poisson(lamda,length)
+        
+        return noise_array
+     
     def visualizeRootLocus(self, q_or_x:np.ndarray,qp:np.ndarray=None)->None:
         """ Plot the system root locus for a given trajectory."""
         gain = np.linspace(0, 0.45, 35)
@@ -337,16 +336,3 @@ class StateSpace:
         plt.ylabel('Imaginary')
         plt.title('Pole Plot')
         plt.grid(True)
-        
-    def computeGaussianNoise(self,length):
-        mean = self.robot.params['noise_params']['gauss']['mean']
-        stdv = self.robot.params['noise_params']['gauss']['stdv']
-        noise_array = np.random.normal(mean,stdv,length)
-        
-        return noise_array
-    
-    def computePoissonNoise(self,length):
-        lamda = self.robot.params['noise_params']['lamda']
-        noise_array = np.random.poisson(lamda,length)
-        
-        return noise_array 

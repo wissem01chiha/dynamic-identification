@@ -1,4 +1,5 @@
 import numpy as np 
+import matplotlib.pyplot as plt 
 from ..dynamics import StateSpace 
 
 class N4SID:

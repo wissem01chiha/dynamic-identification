@@ -1,11 +1,15 @@
+import sys
+import os
 import pinocchio as pin
 import numpy as np
 import logging
 import matplotlib.pyplot as plt 
 import seaborn as sns 
- 
-from ..dynamics import Robot
-from ..utils import RMSE
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from dynamics import Robot
+from utils import RMSE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

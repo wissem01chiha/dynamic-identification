@@ -1,9 +1,12 @@
 import unittest 
+import sys
+import os 
 import numpy as np
 import matplotlib.pyplot as plt
 
-src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.append(src_folder)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from pyDynaMapp.identification import Kalman
 
 
 # Define system matrices

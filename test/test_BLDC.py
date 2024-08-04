@@ -5,11 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import seaborn as sns
 
-src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.append(src_folder)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from models import BLDC
-from utils import discreteTimeIntegral
+from pyDynaMapp.models import BLDC
+from pyDynaMapp.utils import discreteTimeIntegral
 
 class TestBLDC(unittest.TestCase):
     

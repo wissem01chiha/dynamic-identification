@@ -4,8 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import unittest
 
-src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.append(src_folder)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from pyDynaMapp.trajectory import FourierGenerator
 

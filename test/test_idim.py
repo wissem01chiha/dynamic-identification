@@ -4,12 +4,10 @@ import unittest
 import numpy as np
 import matplotlib.pyplot as plt
 
-src_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.append(src_folder)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from identification import IDIMNLS
+from pyDynaMapp.identification import IDIMNLS
  
-
 class TestIDIMNLS(unittest.TestCase):
     
     @staticmethod

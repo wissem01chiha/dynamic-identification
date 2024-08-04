@@ -1,3 +1,5 @@
+import sys
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,7 +10,9 @@ from scipy.signal import butter, filtfilt
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from ..utils import computeCorrelation
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from utils import computeCorrelation
 
 class RobotData:
     """

@@ -1,10 +1,14 @@
 import os
+import sys
 import numpy as np
 import logging
 import pinocchio as pin
-from ..utils import discreteTimeIntegral, yaml2dict, conditionNumber
-from ..viscoelastic import LuGre, MaxwellSlip, Dahl, computeViscousFrictionForce
-from ..models import BLDC
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from utils import discreteTimeIntegral, yaml2dict, conditionNumber
+from viscoelastic import LuGre, MaxwellSlip, Dahl, computeViscousFrictionForce
+from models import BLDC
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -134,7 +138,17 @@ class Robot():
         """
         if q is None:
             q = self.q
-        tau_g =  pin.computeGeneralizedGravity(self.model, self.data, q)
+            tau_g =  pin.computeGeneralizedGravity(self.model, self.data, q)
+        else:
+            if q.ndim ==1 :
+                tau_g =  pin.computeGeneralizedGravity(self.model, self.data, q)
+            elif q.ndim == 2:
+                NSamples, ndof = np.shape(q)
+                tau_g = np.empty_like(q)
+                for i in range(NSamples):
+                    tau_g[i,:] = pin.computeGeneralizedGravity(self.model, self.data, q[i,:])
+            else:
+                logger.error('Input configuration dimonion not supported')
         return tau_g
     
     def computeFrictionTorques(self, qp:np.ndarray, q:np.ndarray):
@@ -143,8 +157,9 @@ class Robot():
         constant joint velocity vector.
  
         Args:
-            - qp       : Joints velocity vector    ( numSamples  * ndof )
-            - tspan    : Simulation time duration  (seconds)
+            - qp       : Joints velocity vector  ( numSamples  * ndof )
+            - q        : Joints position vector  ( numSamples * ndof )
+            - tspan    : Simulation time duration (seconds)
             - sampling : Sampling frequency        (Hz)
             
         Returns:
@@ -527,8 +542,3 @@ class Robot():
         for i in range(len(I)):
             Im[i] = I[i]
         return Im
-        
-        
- 
-
-

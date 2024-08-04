@@ -1,5 +1,10 @@
+import sys
+import os
 import numpy as np
-from ..utils import columnVector
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from utils import columnVector
 
 class Dahl:
     """

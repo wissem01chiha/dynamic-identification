@@ -1,3 +1,10 @@
+"""
+
+in this script ---
+kalman identification based on the augmented system 
+lumberger identification based using state poles placement with window avarging 
+LMI identiifcation on the 
+"""
 import argparse
 import sys
 import os
@@ -18,19 +25,12 @@ parser.add_argument('--iteration',type=int,default=10)
 args = parser.parse_args()
 
 base_dir = os.getcwd()
-figure_path = os.path.join(base_dir,"figure/kinova") 
-config_file_path = os.path.join(base_dir,"exemple/kinova/config.yml")
+figure_path = os.path.join(base_dir ,"figure/kinova") 
+config_file_path = os.path.join(base_dir,"robot/kinova/config.yml")
 state_poles_path = os.path.join(base_dir,"autogen/state_poles.npy")  
-
-pkg_dir = os.path.join(base_dir,'pyDynaMapp')
-sys.path.append(pkg_dir)
-
-config_file_path = os.path.join(pkg_dir,"robot/kinova/config.yml")
-state_poles_path = os.path.join(pkg_dir,"autogen/state_poles.npy")  
-data_file_path = os.path.join(pkg_dir,"data/kinova/identification_data/blast_traj.csv")
-urdf_file_path =  os.path.join(pkg_dir,"robot/kinova/gen3.urdf")
-if not os.path.exists(figure_path):
-    os.makedirs(figure_path)
+data_file_path = os.path.join(base_dir,"data/kinova/identification_data/blast_traj.csv")
+urdf_file_path =  os.path.join(base_dir,"robot/kinova/gen3.urdf")
+ 
 
 from dynamics.robot import Robot
 from dynamics.state_space import  StateSpace
@@ -133,3 +133,8 @@ plt.savefig(os.path.join(figure_path,'joints_velocity_state_model_simulation'))
  
 if args.show_figures:
     plt.show()
+
+
+###################################################
+# run kalman filtering estimation on the augmented system dynamics
+###################################################
