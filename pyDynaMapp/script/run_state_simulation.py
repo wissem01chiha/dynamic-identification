@@ -31,17 +31,15 @@ parser.add_argument('--filter_output',type=bool,default=False)
 args = parser.parse_args()
 
 base_dir = os.getcwd()
-figure_path = os.path.join(base_dir ,"figure/kinova") 
-config_file_path = os.path.join(base_dir,"robot/kinova/config.yml")
-state_poles_path = os.path.join(base_dir,"autogen/state_poles.npy")  
-data_file_path = os.path.join(base_dir,"data/kinova/identification_data/blast_traj.csv")
-urdf_file_path =  os.path.join(base_dir,"robot/kinova/gen3.urdf")
+figure_path      = os.path.join(base_dir ,"pyDynaMapp/figure/kinova") 
+config_file_path = os.path.join(base_dir,"pyDynaMapp/robot/kinova/config.yml")
+state_poles_path = os.path.join(base_dir,"pyDynaMapp/autogen/state_poles.npy")  
+data_file_path   = os.path.join(base_dir,"pyDynaMapp/data/kinova/identification_data/blast_traj.csv")
+urdf_file_path   =  os.path.join(base_dir,"pyDynaMapp/robot/kinova/gen3.urdf")
 
 st = time.time()
 logger = logging.getLogger(__name__)
 if not(args.v):
-    
-    
     dynamics_logger = logging.getLogger('dynamics')
     dynamics_logger.setLevel(logging.ERROR)
 

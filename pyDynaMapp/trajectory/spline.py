@@ -1,7 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
+from   scipy.interpolate import CubicSpline
 import logging
-from scipy.interpolate import CubicSpline
+
 from ..utils import plotArray
 
 logging.basicConfig(level=logging.INFO)
@@ -25,27 +25,19 @@ class SplineGenerator:
         epsilon = 0.0
         logger.info("Computing trajectory identifiability criteria.")
         
-        
         return epsilon
     
-    def computeFullTrajectory(self, ti: float, tf: float, q0=None, qp0=None, qpp0=None):
+    def computeFullTrajectory(self,ti:float,tf:float,q0=None,qp0=None,qpp0=None):
         """Computes the full trajectory between ti and tf."""
         t = np.linspace(ti, tf, 100)  
         q = self.computeTrajectoryState(t, q0)
         qp = np.gradient(q,t)  
         qpp = np.gradient(qp,t)  
         logger.info("Full trajectory computed.")
-        return q, qp, qpp
-    
-    def computeTrajectoryCriterion(self, t_i: float, t_f: float) -> float:
-        """Computes the trajectory criterion between t_i and t_f."""
-        q, qp, qpp = self.computeFullTrajectory(t_i, t_f)
-        criterion = np.sum(q**2 + qp**2 + qpp**2)  
-        logger.info(f"Trajectory criterion computed: {criterion}")
+        return q,qp,qpp
         
-        return criterion
-    
-    def computeTrajectoryConstraints(self,qmax,qmin,qpmax,qpmin,qppmin,qppmax,ti,tf,q0=None,qp0=None,qpp0=None):
+    def computeTrajectoryConstraints(self,qmax,qmin,qpmax,qpmin,qppmin,qppmax,ti,tf,\
+        q0=None,qp0=None,qpp0=None):
         """Ensures trajectory meets specified constraints."""
         q, qp, qpp = self.computeFullTrajectory(ti, tf, q0, qp0, qpp0)
         is_within_constraints = (
@@ -54,6 +46,7 @@ class SplineGenerator:
             np.all(qpp >= qppmin) and np.all(qpp <= qppmax)
         )
         logger.info(f"Trajectory constraints check: {is_within_constraints}")
+        
         return is_within_constraints
     
     def visualizeTrajectory(self, ti, tf, Q0=None, Qp0=None, Qpp0=None):

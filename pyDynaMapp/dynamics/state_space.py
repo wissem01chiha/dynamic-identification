@@ -122,7 +122,7 @@ class StateSpace:
         z = np.concatenate(x,tau,axis=0)
         return z
     
-    def computeAugmentedStateMatrices(self, q_or_x: np.ndarray,qp: np.ndarray):
+    def computeAugmentedStateMatrices(self, q_or_x: np.ndarray,qp: np.ndarray=None):
         """
         Computes and returns the augmented state-space matrices for the 
         transformed state vector z = [x, u].
@@ -134,7 +134,7 @@ class StateSpace:
         Returns:
             tuple: Augmented state-space matrices (A_aug, B_aug, C_aug, D_aug).
         """
-        A, B, C, D = self.computeStateMatrices(q_or_x)
+        A, B, C, D = self.computeStateMatrices(q_or_x,qp)
         n = A.shape[0]   
         m = B.shape[1]   
         A_aug = np.block([[A, B],[np.zeros((m, n)), np.zeros((m, m))]])
@@ -208,29 +208,27 @@ class StateSpace:
             
         return states 
     
-    def llsim(self,gain_matrix:np.ndarray,input_torque:np.ndarray=None,\
-        noise='gaussian',verbose:bool=False):
+    def state_place_poles(self,gain_matrix:np.ndarray,states:np.ndarray,verbose:bool=False):
         """
-        this method is extention of   place_poles for state depend 
-        varing systems, over a samples block (window_size)
-        
+        this method is extention of scipy.signals.place_poles for state depend 
+        varing systems, over each sample data
+            x_{k+1} = A(k)x_{k} + B(k)u_{k}
         Returns:
-            gains_matrix  : numpy.ndarrry (2*ndof, Numblocks) 
+            AA  : numpy.ndarrry [A(1), A(2), ... A(N)] ( 2*ndof , 2*ndof*N)
         """
-        NSamples, ndof = input_torque.shape
-        n = self.robot.model.nq
-        assert ndof == n, "msitamtech error between degree of freedom in robot data"
-        _ , Numblocks = gain_matrix.shape 
-        blockSamples = NSamples//Numblocks
-        states = np.empty((2*n,NSamples))
-        
-        for i  in range(Numblocks):
+        n_, NSamples = states.shape
+        ndof = self.robot.model.nq
+        assert n_ == 2* ndof, "msitamtech error between degree of freedom in robot data"
+        nn, mm = gain_matrix.shape 
+        assert nn == 2*ndof and mm ==NSamples, 'gain matrix shape not suitable'
+        AA = np.zeros((2*ndof,2*ndof*NSamples))
+        for i  in range(1,NSamples):
             if verbose :
-                logger.info(f'processing block {i}/{Numblocks}')
-            states[:,max(i-1,0)*blockSamples:blockSamples] = self.lsim(states[:,i*blockSamples],\
-                input_torque[max(i-1,0)*blockSamples:i*blockSamples,:],gain_matrix[:,i],noise=noise)
+                logger.info(f'processing sample = {i}/{NSamples}')
+            A, B,_,_ = self.computeStateMatrices(states[:,i])
+            AA[:,(i-1)*2*ndof:i*2*ndof]= self.stabilize(A,B,gain_matrix[:,i-1])  
             
-        return states
+        return AA
     
     def linearize(self,states_matrix:np.ndarray):
         """ Computes a- equivalent LTI system by avaraging the state depend 
@@ -238,7 +236,9 @@ class StateSpace:
         Args:
             states_matrix : (2*ndof, NSamples)
         """
-        ndof, NSamples = states_matrix.shape
+        ndof = self.robot.model.nq
+        nn, NSamples = states_matrix.shape
+        assert nn == 2*ndof, 'state matrix rows should be 2*ndof the robot'
         A_avg = np.zeros((2*ndof,2*ndof))
         B_avg = np.zeros((2*ndof,ndof))
         C_avg = np.zeros((ndof, 2*ndof))
@@ -290,11 +290,14 @@ class StateSpace:
             obs_matrix = np.vstack((obs_matrix, C*np.linalg.matrix_power(A,i)))        
         return obs_matrix
     
-    def computeCtlbMatrix(self, qp:np.ndarray, q:np.ndarray):
-        """Compute the controllabilty matrix of the robot"""
+    def computeCtlbMatrix(self, q_or_x: np.ndarray, qp: np.ndarray = None):
+        """Compute the controllability matrix of the robot"""
         n = self.robot.model.nq
+        A, B, _, _ = self.computeStateMatrices(q_or_x, qp)
         ctlb_matrix = B
-        A, B, _, _ = self.computeStateMatrices(q,qp)
+        for i in range(1, n):
+            ctlb_matrix = np.hstack((ctlb_matrix, np.linalg.matrix_power(A, i) @ B))
+
         return ctlb_matrix
     
     def computeGaussianNoise(self,length):

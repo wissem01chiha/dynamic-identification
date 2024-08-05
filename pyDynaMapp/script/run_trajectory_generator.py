@@ -1,15 +1,20 @@
-#############################################################################################
-# pour les paramters optimizées trouver le meilleur trajectoire identifable 
-# genrer beaucoup des trajs ---- Fourier , enregister leur params, ( coeffs, criteria 
-# cond(W) )
-# sur chaqun excuetr l optimisation ---> error RMSE model-reel ,
-# save the final RMSE of each traj 
-# TODO : plot : 2D plot of the RMSe (y) en fontion du frequance du traj (FHz)
-# TODO : plot :  2D plot of the RMSE (y) en fonction du sampling rate du traj (Fs)
-# TODO : plot : 3D plot of the RMSE en fonction du FHz and Fs 
-# TODO : for the linear model : plot of the RMSE with the Cond(W) or the crteria choosen
-# NOTE: to compute the RMSE of a traj we nedd the real data of the robot suiving the traj  
-##############################################################################################
+"""
+For the optimized parameters, find the best identifiable trajectory.
+
+Steps:
+1. Generate many trajectories using Fourier series. Save their parameters (coefficients, criteria, cond(W)).
+2. For each trajectory, execute the optimization to compute the RMSE error between the model and real data.
+3. Save the final RMSE of each trajectory.
+
+TODO:
+    - Plot a 2D plot of the RMSE (y) as a function of the trajectory frequency (FHz).
+    - Plot a 2D plot of the RMSE (y) as a function of the trajectory sampling rate (Fs).
+    - Plot a 3D plot of the RMSE as a function of FHz and Fs.
+    - For the linear model: plot the RMSE with the condition number of W (Cond(W)) or the chosen criteria.
+
+Note:
+    To compute the RMSE of a trajectory, we need the real data of the robot following the trajectory.
+"""
 import sys
 import os
 import logging

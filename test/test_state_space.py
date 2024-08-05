@@ -51,17 +51,25 @@ class TestStateSpace(unittest.TestCase):
         self.assertIsNotNone(states)
         self.assertEqual(states.shape,(14,10), True)
         
-         
     def test_augmented_state_not_none(self):
         x = np.random.rand(14,)
         A_aug, B_aug, C_aug, D_aug =self.model.computeAugmentedStateMatrices(x)
-        self.asertIsNotNone(A_aug)
+        self.assertIsNotNone(A_aug)
+        self.assertIsNotNone(B_aug)
+        self.assertIsNotNone(C_aug)
+        self.assertIsNotNone(D_aug)
         
-    def test_llsim_not_none(self):
-        """"""
+    def test_state_place_poles_not_none(self):
+        AA = self.model.state_place_poles(-np.abs(np.random.rand(14,10)),\
+            np.random.rand(14,10))
+        self.assertIsNotNone(AA)
         
-        
-        
+    def test_linerize_not_none(self):
+        A_avg, B_avg , C_avg, D_avg = self.model.linearize(np.random.rand(14,10))
+        self.assertIsNotNone(A_avg)
+        self.assertIsNotNone(B_avg)
+        self.assertIsNotNone(C_avg)
+        self.assertIsNotNone(D_avg)
         
     """   
     def test_visualize_pols_plot(self):

@@ -1,5 +1,4 @@
 import numpy as np
-import math
 
 class LuGre:
     """
@@ -42,24 +41,25 @@ class LuGre:
         t = np.arange(self.tinit, self.tspan + self.ts, self.ts)
         N = len(t)
         
-        z = np.zeros(N, dtype=np.float32)
-        F = np.zeros(N, dtype=np.float32)
+        z = np.zeros(N, dtype=np.float64)
+        F = np.zeros(N, dtype=np.float64)
         z[0] = self.z0
 
         for idx in range(1, N):
             v_safe = max(abs(self.vs), 1e-3)
             sigma0_safe = max(abs(self.sigma0), 1e-6)
             exp_input = -(self.v / v_safe) ** 2
-            exp_input_clipped = min(max(exp_input, -1e6), 1e6)  
-            gv = (self.Fc + (self.Fs - self.Fc) * math.exp(exp_input_clipped)) / sigma0_safe
-            if gv < 1e-4:
-                gv = 1e-4
+            exp_input_clipped = np.clip(exp_input, -1e6, 1e6)
+            gv = (self.Fc + (self.Fs - self.Fc) * np.exp(exp_input_clipped)) / sigma0_safe
+            gv = max(gv, 1e-4)  # Ensure gv does not become too small
+            
             z_dot = self.v - abs(self.v) * z[idx-1] / gv
             z[idx] = z[idx-1] + z_dot * self.ts
-            if math.isnan(z[idx]) or math.isinf(z[idx]):
+            if np.isnan(z[idx]) or np.isinf(z[idx]):
                 z[idx] = 0
+            
             F[idx] = self.sigma0 * z[idx] + self.sigma1 * z_dot + self.sigma2 * self.v
-            if math.isnan(F[idx]) or math.isinf(F[idx]):
+            if np.isnan(F[idx]) or np.isinf(F[idx]):
                 F[idx] = 0
 
         return F
@@ -71,9 +71,9 @@ class LuGre:
         Returns:
             - Fss (float): Steady state friction force.
         """
-        v_safe = max(np.abs(self.vs), 1e-6)  
+        v_safe = max(np.abs(self.vs), 1e-6)
         exp_input = -(self.v / v_safe) ** 2
-        exp_input_clipped = np.clip(exp_input, -1e6, 1e6)  
+        exp_input_clipped = np.clip(exp_input, -1e6, 1e6)
         Fss = self.Fc * np.sign(self.v) + (self.Fs - self.Fc) * \
               np.exp(exp_input_clipped) * np.sign(self.v) + self.sigma2 * self.v
         return Fss

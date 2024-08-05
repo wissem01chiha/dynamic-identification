@@ -1,6 +1,10 @@
+import sys
+import os
 import numpy as np 
-import matplotlib.pyplot as plt 
-from ..dynamics import StateSpace 
+import matplotlib.pyplot as plt
+ 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from dynamics import StateSpace 
 
 class N4SID:
     """

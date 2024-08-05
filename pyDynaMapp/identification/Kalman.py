@@ -1,13 +1,17 @@
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
- 
+from scipy.signal import place_poles
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 class Kalman:
     """
-    KALMAN
-    
     Classical Kalman filter identification algorithms base class.
     
     Args:
+    
         F (np.ndarray): State transition model.
         H (np.ndarray): Observation model.
         Q (np.ndarray): Covariance of the process noise.
@@ -64,8 +68,8 @@ class Kalman:
             self.predict()
             self.update(z)
             y = self.update(z)
-            states.append(self.x.copy())
-            innovations.append(y.copy())
+            states.append(self.x)
+            innovations.append(y)
         return np.array(states), np.array(innovations)
 
     def evaluate(self, true_states, estimated_states):
@@ -104,3 +108,76 @@ class Kalman:
         if not(ylabel is None):
             plt.ylabel(ylabel,fontsize=9)
         plt.legend()
+
+
+class RobustKalman:
+    """
+    Robust Kalman Filter Base Model Class 
+    """
+    def __init__(self, A, B, H, Q, R, P0, x0):
+        self.A = A  # State transition matrix (time-varying)
+        self.B = B  # Control input matrix (time-varying)
+        self.H = H  # Observation matrix (time-varying)
+        self.Q = Q  # Process noise covariance matrix (time-varying)
+        self.R = R  # Measurement noise covariance matrix (time-varying)
+        self.P = P0  # Initial covariance estimate
+        self.x = x0  # Initial state estimate
+        self.n = A.shape[0]
+
+    def predict(self, u, k):
+        """Prediction step"""
+        A_k = self.A[:, (k-1)*self.n:k*self.n]
+        B_k = self.B[:, (k-1)*self.n//2:k*self.n//2]
+        Q_k = self.Q[:, (k-1)*self.n:k*self.n]
+        np.random.seed(42)
+        A_k = self._stabilize(A_k,B_k,-np.abs(np.random.rand(14)))
+        self.x = A_k @ self.x + B_k @ u
+        self.P[:, (k-1)*self.n:k*self.n] = A_k @ self.P[:, (k-1)*self.n:k*self.n] @ A_k.T + Q_k
+
+        if np.isnan(self.x).any() or np.isnan(self.P).any():
+            raise ValueError("NaN encountered in predict step")
+
+    def update(self, z, k):
+        """Update step"""
+        H_k = self.H[:,(k-1)*self.n:k*self.n]
+        R_k = np.diag(self.R[:, k])
+        y = z - H_k @ self.x
+        S = H_k @ self.P[:, (k-1)*self.n:k*self.n] @ H_k.T + R_k
+        K = self.P[:, (k-1)*self.n:k*self.n] @ H_k.T @ np.linalg.inv(S)
+        self.x  = self.x + K @ y
+        I = np.eye(H_k.shape[1])
+        self.P[:, (k-1)*self.n:k*self.n] = (I - K @ H_k) @ self.P[:, (k-1)*self.n:k*self.n]
+
+        if np.isnan(self.x).any() or np.isnan(self.P).any():
+            raise ValueError("NaN encountered in update step")
+
+    def step(self, u, z, k):
+        """One step of prediction and update"""
+        self.predict(u, k)
+        self.update(z, k)
+        return self.x, self.P
+    
+    def _stabilize(self,A,B,desired_poles:np.ndarray):
+        """ 
+        Check what ever the numerical recursive control scheme given by :
+                  x(k+1) = Ax(k) + B u
+        is stable or not and adjust  it if necessary within ploes placement 
+        strategy.
+        """
+        rank_B = np.linalg.matrix_rank(B)
+        if rank_B == 0:
+            logger.error("The control matrix B has rank 0")
+        desired_poles = desired_poles.tolist()
+        pole_counts = {pole: desired_poles.count(pole) for pole in set(desired_poles)}
+        for pole, count in pole_counts.items():
+            if count > rank_B:
+                logger.error(\
+            f"The pole {pole} is repeated {count} times, more than the rank of B ({rank_B}).")
+        eigenvalues = np.linalg.eigvals(A)
+        if np.any(np.abs(eigenvalues) < 1) :
+            result = place_poles(A, B, desired_poles)
+            k = result.gain_matrix 
+            A_new = A - np.dot(B, k)
+        else:
+            A_new = A
+        return A_new

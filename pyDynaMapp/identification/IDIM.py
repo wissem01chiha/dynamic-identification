@@ -1,44 +1,46 @@
-from abc import ABC, abstractmethod
-from typing import Callable
-import numpy as np
 import sys
-from ..utils import RobotData
+import os
+import numpy as np
+from typing import Callable
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from utils import RobotData
 
 class IDIM:
     
     def __init__(self) -> None:
+        self.IDIM_LE 
         pass
+        
     
-    
-    @abstractmethod
     def set_upper_bounds(self):
         pass
     
-    @abstractmethod
+   
     def set_lower_bounds(self):
         pass
 
-    @abstractmethod
+    
     def set_maxeval(self):
         pass
 
-    @abstractmethod
+   
     def set_set_min_objective(self,f:Callable[[np.ndarray],np.ndarray]):
         pass
 
-    @abstractmethod
+ 
     def optimize(self,x0:np.ndarray):
         pass
 
-    @abstractmethod 
     def opt(self,method:str):
         pass
     
-    @abstractmethod
+    
     def vizulizeOuput(self):
         pass
 
-    @abstractmethod
+    
     def save(self,folder_path:str):
         pass
 
@@ -79,7 +81,8 @@ from typing import Callable
 import matplotlib.pyplot as plt
 import seaborn as sns 
 from scipy.optimize import least_squares, curve_fit 
-from ..utils import RMSE, clampArray, plotArray, plot2Arrays
+
+from utils import RMSE, clampArray, plotArray, plot2Arrays
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -244,7 +247,7 @@ class IDIMNLS:
 import logging 
 import matplotlib.pyplot as plt  
 
-from ..dynamics import Robot, Regressor
+from dynamics import Robot, Regressor
 
 
 class IDIMOLS:

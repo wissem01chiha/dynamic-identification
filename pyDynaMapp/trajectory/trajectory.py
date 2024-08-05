@@ -1,7 +1,11 @@
+import os 
+import sys
 import numpy as np 
 import logging 
 import seaborn as sns
 from matplotlib import pyplot as plt
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,13 +33,7 @@ class TrajectoryGenerator:
         if (mq != mqp) or (mqp != mqpp) or (mq != mqpp) or \
             (nq != nqp) or (nqp != nqpp) or (nq != nqpp):
             logger.error('Trajectory engine: incorrect data dimensions!')
-    
-    def getTrajectoryData(self):
-        
-        
-        return 
-    
-    
+     
     def plotTrajectory(self)->None:
         sns.set(style="whitegrid")
         fig, axes = plt.subplots(3, 3, figsize=(12, 6))

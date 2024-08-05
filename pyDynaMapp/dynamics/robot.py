@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
  
 class Robot():
     """
-    Robot
     Base class for Robot models.
     
     Args:
