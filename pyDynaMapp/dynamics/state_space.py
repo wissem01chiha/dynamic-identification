@@ -213,6 +213,9 @@ class StateSpace:
         this method is extention of scipy.signals.place_poles for state depend 
         varing systems, over each sample data
             x_{k+1} = A(k)x_{k} + B(k)u_{k}
+        Args:
+            - gain_matrix : 
+            
         Returns:
             AA  : numpy.ndarrry [A(1), A(2), ... A(N)] ( 2*ndof , 2*ndof*N)
         """

@@ -24,11 +24,12 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from identification import Kalman, RobustKalman
 from dynamics import StateSpace, Robot
-from utils import RobotData, plot2Arrays, plotArray, yaml2dict, MAE
+from utils import RobotData, plot2Arrays, plot3Arrays,  yaml2dict, smooth_columns, RMSE
 
 base_dir = os.getcwd()
 figure_path      = os.path.join(base_dir ,"pyDynaMapp/figure/kinova") 
@@ -72,9 +73,10 @@ R  = np.zeros((2*ndof,num_samples))
 Q = np.zeros((2*ndof,2*ndof*num_samples))
 
 
-start = 100
-step = 1
-stop = 5000
+start = 1
+step = 100
+stop = 29106
+
 for i in range(start, stop,step):
     print(f'process sample = {i}/{num_samples}')
     Ai, Bi, _, _ = kinova_ss.computeStateMatrices(q_f[i, :], qp_f[i, :])
@@ -90,31 +92,49 @@ for i in range(start, stop,step):
     A[:, (i-1)*2*ndof:i*2*ndof] = Ai
     B[:, (i-1)*ndof:i*ndof] = Bi
     H[:, (i-1)*2*ndof:i*2*ndof] =  np.eye(2*ndof)
-    Q[:, (i-1)*2*ndof:i*2*ndof] = np.diag([.5] * 2*ndof)   
-    R[:, i] = 0.2* np.ones(2*ndof)   
-    P0[:, (i-1)*2*ndof:i*2*ndof] = np.diag([0.01] * 2*ndof)
+    Q[:, (i-1)*2*ndof:i*2*ndof] = np.diag([0.9] * 2*ndof)   
+    R[:, i] = 0.45 * np.ones(2*ndof)   
+    P0[:, (i-1)*2*ndof:i*2*ndof] = np.diag([0.1] * 2*ndof)
     
-
-x0 = kinova_ss.getStateVector(qp[start,:],q[start,:])                            
+x0 = kinova_ss.getStateVector(qp_f[start,:],q_f[start,:])                            
 sim_states = np.zeros((2*ndof,num_samples))
 kf = RobustKalman(A, B, H, Q, R, P0, x0)
+states_error = []
 for k in range(start, stop,step):
-    u = 0.1*torque_f[k,:]
-    z = kinova_ss.getStateVector(qp_f[k,:],q_f[k,:])
+    u = 1/40*data.torque[k,:] # 39 is the max torque give by any jont motor extraced form data sheeet is 39
+    z = kinova_ss.getStateVector(qp[k,:],q[k,:])
     x, _ = kf.step(u, z, k)
     sim_states[:,k] = x
-    print(f"Time {k}:, state RMSE {np.sqrt(np.mean((x-z)**2))}")
-    
-states = sim_states[7:14, start:stop:step]
-vel = qp[start:stop:step,:]
-scaled_states = 2*(states - np.min(states))/(np.max(states)-np.min(states))
-scaled_vel = 2*(vel - np.min(vel))/(np.max(vel)-np.min(vel))
-plot2Arrays(scaled_states.T,scaled_vel,'state','true',\
-f'Joints Velocity State Model Simulation, cutoff = {cutoff_frequency}, sampling ={data.samplingRate}')
+    states_error.append(np.sqrt(np.mean((x-z)**2))/np.sqrt(np.mean((z)**2)))
+    print(f"Time {k}:, state relative RMSE {np.sqrt(np.mean((x-z)**2))/np.sqrt(np.mean((z)**2))}")
+
+sim_vel = sim_states[7:14, start:stop:step]
+true_vel= qp[start:stop:step,:]
+scaled_sim_vel = sim_vel
+scaled_sim_vel[4:7,:] = 1/5*scaled_sim_vel[4:7,:]
+scaled_sim_vel[:4,:] = 1/1.3899*scaled_sim_vel[:4,:]
+states_error = np.array(states_error)
+avg_error = np.mean(states_error)
+window_size = 10
+avg_error_per_window = np.convolve(states_error, np.ones(window_size)/window_size, mode='valid')
+filt_scaled_sim_vel =  smooth_columns(scaled_sim_vel.T)
+global_rmse = RMSE(filt_scaled_sim_vel,true_vel)
+rmse_moy =np.mean(global_rmse)
+# plotting routines 
+time_ms = np.arange(start, stop, step)
+plt.figure(figsize=(10, 6))
+plt.plot(time_ms, states_error, label='RMSE', color='blue')
+plt.axhline(avg_error, color='red', linestyle='--', label='Average Error')
+plt.plot(time_ms[window_size-1:], avg_error_per_window, color='green', linestyle='-.', label=f'Average Error (Window Size {window_size})')
+
+
+plt.xlabel('Time (ms)')
+plt.ylabel('RMSE')
+plt.title('Robust kalman Filter RMSE over Time')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+
+plot3Arrays(scaled_sim_vel.T,true_vel,filt_scaled_sim_vel ,'sim','true','filt',\
+f'Robust kalman Filter Identification, cutoff={cutoff_frequency}, sampling ={data.samplingRate}, Mean RMSE={rmse_moy}')
 plt.show()
-    
-    
-
-
-
-

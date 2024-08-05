@@ -5,6 +5,7 @@ import logging
 import math
 import json
 import yaml
+from scipy.ndimage import uniform_filter1d
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -105,6 +106,26 @@ def clampArray(array:np.ndarray, lower_bound, upper_bound):
     
     return clamped_array
 
+def smooth_columns(data: np.ndarray, window_size: int = 5) -> np.ndarray:
+    """
+    Smooth each column of the input data matrix using a moving average.
+    
+    Parameters:
+    - data: np.ndarray, the input data matrix of size N x 7
+    - window_size: int, the window size for the moving average
+    
+    Returns:
+    - smoothed_data: np.ndarray, the smoothed data matrix of the same size as input
+    """
+    assert data.shape[1] == 7, "Input data must have 7 columns."
+    
+    smoothed_data = np.zeros_like(data)
+    
+    for i in range(data.shape[1]):
+        smoothed_data[:, i] = uniform_filter1d(data[:, i], size=window_size)
+    
+    return smoothed_data
+
 def plotArray(array: np.ndarray,title=None,ylabel = None) -> None:
     """
     Given an ( n * m )  data array where n >> m, plot each coloum data 
@@ -164,6 +185,7 @@ def plot2Arrays(array1: np.ndarray, array2: np.ndarray, legend1=None, legend2=No
         sns.lineplot(ax=ax, x=np.arange(N), y=array2[:, i], linewidth=0.5, color=color2, label=legend2)
         ax.set_xlabel("Time (ms)", fontsize = 9)
         ax.set_title(f'Joint {i+1}', fontsize = 9)
+        ax.grid(True)
         if legend1 or legend2:
             ax.legend(fontsize = 6)
     
@@ -182,7 +204,7 @@ def plot3Arrays(array1: np.ndarray, array2: np.ndarray, array3: np.ndarray,
     """
     ndof = array1.shape[1]
     N = array1.shape[0]
-    fig, axes = plt.subplots(3, 3, figsize=(12, 8), dpi=100)
+    fig, axes = plt.subplots(3, 3, figsize=(12, 6), dpi=100)
     axes = axes.flatten()
     
     for i in range(ndof):
@@ -192,9 +214,10 @@ def plot3Arrays(array1: np.ndarray, array2: np.ndarray, array3: np.ndarray,
         sns.lineplot(ax=ax, x=np.arange(N), y=array3[:, i], linewidth=0.5, color=color3, label=legend3)
         ax.set_xlabel("Time (ms)", fontsize=9)
         ax.set_title(f'Joint {i+1}', fontsize=9)
+        ax.grid(True)
         if legend1 or legend2 or legend3:
             ax.legend(fontsize=6)
-        #ax.set_ylim(-1, 1)
+         
     for j in range(ndof, len(axes)):
         fig.delaxes(axes[j])
     if title:

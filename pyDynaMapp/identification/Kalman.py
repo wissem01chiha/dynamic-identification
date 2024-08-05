@@ -129,8 +129,8 @@ class RobustKalman:
         A_k = self.A[:, (k-1)*self.n:k*self.n]
         B_k = self.B[:, (k-1)*self.n//2:k*self.n//2]
         Q_k = self.Q[:, (k-1)*self.n:k*self.n]
-        np.random.seed(42)
-        A_k = self._stabilize(A_k,B_k,-np.abs(np.random.rand(14)))
+        A_k = self._stabilize(A_k,B_k,np.array([-0.132,-0.552,-0.612,-0.647,-0.689,-0.701,-0.847,\
+            -0.111,-0.688,-0.674,-0.607,-0.609,-0.501,-0.637]))
         self.x = A_k @ self.x + B_k @ u
         self.P[:, (k-1)*self.n:k*self.n] = A_k @ self.P[:, (k-1)*self.n:k*self.n] @ A_k.T + Q_k
 
