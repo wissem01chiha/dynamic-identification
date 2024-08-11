@@ -58,7 +58,7 @@ for any bugs encountered during installation, please make sure to open an issue 
 
 
 #### Unix
- We stronglly recommend to use conda to craete a virtual enviroment using: 
+ We strongly recommend using Conda to create a virtual environment with: 
  
 ```shell
 conda env create -f environment.yml
