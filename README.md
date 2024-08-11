@@ -1,12 +1,12 @@
 ## pyDynaMapp : Python Dynamics Mapping Package
-<div align="center">
+
 
 [![Version](https://anaconda.org/chiha/pydynamapp/badges/version.svg)](https://anaconda.org/chiha/pydynamapp)
 [![Version](https://anaconda.org/chiha/pydynamapp/badges/latest_release_date.svg)](https://anaconda.org/chiha/pydynamapp)
 [![Version](https://anaconda.org/chiha/pydynamapp/badges/platforms.svg)](https://anaconda.org/chiha/pydynamapp)
 [![Version](https://anaconda.org/chiha/pydynamapp/badges/license.svg)](https://anaconda.org/chiha/pydynamapp)
 [![Version](https://anaconda.org/chiha/pydynamapp/badges/downloads.svg)](https://anaconda.org/chiha/pydynamapp)
-</div>
+
 
 The primary goal of this project is to offer a flexible framework for modeling and identifying serial manipulators, including the incorporation of nonlinear effects such as friction, stiffness, and backlash in robot joints. Additionally, a predictive feedback control mechanism is being developed to compensate these effects, making the framework suitable for collaborative robotics applications.
 
