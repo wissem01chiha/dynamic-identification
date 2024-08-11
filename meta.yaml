@@ -1,0 +1,35 @@
+package:
+  name: pydynamapp
+  version: "0.1.0"
+
+source:
+  path: dist/pydynamapp-0.1.0.tar.gz
+
+build:   
+  number: 1
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - python=3.12
+    - setuptools
+  run:
+    - python=3.12
+    - numpy
+    - pinocchio=2.7.1
+    - numba=0.59.0
+    - matplotlib
+    - seaborn
+    - pyyaml
+    - sympy
+    - nlopt
+    - scipy
+  pip:
+    - pinocchio==0.4.3
+channels:
+  - conda-forge
+  - defaults
+about:
+  summary: "0.1.0"
+  home: https://github.com/wissem01chiha/dynamic-identification
+  license: MIT
