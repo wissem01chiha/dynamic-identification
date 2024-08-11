@@ -1,61 +1,124 @@
+## pyDynaMapp : Python Dynamics Mapping Package
 <div align="center">
 
-## Robotic Dynamics Identification Toolkit
-[![Build Status](https://github.com/Justintime50/python-template/workflows/build/badge.svg)](https://github.com/Justintime50/python-template/actions)
-[![Coverage Status](https://coveralls.io/repos/github/Justintime50/python-template/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/python-template?branch=main)
-[![Licence](https://img.shields.io/github/license/justintime50/python-template)](LICENSE)
+[![Version](https://anaconda.org/chiha/pydynamapp/badges/version.svg)](https://anaconda.org/chiha/pydynamapp)
+[![Version](https://anaconda.org/chiha/pydynamapp/badges/latest_release_date.svg)](https://anaconda.org/chiha/pydynamapp)
+[![Version](https://anaconda.org/chiha/pydynamapp/badges/platforms.svg)](https://anaconda.org/chiha/pydynamapp)
+[![Version](https://anaconda.org/chiha/pydynamapp/badges/license.svg)](https://anaconda.org/chiha/pydynamapp)
+[![Version](https://anaconda.org/chiha/pydynamapp/badges/downloads.svg)](https://anaconda.org/chiha/pydynamapp)
 </div>
 
-The main objective of this project is to provide an extensive framework for modeling and identificationof the dynamics of 
-collaborative serial manipulators.The code extends the classical linear identification methods (IDDIM, CLOE, ...) to non linear dynamics
-The available solutions, which can be found here [softwares](/docs/README.md), do not support advanced modeling of friction, stiffness, noise, 
- and robotic joint actuator/transmission systems. This project also aims to provide a comprehensive interface for state-space modeling 
- approaches and transfer functions, rather than standard inverse dynamics equations. Regading the complxity of this models, it offers a method to 
- solve and optimize them,  to find the best trajectory directions and joints configurations that excite the robot dynamics.
+The primary goal of this project is to offer a flexible framework for modeling and identifying serial manipulators, including the incorporation of nonlinear effects such as friction, stiffness, and backlash in robot joints. Additionally, a predictive feedback control mechanism is being developed to compensate these effects, making the framework suitable for collaborative robotics applications.
+
 ### Getting started
-
-### Package structure
-all software base structures and functions are in the [source](/src/) folder, specific robot configuration/functions scripts are in [exemple](/exemple/) folder.
-### Features
-- trajectory data processing
-- compute optimized excitation trajectories with non-linear optimization
-- compute manipulator state space model 
-- state space identification based methods 
-- computation of manipulators transfer functions 
-- dynamic modeling with effects of frictions, actuator inertia, joint stiffness, and torque offset.
-- generation of optimal exciting trajectories.
-- calculation of physically consistent standard inertial parameters.
-### Documentation
-The computation of basic rigid body algorithms for the manipulator is done with [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/). For more information, refer to [Pinocchio's GitHub page](https://github.com/stack-of-tasks/pinocchio) or [pinocchio cheat sheet](docs/pinocchio_sheet.pdf).  
-
-see [documentation](docs/README.md) file.
-### Examples
-all simulation scripts examples are in the [exemple](/exemple/)
- the, at the the for [kinova Gen3-R07](https://www.kinovarobotics.com/uploads/User-Guide-Gen3-R07.pdf) robot can be found in the [examples](exemple/kinova/) directory.
 ### Prerequisites
-the code was tested sucessfuly on the flowing platform : Windows 11 ( python 3.12.4 - miniconda 4.5.0 - cuda 12.50)
+The code was tested successfully on the following platform:
 
-- CUDA Compilation Toolkit > 11
-- Python interpreter > 3.12
-- Conda > 4.5.0
+- **Windows 11**:
+  - python 3.12.4
+  - miniconda 4.5.0
+  - cuda 12.50 (optional)
+
+> **⚠️ Warning:** The package has not been tested or built for Unix-like systems (macOS, Linux). Please refer to the [Unix installation](#installation/Unix) section for more details.
+
 ### Installation 
-the code will be soon available to installation with python package magners like pip or conda, 
-now:
-create a new conda environment and install all the dependencies:  
+#### Windows
+> **Note:** If Anaconda is installed on your system, skip the first step. Conda is the only Python package manager supported at the moment.
+
+
+1. Download and install [Miniconda](https://docs.anaconda.com/miniconda/miniconda-install/). For Windows installation, refer to the [Miniconda Windows Installation Guide](https://docs.anaconda.com/miniconda/miniconda-install/).
+
+2. Install the package using the following command:
+    ```shell
+    conda install chiha::pydynamapp
+    ```
+
+#### Using Git:
+
+1. Clone the repository:
+    ```shell
+    git clone https://github.com/wissem01chiha/dynamic-identification
+    ```
+2. Install the following dependencies manually using your package manager:
+
+    - `numpy==1.26.4`
+    - `pinocchio==2.7.1`
+    - `scipy==1.14.0`
+    - `nlopt==2.7.1`
+    - `pandas==2.2.2`
+    - `matplotlib==3.8.4`
+
+3. Run all tests to check the installation:
+
+    ```shell
+    python3 run_tests.py
+    ```
+
+for any bugs encountered during installation, please make sure to open an issue at: [Issues](https://github.com/wissem01chiha/dynamic-identification/issues)
+
+
+#### Unix
+ We stronglly recommend to use conda to craete a virtual enviroment using: 
+ 
 ```shell
 conda env create -f environment.yml
 conda activate dynamapp
 ```
-## Tests
+an then follow the same instruction in [using git](#installation/usinggit) to insatll code dependancies in the virtual enviroment.
+run test to check installation: 
 .. on Linux platforms:
 ```shell 
   chmod u+x run_tests.sh
   ./run_tests.sh
 ``` 
-to run all package tests 
-```shell
-python3 run_tests.py 
-``` 
+for any bugs encountered during installation, please make sure to open an issue at: [Issues](https://github.com/wissem01chiha/dynamic-identification/issues)
+
+### Package Structure
+
+- The **`script`** folder contains executable identification scripts. Settings for each algorithm are passed through command-line arguments.
+- The **`dynamics`** folder contains all direct and inverse dynamics model computations, state-space representation, and regressor formulation.
+- The **`viscoelastic`** folder contains all base classes for contact models.
+- The package relies on the [URDF](https://wiki.ros.org/urdf) file format in the **`robot`** folder to represent the rigid body tree of the robot and contains basic inertial and geometric parameters. For more information, refer to:
+  - [Pinocchio Documentation](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/)
+  - [Pinocchio's GitHub Page](https://github.com/stack-of-tasks/pinocchio)
+  - [Pinocchio Cheat Sheet](docs/pinocchio_sheet.pdf)
+
+- **create a robot model:** Use a URDF file along with a configuration file. The configuration file should follow the same layout as the [Kinova config file](https://github.com/wissem01chiha/dynamic-identification/blob/main/pyDynaMapp/robot/kinova/config.yml).
+
+    ```python
+    from pyDynaMapp.dynamics import Robot
+
+    kinova = Robot(urdf_file_path, configuration_file_path)
+    
+    # Example: Compute mass and Coriolis matrices for home position
+    C = kinova.computeCoriolisMatrix()
+    M = kinova.computeMassMatrix()
+    
+    # Example: Compute the joint torques vector for home position
+    T = kinova.computeGeneralizedTorques()
+    ```
+
+- **create a state-space representation :** 
+
+    ```python
+    from pyDynaMapp.dynamics import StateSpace
+    import numpy as np
+
+    kinova_ss = StateSpace(urdf_file_path, configuration_file_path)
+    
+    # Example: Compute the state-space matrices at a given configuration using a state vector x
+    x = np.random.rand(14)
+    A, B, C, D = kinova_ss.model.computeStateMatrices(x)
+    
+    # Example: Compute the state-space matrices at a given configuration using position and velocity vectors
+    q = np.random.rand(7)
+    qp = np.random.rand(7)
+    A, B, C, D = kinova_ss.model.computeStateMatrices(q, qp)
+
+### Documentation
+**Official documentation is not yet released and is a work in progress.** 
+for more information, please visit the [pyDynaMapp-Anaconda](https://anaconda.org/chiha/pydynamapp) page.
+
 ### References
 - **A three-loop physical parameter identification method of robot manipulators considering physical feasibility and nonlinear friction mode**, *Tangzhong Song, Lijin Fang,Guanghui Liu, Hanyu Pang*, 2024
 - **Comprehensive modeling and identification of nonlinear joint dynamics for collaborative industrial robot manipulators**, *Emil Madsen, Oluf Skov Rosenlund, David Brandt, Xuping Zhang*, 2020

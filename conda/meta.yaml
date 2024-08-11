@@ -1,0 +1,16 @@
+package:
+  name: "pydynamapp"
+  version: "0.1.0"
+about:
+  summary: "Identification and Calibration of Serial Collaborative 
+            Robotic Manipulators Dynamics with Friction, Compliance, 
+            and Backlash Compensation."
+  home: https://github.com/wissem01chiha/dynamic-identification
+source:
+  path: ../setup.py
+build:
+  script: python setup.py install
+requirements:
+  build:
+    - python
+    - setuptools
