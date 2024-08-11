@@ -1,4 +1,4 @@
-## pyDynaMapp : Python Dynamics Mapping Package
+## pyDynaMapp : Python Dynamics Mapping Package For Robotics
 
 
 [![Version](https://anaconda.org/chiha/pydynamapp/badges/version.svg)](https://anaconda.org/chiha/pydynamapp)
