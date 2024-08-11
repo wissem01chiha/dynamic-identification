@@ -133,7 +133,7 @@ for any bugs encountered during installation, please make sure to open an issue 
     A, B, C, D = kinova_ss.model.computeStateMatrices(q, qp)
 
 ### Documentation
-**Official documentation is not yet released and is a work in progress.** 
+official documentation is not yet released and is a work in progress.   
 for more information, please visit the [pyDynaMapp-Anaconda](https://anaconda.org/chiha/pydynamapp) page.
 
 ### References
