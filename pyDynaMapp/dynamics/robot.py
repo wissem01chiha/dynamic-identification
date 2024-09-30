@@ -16,17 +16,16 @@ logger = logging.getLogger(__name__)
 class Robot():
     """
     Base class for Robot models.
-    
-    Args:
-        - urdf_file_path   : Manipulator 
-        - config_file_path : Manipulator configuration file path 
-        - model          : Pinocchio multibody model of the manipulator
-        - params         : Model static paramters
-        - data           : Pinocchio multibody data model
-        - q              : Joints position vector 
-        - v              : Joints velocity vector 
-        - a              : Joints acceleration vector.
-        
+
+    Parameters:
+        urdf_file_path (str): Manipulator URDF file path.
+        config_file_path (str): Manipulator configuration file path.
+        model (Pinocchio.Model): Pinocchio multibody model of the manipulator.
+        params (dict): Model static parameters.
+        data (Pinocchio.Data): Pinocchio multibody data model.
+        q (np.ndarray): Joints position vector.
+        v (np.ndarray): Joints velocity vector.
+        a (np.ndarray): Joints acceleration vector.
     """
     def __init__(self,urdf_file_path,config_file_path,q=None,v=None,a=None,)->None:
         

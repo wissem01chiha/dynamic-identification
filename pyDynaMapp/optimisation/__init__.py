@@ -1,11 +1,11 @@
 import sys 
-from .pso import *
-from .cupso import *
-from .cmaes import *
-from .dea import *
+from .PSO import *
+from .cuPSO import *
+from .CMAES import *
+from .DEA import *
 __all__ = [PSO, DEA]
 if 'cuda' in sys.argv:
    __all__.append('cupso')
-   from cupso import *
+   from cuPSO import *
 else:
     cuPSO = None

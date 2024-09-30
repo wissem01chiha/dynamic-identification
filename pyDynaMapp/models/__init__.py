@@ -1,2 +1,2 @@
-from .bldc import *
+from .BLDC import *
 from .harmonic_drive import *
