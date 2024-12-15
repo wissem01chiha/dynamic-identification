@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.utils.tools &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.utils.tools &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -88,28 +88,28 @@
     <span class="k">return</span> <span class="n">wrapped_angle</span>
 
 <div class="viewcode-block" id="wrap2deg">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.wrap2deg">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.wrap2deg">[docs]</a>
 <span class="k">def</span> <span class="nf">wrap2deg</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap angle to the interval [-180, 180].&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">angle</span> <span class="o">-</span> <span class="mi">360</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">angle</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span> <span class="o">/</span> <span class="mi">360</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="rad2deg">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.rad2deg">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.rad2deg">[docs]</a>
 <span class="k">def</span> <span class="nf">rad2deg</span><span class="p">(</span><span class="n">angle_radians</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts an angle given in radians to degrees.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">angle_radians</span> <span class="o">*</span> <span class="p">(</span><span class="mi">180</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="wrapXpi">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.wrapXpi">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.wrapXpi">[docs]</a>
 <span class="k">def</span> <span class="nf">wrapXpi</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap angle to the interval [-X*pi, X*pi].&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">angle</span> <span class="o">-</span> <span class="n">X</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">angle</span> <span class="o">+</span> <span class="n">X</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="deg2rad">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.deg2rad">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.deg2rad">[docs]</a>
 <span class="k">def</span> <span class="nf">deg2rad</span><span class="p">(</span><span class="n">angle_degrees</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts an angle given in degrees to radians.&quot;&quot;&quot;</span>
     <span class="n">radians</span> <span class="o">=</span> <span class="n">angle_degrees</span> <span class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
@@ -117,7 +117,7 @@
 
 
 <div class="viewcode-block" id="checkSkewSymmetric">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.checkSkewSymmetric">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.checkSkewSymmetric">[docs]</a>
 <span class="k">def</span> <span class="nf">checkSkewSymmetric</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the input matrix is skew-symmetric.&quot;&quot;&quot;</span>
     <span class="n">matrix_transpose</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
@@ -126,7 +126,7 @@
 
 
 <div class="viewcode-block" id="struct2json">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.struct2json">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.struct2json">[docs]</a>
 <span class="k">def</span> <span class="nf">struct2json</span><span class="p">(</span><span class="n">structData</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Saves a Python dictionary to a JSON file.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structData</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -141,7 +141,7 @@
 
 
 <div class="viewcode-block" id="columnVector">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.columnVector">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.columnVector">[docs]</a>
 <span class="k">def</span> <span class="nf">columnVector</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a vector to a column vector.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -151,7 +151,7 @@
 
 
 <div class="viewcode-block" id="matrix2Text">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.matrix2Text">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.matrix2Text">[docs]</a>
 <span class="k">def</span> <span class="nf">matrix2Text</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write the values of a matrix to a text file.&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
@@ -166,7 +166,7 @@
 
     
 <div class="viewcode-block" id="yaml2dict">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.yaml2dict">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.yaml2dict">[docs]</a>
 <span class="k">def</span> <span class="nf">yaml2dict</span><span class="p">(</span><span class="n">yamlFilePath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get parameters from the config YAML file and return them as a </span>
@@ -188,7 +188,7 @@
 
     
 <div class="viewcode-block" id="wrapArray">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.wrapArray">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.wrapArray">[docs]</a>
 <span class="k">def</span> <span class="nf">wrapArray</span><span class="p">(</span><span class="n">array</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">):</span>
     <span class="n">range_width</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">-</span> <span class="n">lower_bound</span>
     <span class="n">wrapped_array</span> <span class="o">=</span> <span class="n">lower_bound</span> <span class="o">+</span> <span class="p">(</span><span class="n">array</span> <span class="o">-</span> <span class="n">lower_bound</span><span class="p">)</span>
@@ -197,7 +197,7 @@
 
     
 <div class="viewcode-block" id="scaleArray">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.scaleArray">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.scaleArray">[docs]</a>
 <span class="k">def</span> <span class="nf">scaleArray</span><span class="p">(</span><span class="n">array</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">lower_bound</span><span class="p">,</span><span class="n">upper_bound</span><span class="p">):</span>
     <span class="n">min_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
     <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
@@ -207,7 +207,7 @@
 
 
 <div class="viewcode-block" id="clampArray">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.clampArray">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.clampArray">[docs]</a>
 <span class="k">def</span> <span class="nf">clampArray</span><span class="p">(</span><span class="n">array</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">):</span>
     <span class="n">clamped_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">)</span>
     
@@ -215,7 +215,7 @@
 
 
 <div class="viewcode-block" id="smooth_columns">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.smooth_columns">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.smooth_columns">[docs]</a>
 <span class="k">def</span> <span class="nf">smooth_columns</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Smooth each column of the input data matrix using a moving average.</span>
@@ -238,7 +238,7 @@
 
 
 <div class="viewcode-block" id="plotArray">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.plotArray">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.plotArray">[docs]</a>
 <span class="k">def</span> <span class="nf">plotArray</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">ylabel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given an ( n * m )  data array where n &gt;&gt; m, plot each coloum data </span>
@@ -279,7 +279,7 @@
         
          
 <div class="viewcode-block" id="plot2Arrays">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.plot2Arrays">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.plot2Arrays">[docs]</a>
 <span class="k">def</span> <span class="nf">plot2Arrays</span><span class="p">(</span><span class="n">array1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">array2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">legend1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">color1</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">color2</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -313,7 +313,7 @@
 
     
 <div class="viewcode-block" id="plot3Arrays">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.plot3Arrays">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.plot3Arrays">[docs]</a>
 <span class="k">def</span> <span class="nf">plot3Arrays</span><span class="p">(</span><span class="n">array1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">array2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">array3</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
                     <span class="n">legend1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color1</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">color2</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">color3</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -345,7 +345,7 @@
 
     
 <div class="viewcode-block" id="plotElementWiseArray">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.tools.plotElementWiseArray">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.tools.plotElementWiseArray">[docs]</a>
 <span class="k">def</span> <span class="nf">plotElementWiseArray</span><span class="p">(</span><span class="n">array</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">ylabel</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
     <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)))</span><span class="o">+</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)),</span><span class="n">y</span><span class="o">=</span><span class="n">array</span><span class="p">)</span>

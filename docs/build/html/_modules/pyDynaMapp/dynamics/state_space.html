@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.dynamics.state_space &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.dynamics.state_space &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -86,7 +86,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="StateSpace">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace">[docs]</a>
 <span class="k">class</span> <span class="nc">StateSpace</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for state space identification models </span>
 <span class="sd">    </span>
@@ -97,7 +97,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">urdf_file_path</span><span class="p">,</span><span class="n">config_file_path</span><span class="p">)</span>
             
 <div class="viewcode-block" id="StateSpace.computeStateMatrices">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeStateMatrices">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeStateMatrices">[docs]</a>
     <span class="k">def</span> <span class="nf">computeStateMatrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_or_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">qp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the state space matrices of the robot model.</span>
@@ -138,7 +138,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.getStateVector">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.getStateVector">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.getStateVector">[docs]</a>
     <span class="k">def</span> <span class="nf">getStateVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">qp</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">q</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the State vector give the joints poistion and velocity.</span>
 <span class="sd">        Returns:</span>
@@ -152,7 +152,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.updateStateVector">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.updateStateVector">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.updateStateVector">[docs]</a>
     <span class="k">def</span> <span class="nf">updateStateVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q_or_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">qp_or_tau</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">tau</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>\
                           <span class="n">state_poles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
@@ -184,7 +184,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.computeStateInputVector">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeStateInputVector">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeStateInputVector">[docs]</a>
     <span class="k">def</span> <span class="nf">computeStateInputVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">states</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">input_torque</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the state space input torques vector U.</span>
@@ -203,7 +203,7 @@
 
         
 <div class="viewcode-block" id="StateSpace.getAugmentedStateVector">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.getAugmentedStateVector">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.getAugmentedStateVector">[docs]</a>
     <span class="k">def</span> <span class="nf">getAugmentedStateVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">qp</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">tau</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Compute the Augemnted state vector&quot;&quot;&quot;</span>
         <span class="n">x</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStateVector</span><span class="p">(</span><span class="n">qp</span><span class="p">,</span><span class="n">q</span><span class="p">)</span>
@@ -212,7 +212,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.computeAugmentedStateMatrices">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeAugmentedStateMatrices">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeAugmentedStateMatrices">[docs]</a>
     <span class="k">def</span> <span class="nf">computeAugmentedStateMatrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_or_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">qp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes and returns the augmented state-space matrices for the </span>
@@ -237,7 +237,7 @@
 
         
 <div class="viewcode-block" id="StateSpace.computeStateEigvals">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeStateEigvals">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeStateEigvals">[docs]</a>
     <span class="k">def</span> <span class="nf">computeStateEigvals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_or_x</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">qp</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the dynamics system eigvalues&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">q_or_x</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">nq</span>
@@ -249,7 +249,7 @@
 
         
 <div class="viewcode-block" id="StateSpace.computeReducedStateMatrices">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeReducedStateMatrices">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeReducedStateMatrices">[docs]</a>
     <span class="k">def</span> <span class="nf">computeReducedStateMatrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">qp</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">tau</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; computes the new transformed system by diagonalized the state matrix A </span>
 <span class="sd">        &quot;&quot;&quot;</span> 
@@ -265,7 +265,7 @@
 
          
 <div class="viewcode-block" id="StateSpace.computeStateTransitionMatrix">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeStateTransitionMatrix">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeStateTransitionMatrix">[docs]</a>
     <span class="k">def</span> <span class="nf">computeStateTransitionMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">tf</span><span class="p">,</span> <span class="n">ti</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; compute the state transition matrix of the system</span>
 <span class="sd">        Args:</span>
@@ -278,7 +278,7 @@
 
         
 <div class="viewcode-block" id="StateSpace.lsim">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.lsim">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.lsim">[docs]</a>
     <span class="k">def</span> <span class="nf">lsim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">system_poles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">noise</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span>\
         <span class="n">verbose</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Simulate the system response with a given input torque.</span>
@@ -313,7 +313,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.state_place_poles">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.state_place_poles">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.state_place_poles">[docs]</a>
     <span class="k">def</span> <span class="nf">state_place_poles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">gain_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">states</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">verbose</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        this method is extention of scipy.signals.place_poles for state depend </span>
@@ -341,7 +341,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.linearize">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.linearize">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.linearize">[docs]</a>
     <span class="k">def</span> <span class="nf">linearize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">states_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Computes a- equivalent LTI system by avaraging the state depend </span>
 <span class="sd">        Linear system. </span>
@@ -367,7 +367,7 @@
     
     
 <div class="viewcode-block" id="StateSpace.stabilize">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.stabilize">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.stabilize">[docs]</a>
     <span class="k">def</span> <span class="nf">stabilize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">desired_poles</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Check what ever the numerical recursive control scheme given by :</span>
@@ -398,7 +398,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.computeObsMatrix">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeObsMatrix">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeObsMatrix">[docs]</a>
     <span class="k">def</span> <span class="nf">computeObsMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_or_x</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">qp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the observaliblite matrix of the robot&quot;&quot;&quot;</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">nq</span>
@@ -410,7 +410,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.computeCtlbMatrix">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeCtlbMatrix">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeCtlbMatrix">[docs]</a>
     <span class="k">def</span> <span class="nf">computeCtlbMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_or_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">qp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the controllability matrix of the robot&quot;&quot;&quot;</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">nq</span>
@@ -423,7 +423,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.computeGaussianNoise">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeGaussianNoise">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computeGaussianNoise">[docs]</a>
     <span class="k">def</span> <span class="nf">computeGaussianNoise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">length</span><span class="p">):</span>
         <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;noise_params&#39;</span><span class="p">][</span><span class="s1">&#39;gauss&#39;</span><span class="p">][</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
         <span class="n">stdv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;noise_params&#39;</span><span class="p">][</span><span class="s1">&#39;gauss&#39;</span><span class="p">][</span><span class="s1">&#39;stdv&#39;</span><span class="p">]</span>
@@ -433,7 +433,7 @@
 
     
 <div class="viewcode-block" id="StateSpace.computePoissonNoise">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computePoissonNoise">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.computePoissonNoise">[docs]</a>
     <span class="k">def</span> <span class="nf">computePoissonNoise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">length</span><span class="p">):</span>
         <span class="n">lamda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;noise_params&#39;</span><span class="p">][</span><span class="s1">&#39;lamda&#39;</span><span class="p">]</span>
         <span class="n">noise_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">lamda</span><span class="p">,</span><span class="n">length</span><span class="p">)</span>
@@ -442,7 +442,7 @@
 
      
 <div class="viewcode-block" id="StateSpace.visualizeRootLocus">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.visualizeRootLocus">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.visualizeRootLocus">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeRootLocus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_or_x</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">qp</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Plot the system root locus for a given trajectory.&quot;&quot;&quot;</span>
         <span class="n">gain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.45</span><span class="p">,</span> <span class="mi">35</span><span class="p">)</span>
@@ -460,7 +460,7 @@
 
          
 <div class="viewcode-block" id="StateSpace.visualizeStatePoles">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.visualizeStatePoles">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.state_space.StateSpace.visualizeStatePoles">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeStatePoles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">qp</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the system poles for a given trajectory&quot;&quot;&quot;</span>
         <span class="n">eigenvalues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStateEigvals</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">qp</span><span class="p">)</span>

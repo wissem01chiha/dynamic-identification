@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.trajectory.trapezoidal &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.trajectory.trapezoidal &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -79,7 +79,7 @@
 
 
 <div class="viewcode-block" id="TrapezoidalGenerator">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator">[docs]</a>
 <span class="k">class</span> <span class="nc">TrapezoidalGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for trapezoidal trajectories generation </span>
@@ -119,7 +119,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ts</span> <span class="o">=</span> <span class="mf">0.01</span>
 
 <div class="viewcode-block" id="TrapezoidalGenerator.TrapezoidalGenerator">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator.TrapezoidalGenerator">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator.TrapezoidalGenerator">[docs]</a>
     <span class="k">def</span> <span class="nf">TrapezoidalGenerator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initConfig</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nwaypoints</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -143,7 +143,7 @@
 
 
 <div class="viewcode-block" id="TrapezoidalGenerator.initConfig">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator.initConfig">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator.initConfig">[docs]</a>
     <span class="k">def</span> <span class="nf">initConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qd</span> <span class="o">=</span> <span class="p">[]</span>
@@ -155,7 +155,7 @@
 
 
 <div class="viewcode-block" id="TrapezoidalGenerator.trapTraj_PTP">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator.trapTraj_PTP">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator.trapTraj_PTP">[docs]</a>
     <span class="k">def</span> <span class="nf">trapTraj_PTP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
         <span class="n">ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span>
         <span class="n">q_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">q0</span><span class="p">])</span>
@@ -180,7 +180,7 @@
 
 
 <div class="viewcode-block" id="TrapezoidalGenerator.visualizeTrajectory">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator.visualizeTrajectory">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trapezoidal.TrapezoidalGenerator.visualizeTrajectory">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeTrajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">time_slot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
             <span class="mf">0.0</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nf</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nf</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>

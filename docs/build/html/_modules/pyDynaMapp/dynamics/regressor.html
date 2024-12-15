@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.dynamics.regressor &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.dynamics.regressor &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -87,7 +87,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Regressor">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor">[docs]</a>
 <span class="k">class</span> <span class="nc">Regressor</span><span class="p">:</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">:</span><span class="n">Robot</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -99,7 +99,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">param_vector_max_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_col</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">nv</span>
         
 <div class="viewcode-block" id="Regressor.computeBasicRegressor">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeBasicRegressor">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeBasicRegressor">[docs]</a>
     <span class="k">def</span> <span class="nf">computeBasicRegressor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">v</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">a</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">id_inertias</span><span class="o">=</span><span class="p">[]</span>
@@ -150,7 +150,7 @@
         
         
 <div class="viewcode-block" id="Regressor.computeFullRegressor">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeFullRegressor">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeFullRegressor">[docs]</a>
     <span class="k">def</span> <span class="nf">computeFullRegressor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">v</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">a</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Compute the Regressor matrix of the robot </span>
@@ -216,7 +216,7 @@
 
 
 <div class="viewcode-block" id="Regressor.computeBasicSparseRegressor">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeBasicSparseRegressor">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeBasicSparseRegressor">[docs]</a>
     <span class="k">def</span> <span class="nf">computeBasicSparseRegressor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">a</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; the torque of joint i do not depend on the torque of joint i-1 &quot;&quot;&quot;</span>
         <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">computeBasicRegressor</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">a</span><span class="p">)</span>
@@ -228,7 +228,7 @@
 
         
 <div class="viewcode-block" id="Regressor.computeReducedRegressor">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeReducedRegressor">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeReducedRegressor">[docs]</a>
     <span class="k">def</span> <span class="nf">computeReducedRegressor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Eliminates columns which has L2 norm smaller than tolerance.</span>
@@ -250,7 +250,7 @@
 
     
 <div class="viewcode-block" id="Regressor.computeRegressionCriterion">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeRegressionCriterion">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeRegressionCriterion">[docs]</a>
     <span class="k">def</span> <span class="nf">computeRegressionCriterion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">torque</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">x</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Compute the Regression error model : ε = τ - W.Θ &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span><span class="mi">1</span><span class="p">:</span>
@@ -266,7 +266,7 @@
         
     
 <div class="viewcode-block" id="Regressor.computeDifferentialRegressor">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeDifferentialRegressor">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeDifferentialRegressor">[docs]</a>
     <span class="k">def</span> <span class="nf">computeDifferentialRegressor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span><span class="n">dx</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        This function differentiates the computeIdentificationModel of the class robot.</span>
@@ -302,7 +302,7 @@
 
     
 <div class="viewcode-block" id="Regressor.computeDifferentiationError">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeDifferentiationError">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.computeDifferentiationError">[docs]</a>
     <span class="k">def</span> <span class="nf">computeDifferentiationError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span><span class="n">dx</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; retun the gradient differentiation error &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">setIdentificationModelData</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
@@ -314,7 +314,7 @@
 
     
 <div class="viewcode-block" id="Regressor.addJointOffset">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.addJointOffset">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.addJointOffset">[docs]</a>
     <span class="k">def</span> <span class="nf">addJointOffset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">param</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;problem_params&#39;</span><span class="p">][</span><span class="s2">&quot;has_joint_offset&quot;</span><span class="p">]:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Dynamics Engine : Robot has no joint offsets. &#39;</span><span class="p">)</span>
@@ -329,7 +329,7 @@
 
     
 <div class="viewcode-block" id="Regressor.addActuatorInertia">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.addActuatorInertia">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.addActuatorInertia">[docs]</a>
     <span class="k">def</span> <span class="nf">addActuatorInertia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;problem_params&#39;</span><span class="p">][</span><span class="s2">&quot;has_friction&quot;</span><span class="p">]:</span>
             <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>  
@@ -341,7 +341,7 @@
 
     
 <div class="viewcode-block" id="Regressor.addFriction">
-<a class="viewcode-back" href="../../../pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.addFriction">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.dynamics.html#pyDynaMapp.dynamics.regressor.Regressor.addFriction">[docs]</a>
     <span class="k">def</span> <span class="nf">addFriction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">param</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;identification&#39;</span><span class="p">][</span><span class="s1">&#39;problem_params&#39;</span><span class="p">][</span><span class="s2">&quot;has_friction&quot;</span><span class="p">]:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Dynamics Engine : Robot joints has no friction.&#39;</span><span class="p">)</span>

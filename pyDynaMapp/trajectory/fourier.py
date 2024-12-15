@@ -181,11 +181,27 @@ class FourierGenerator:
  
 
     def computeTrajectoryIdentifiability(self,ti,tf,torque,q,qp,qpp,x):
-        """ 
-        evaluates the rgression criteria ε(qi,qpi,qppi,x) , en fonction du trajectory certain computed 
-        pervoiously C(qi,qpi,qppi) for fixed x system paramter vector :
-        > the traj is identificable if the crietria is minimal in the most of time steps 
-        TODO : find the rlation betwen the rgression crirtia evolution and the trajectory C over time t
+        """
+        Evaluate the regression criteria ε(qi, qpi, qppi, x) based on a given trajectory.
+
+        This function computes the regression criteria for a fixed system parameter vector `x`
+        and a trajectory `C(qi, qpi, qppi)` computed previously. The trajectory is considered
+        identifiable if the criteria is minimal for most of the time steps.
+
+        Args:
+            qi: Generalized position coordinates of the trajectory.
+            qpi: Generalized velocity coordinates of the trajectory.
+            qppi: Generalized acceleration coordinates of the trajectory.
+            x: Fixed system parameter vector.
+
+        Returns:
+            Regression criteria value ε for the given trajectory and system parameters.
+
+        Notes:
+            - The trajectory is identifiable if ε remains minimal over most time steps.
+            - TODO:
+             Investigate the relationship between the regression criteria evolution and
+            the trajectory `C` over time `t`.
         """
         reg = Regressor()
         N = len(q)

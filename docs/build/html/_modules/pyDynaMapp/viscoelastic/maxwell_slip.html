@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.viscoelastic.maxwell_slip &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.viscoelastic.maxwell_slip &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -74,7 +74,7 @@
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">odeint</span>
 
 <div class="viewcode-block" id="MaxwellSlip">
-<a class="viewcode-back" href="../../../pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell_slip.MaxwellSlip">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell_slip.MaxwellSlip">[docs]</a>
 <span class="k">class</span> <span class="nc">MaxwellSlip</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    MaxwellSlip - Compute Maxwell Slip Friction Model.</span>
@@ -110,7 +110,7 @@
       <span class="bp">self</span><span class="o">.</span><span class="n">samplingRate</span> <span class="o">=</span> <span class="n">samplingRate</span>
       
 <div class="viewcode-block" id="MaxwellSlip.maxwell">
-<a class="viewcode-back" href="../../../pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell_slip.MaxwellSlip.maxwell">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell_slip.MaxwellSlip.maxwell">[docs]</a>
     <span class="k">def</span> <span class="nf">maxwell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="n">dydt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>   
         <span class="n">F</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">:]</span>
@@ -126,7 +126,7 @@
 
 
 <div class="viewcode-block" id="MaxwellSlip.computeFrictionForce">
-<a class="viewcode-back" href="../../../pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell_slip.MaxwellSlip.computeFrictionForce">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell_slip.MaxwellSlip.computeFrictionForce">[docs]</a>
     <span class="k">def</span> <span class="nf">computeFrictionForce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">timeSpan</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">samplingRate</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">timeSpan</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">))</span>

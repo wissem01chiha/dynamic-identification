@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.identification.CVA &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.identification.CVA &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -74,7 +74,7 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <div class="viewcode-block" id="CVA">
-<a class="viewcode-back" href="../../../pyDynaMapp.identification.html#pyDynaMapp.identification.CVA.CVA">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.identification.html#pyDynaMapp.identification.CVA.CVA">[docs]</a>
 <span class="k">class</span> <span class="nc">CVA</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Canonical Variate Analysis:</span>
@@ -87,14 +87,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">num_vars</span> <span class="o">=</span> <span class="n">num_vars</span>
         
 <div class="viewcode-block" id="CVA.fit">
-<a class="viewcode-back" href="../../../pyDynaMapp.identification.html#pyDynaMapp.identification.CVA.CVA.fit">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.identification.html#pyDynaMapp.identification.CVA.CVA.fit">[docs]</a>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit the CVA model to the data X.&quot;&quot;&quot;</span></div>
 
         <span class="c1"># Implement the fitting process here</span>
     
 <div class="viewcode-block" id="CVA.transform">
-<a class="viewcode-back" href="../../../pyDynaMapp.identification.html#pyDynaMapp.identification.CVA.CVA.transform">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.identification.html#pyDynaMapp.identification.CVA.CVA.transform">[docs]</a>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform the data X into the canonical variates.&quot;&quot;&quot;</span>
         <span class="c1"># Implement the transformation process here</span>

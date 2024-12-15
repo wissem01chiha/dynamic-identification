@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.viscoelastic.maxwell &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.viscoelastic.maxwell &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -73,7 +73,7 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <div class="viewcode-block" id="Maxwell">
-<a class="viewcode-back" href="../../../pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell.Maxwell">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell.Maxwell">[docs]</a>
 <span class="k">class</span> <span class="nc">Maxwell</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maxwell-Voight contact model class.</span>
@@ -91,7 +91,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="n">E</span>
 
 <div class="viewcode-block" id="Maxwell.stress">
-<a class="viewcode-back" href="../../../pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell.Maxwell.stress">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell.Maxwell.stress">[docs]</a>
     <span class="k">def</span> <span class="nf">stress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strain</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">strain_rate</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the stress based on strain and strain rate using the Maxwell-Voight model.</span>
@@ -107,7 +107,7 @@
 
 
 <div class="viewcode-block" id="Maxwell.simulate">
-<a class="viewcode-back" href="../../../pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell.Maxwell.simulate">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.viscoelastic.html#pyDynaMapp.viscoelastic.maxwell.Maxwell.simulate">[docs]</a>
     <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">strain</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simulate the stress response over time for a given strain history.</span>

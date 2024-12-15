@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.trajectory.trajectory &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.trajectory.trajectory &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -83,7 +83,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TrajectoryGenerator">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trajectory.TrajectoryGenerator">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trajectory.TrajectoryGenerator">[docs]</a>
 <span class="k">class</span> <span class="nc">TrajectoryGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for general tarjectory motion generation.</span>
@@ -100,7 +100,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tf</span> <span class="o">=</span> <span class="mi">1000</span>
         
 <div class="viewcode-block" id="TrajectoryGenerator.setTrajectoryData">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trajectory.TrajectoryGenerator.setTrajectoryData">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trajectory.TrajectoryGenerator.setTrajectoryData">[docs]</a>
     <span class="k">def</span> <span class="nf">setTrajectoryData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">Qp</span><span class="p">,</span> <span class="n">Qpp</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
 
         <span class="n">mq</span><span class="p">,</span><span class="n">nq</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">shape</span>
@@ -112,7 +112,7 @@
 
      
 <div class="viewcode-block" id="TrajectoryGenerator.plotTrajectory">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trajectory.TrajectoryGenerator.plotTrajectory">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.trajectory.TrajectoryGenerator.plotTrajectory">[docs]</a>
     <span class="k">def</span> <span class="nf">plotTrajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
         <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>

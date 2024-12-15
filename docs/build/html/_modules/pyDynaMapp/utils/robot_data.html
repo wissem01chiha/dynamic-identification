@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.utils.robot_data &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.utils.robot_data &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -87,7 +87,7 @@
 <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">computeCorrelation</span>
 
 <div class="viewcode-block" id="RobotData">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData">[docs]</a>
 <span class="k">class</span> <span class="nc">RobotData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize the RobotData object by loading and processing data from a CSV file.</span>
@@ -155,7 +155,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">corrJointAcceleration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">desiredAcceleration</span><span class="p">,</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         
 <div class="viewcode-block" id="RobotData.updateSamplingRate">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.updateSamplingRate">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.updateSamplingRate">[docs]</a>
     <span class="k">def</span> <span class="nf">updateSamplingRate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_sampling_rate</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">samplingRate</span> <span class="o">=</span> <span class="n">new_sampling_rate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeStep</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">samplingRate</span>
@@ -163,7 +163,7 @@
 
         
 <div class="viewcode-block" id="RobotData.lowPassfilter">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.lowPassfilter">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.lowPassfilter">[docs]</a>
     <span class="k">def</span> <span class="nf">lowPassfilter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff_frequency</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Filtring robot data using a butter low pass filter&quot;&quot;&quot;</span>
         <span class="n">nyquist_freq</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">samplingRate</span>
@@ -185,7 +185,7 @@
 
     
 <div class="viewcode-block" id="RobotData.computeTorqueNoise">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.computeTorqueNoise">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.computeTorqueNoise">[docs]</a>
     <span class="k">def</span> <span class="nf">computeTorqueNoise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">variable</span><span class="o">=</span><span class="s1">&#39;torque&#39;</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;std&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimates the Noise level in torque sensor mesurements.</span>
@@ -214,7 +214,7 @@
 
     
 <div class="viewcode-block" id="RobotData.computePositionNoise">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.computePositionNoise">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.computePositionNoise">[docs]</a>
     <span class="k">def</span> <span class="nf">computePositionNoise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;std&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">tuple</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimates the Noise level in torque sensor mesurements.</span>
@@ -230,7 +230,7 @@
 
     
 <div class="viewcode-block" id="RobotData.visualizeCorrelation">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeCorrelation">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeCorrelation">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeCorrelation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">variable</span><span class="o">=</span><span class="s1">&#39;torque&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot the correlation graph between joints variable data given by </span>
@@ -256,7 +256,7 @@
     
     
 <div class="viewcode-block" id="RobotData.visualizeVelocity">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeVelocity">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeVelocity">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeVelocity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the joints velocity recorded by the sensors.&quot;&quot;&quot;</span>
         <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
@@ -271,7 +271,7 @@
 
         
 <div class="viewcode-block" id="RobotData.visualizePosition">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizePosition">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizePosition">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizePosition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the joints position recorded by the sensors.&quot;&quot;&quot;</span>
         <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
@@ -287,7 +287,7 @@
 
         
 <div class="viewcode-block" id="RobotData.visualizeTorque">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeTorque">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeTorque">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeTorque</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>  
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the joints torque&quot;&quot;&quot;</span>
         <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span> 
@@ -303,7 +303,7 @@
 
           
 <div class="viewcode-block" id="RobotData.visualizeCurrent">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeCurrent">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeCurrent">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeCurrent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>   
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the joints current &quot;&quot;&quot;</span> 
         <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
@@ -319,7 +319,7 @@
 
     
 <div class="viewcode-block" id="RobotData.visualizeAcceleration">
-<a class="viewcode-back" href="../../../pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeAcceleration">[docs]</a>
+<a class="viewcode-back" href="../../../source/pyDynaMapp.utils.html#pyDynaMapp.utils.robot_data.RobotData.visualizeAcceleration">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeAcceleration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span> 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the joints desired accleration&quot;&quot;&quot;</span>
         <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>

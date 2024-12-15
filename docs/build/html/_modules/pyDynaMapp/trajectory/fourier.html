@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyDynaMapp.trajectory.fourier &mdash; pyDynaMapp 0.1.0 documentation</title>
+  <title>pyDynaMapp.trajectory.fourier &mdash; DynaMapp 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            pyDynaMapp
+            DynaMapp
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -42,7 +42,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pyDynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">DynaMapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">CONTRIBUTING</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../INSTALL.html">INSTALLATION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CHANGELOG.html">CHANGELOG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/source/modules.html">pyDynaMapp</a></li>
 </ul>
 
         </div>
@@ -51,7 +55,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">pyDynaMapp</a>
+          <a href="../../../index.html">DynaMapp</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -86,7 +90,7 @@
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">plotArray</span>
 
 <div class="viewcode-block" id="FourierGenerator">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator">[docs]</a>
 <span class="k">class</span> <span class="nc">FourierGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for peroidic trajectories generation.</span>
@@ -99,7 +103,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">trajectory_params</span> <span class="o">=</span> <span class="n">trajectory_params</span>
         
 <div class="viewcode-block" id="FourierGenerator.computeTrajectoryState">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeTrajectoryState">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeTrajectoryState">[docs]</a>
     <span class="k">def</span> <span class="nf">computeTrajectoryState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">q0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qpp0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Computes the trajectory states at time date t &quot;&quot;&quot;</span>
         <span class="n">pulsation</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectory_params</span><span class="p">[</span><span class="s1">&#39;frequancy&#39;</span><span class="p">]</span>
@@ -125,7 +129,7 @@
 
     
 <div class="viewcode-block" id="FourierGenerator.computeFullTrajectory">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeFullTrajectory">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeFullTrajectory">[docs]</a>
     <span class="k">def</span> <span class="nf">computeFullTrajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ti</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span><span class="n">q0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qpp0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the full trajectory data between ti and tf &quot;&quot;&quot;</span>
 
@@ -142,7 +146,7 @@
 
     
 <div class="viewcode-block" id="FourierGenerator.computeDifferentiationError">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeDifferentiationError">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeDifferentiationError">[docs]</a>
     <span class="k">def</span> <span class="nf">computeDifferentiationError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ti</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">tf</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">q0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qpp0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">reg</span> <span class="o">=</span> <span class="n">Regressor</span><span class="p">()</span>
         <span class="n">q</span><span class="p">,</span> <span class="n">qp</span><span class="p">,</span> <span class="n">qpp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">computeFullTrajectory</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">qp0</span><span class="p">,</span> <span class="n">qpp0</span><span class="p">)</span>
@@ -151,7 +155,7 @@
 
     
 <div class="viewcode-block" id="FourierGenerator.computeConstraintedDifferentiationError">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeConstraintedDifferentiationError">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeConstraintedDifferentiationError">[docs]</a>
     <span class="k">def</span> <span class="nf">computeConstraintedDifferentiationError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ti</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">tf</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">q0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qpp0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">reg</span> <span class="o">=</span> <span class="n">Regressor</span><span class="p">()</span>
         <span class="n">q</span><span class="p">,</span> <span class="n">qp</span><span class="p">,</span> <span class="n">qpp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computeTrajectoryConstraints</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span><span class="n">tf</span><span class="p">,</span><span class="mf">1.57</span><span class="p">,</span><span class="o">-</span><span class="mf">1.57</span><span class="p">,</span><span class="mf">1.2</span><span class="p">,</span><span class="o">-</span><span class="mf">1.2</span><span class="p">,</span><span class="mf">5.2</span><span class="p">,</span><span class="o">-</span><span class="mf">5.2</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">qp0</span><span class="p">,</span> <span class="n">qpp0</span><span class="p">)</span>
@@ -160,7 +164,7 @@
 
     
 <div class="viewcode-block" id="FourierGenerator.computeTrajectoryError">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeTrajectoryError">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeTrajectoryError">[docs]</a>
     <span class="k">def</span> <span class="nf">computeTrajectoryError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">tspan</span><span class="p">,</span><span class="n">new_traj_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">q0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>\
                                <span class="n">qpp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
       
@@ -195,7 +199,7 @@
     
 
 <div class="viewcode-block" id="FourierGenerator.visualizeTrajectory">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.visualizeTrajectory">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.visualizeTrajectory">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeTrajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span><span class="n">tf</span><span class="p">,</span> <span class="n">q0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qpp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savePath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute and plot a given trajectory, each variable in a single plot&quot;&quot;&quot;</span>
 
@@ -210,7 +214,7 @@
 
             
 <div class="viewcode-block" id="FourierGenerator.save2csv">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.save2csv">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.save2csv">[docs]</a>
     <span class="k">def</span> <span class="nf">save2csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ti</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">tf</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">file_path</span><span class="p">,</span><span class="n">q0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qpp0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; compute a given trajectory and save it to csv file.&quot;&quot;&quot;</span> 
 
@@ -255,7 +259,7 @@
 
 
 <div class="viewcode-block" id="FourierGenerator.computeTrajectoryCriterion">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeTrajectoryCriterion">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeTrajectoryCriterion">[docs]</a>
     <span class="k">def</span> <span class="nf">computeTrajectoryCriterion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ti</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">tf</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">q0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qp0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">qpp0</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the trajectory identification criteria.</span>
@@ -279,13 +283,29 @@
  
 
 <div class="viewcode-block" id="FourierGenerator.computeTrajectoryIdentifiability">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeTrajectoryIdentifiability">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeTrajectoryIdentifiability">[docs]</a>
     <span class="k">def</span> <span class="nf">computeTrajectoryIdentifiability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ti</span><span class="p">,</span><span class="n">tf</span><span class="p">,</span><span class="n">torque</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">qp</span><span class="p">,</span><span class="n">qpp</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">        evaluates the rgression criteria ε(qi,qpi,qppi,x) , en fonction du trajectory certain computed </span>
-<span class="sd">        pervoiously C(qi,qpi,qppi) for fixed x system paramter vector :</span>
-<span class="sd">        &gt; the traj is identificable if the crietria is minimal in the most of time steps </span>
-<span class="sd">        TODO : find the rlation betwen the rgression crirtia evolution and the trajectory C over time t</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate the regression criteria ε(qi, qpi, qppi, x) based on a given trajectory.</span>
+
+<span class="sd">        This function computes the regression criteria for a fixed system parameter vector `x`</span>
+<span class="sd">        and a trajectory `C(qi, qpi, qppi)` computed previously. The trajectory is considered</span>
+<span class="sd">        identifiable if the criteria is minimal for most of the time steps.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            qi: Generalized position coordinates of the trajectory.</span>
+<span class="sd">            qpi: Generalized velocity coordinates of the trajectory.</span>
+<span class="sd">            qppi: Generalized acceleration coordinates of the trajectory.</span>
+<span class="sd">            x: Fixed system parameter vector.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Regression criteria value ε for the given trajectory and system parameters.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            - The trajectory is identifiable if ε remains minimal over most time steps.</span>
+<span class="sd">            - TODO:</span>
+<span class="sd">             Investigate the relationship between the regression criteria evolution and</span>
+<span class="sd">            the trajectory `C` over time `t`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">reg</span> <span class="o">=</span> <span class="n">Regressor</span><span class="p">()</span>
         <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
@@ -301,7 +321,7 @@
     
     
 <div class="viewcode-block" id="FourierGenerator.computeProba">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeProba">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.computeProba">[docs]</a>
     <span class="k">def</span> <span class="nf">computeProba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">eps_n</span><span class="p">,</span><span class="n">J_n</span><span class="p">,</span> <span class="n">bound</span><span class="p">):</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">J_n</span> <span class="o">&lt;=</span> <span class="n">bound</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">eps_n_</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eps_n</span><span class="p">[</span><span class="n">indices</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">)</span>
@@ -313,7 +333,7 @@
     
     
 <div class="viewcode-block" id="FourierGenerator.visualizeTrajectoryIdentifiability">
-<a class="viewcode-back" href="../../../pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.visualizeTrajectoryIdentifiability">[docs]</a>
+<a class="viewcode-back" href="../../../docs/source/pyDynaMapp.trajectory.html#pyDynaMapp.trajectory.fourier.FourierGenerator.visualizeTrajectoryIdentifiability">[docs]</a>
     <span class="k">def</span> <span class="nf">visualizeTrajectoryIdentifiability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">torque</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">qp</span><span class="p">,</span> <span class="n">qpp</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>    
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Visualize the trajectory identifiability criteria</span>
